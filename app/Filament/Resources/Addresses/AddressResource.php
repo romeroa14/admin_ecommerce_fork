@@ -9,6 +9,7 @@ use App\Filament\Resources\Addresses\Schemas\AddressForm;
 use App\Filament\Resources\Addresses\Tables\AddressesTable;
 use App\Models\Address;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -22,7 +23,7 @@ class AddressResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'address_line_1';
 
-    // protected static ?string $navigationGroup = 'Usuarios';
+    protected static UnitEnum|string|null $navigationGroup = 'Usuarios';
 
     protected static ?string $navigationLabel = 'Direcciones';
 

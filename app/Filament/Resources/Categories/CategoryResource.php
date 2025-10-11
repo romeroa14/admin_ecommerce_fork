@@ -8,7 +8,6 @@ use App\Filament\Resources\Categories\Pages\ListCategories;
 use App\Filament\Resources\Categories\Schemas\CategoryForm;
 use App\Filament\Resources\Categories\Tables\CategoriesTable;
 use App\Models\Category;
-use App\Enums\NavigationGroup;
 use BackedEnum;
 use UnitEnum;
 use Filament\Resources\Resource;
@@ -24,7 +23,7 @@ class CategoryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    // protected static ?string $navigationGroup = 'Catálogo';
+    protected static UnitEnum|string|null $navigationGroup = 'Catálogo';
 
     protected static ?string $navigationLabel = 'Categorías';
 

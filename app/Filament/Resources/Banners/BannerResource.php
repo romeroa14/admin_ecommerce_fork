@@ -25,7 +25,7 @@ class BannerResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    // protected static ?string $navigationGroup = 'Marketing';
+    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?string $navigationLabel = 'Banners';
 

@@ -8,7 +8,6 @@ use App\Filament\Resources\Brands\Pages\ListBrands;
 use App\Filament\Resources\Brands\Schemas\BrandForm;
 use App\Filament\Resources\Brands\Tables\BrandsTable;
 use App\Models\Brand;
-use App\Enums\NavigationGroup;
 use BackedEnum;
 use UnitEnum;
 use Filament\Resources\Resource;
@@ -20,11 +19,11 @@ class BrandResource extends Resource
 {
     protected static ?string $model = Brand::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    // protected static ?string $navigationGroup = 'Catálogo';
+    protected static UnitEnum|string|null $navigationGroup = 'Catálogo';
 
     protected static ?string $navigationLabel = 'Marcas';
 

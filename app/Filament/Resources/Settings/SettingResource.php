@@ -24,7 +24,7 @@ class SettingResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'key';
 
-    // protected static ?string $navigationGroup = 'Administración';
+    protected static UnitEnum|string|null $navigationGroup = 'Administración';
 
     protected static ?string $navigationLabel = 'Configuraciones';
 

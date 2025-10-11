@@ -24,7 +24,7 @@ class TaxResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    // protected static ?string $navigationGroup = 'Ventas';
+    protected static UnitEnum|string|null $navigationGroup = 'Ventas';
 
     protected static ?string $navigationLabel = 'Impuestos';
 

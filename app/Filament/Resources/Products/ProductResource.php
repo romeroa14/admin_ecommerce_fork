@@ -8,7 +8,6 @@ use App\Filament\Resources\Products\Pages\ListProducts;
 use App\Filament\Resources\Products\Schemas\ProductForm;
 use App\Filament\Resources\Products\Tables\ProductsTable;
 use App\Models\Product;
-use App\Enums\NavigationGroup;
 use BackedEnum;
 use UnitEnum;
 use Filament\Resources\Resource;
@@ -24,7 +23,7 @@ class ProductResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    // protected static ?string $navigationGroup = 'Catálogo';
+    protected static UnitEnum|string|null $navigationGroup = 'Catálogo';
 
     protected static ?string $navigationLabel = 'Productos';
 

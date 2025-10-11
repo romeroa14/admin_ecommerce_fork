@@ -24,7 +24,7 @@ class NewsletterSubscriberResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'email';
 
-    // protected static ?string $navigationGroup = 'Marketing';
+    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?string $navigationLabel = 'Newsletter';
 

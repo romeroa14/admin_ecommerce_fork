@@ -12,6 +12,7 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
+use Filament\Navigation\NavigationGroup;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -40,6 +41,28 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('🛍️ Catálogo')
+                    ->icon('heroicon-o-shopping-bag')
+                    ->collapsed(false),
+                NavigationGroup::make()
+                    ->label('💰 Ventas')
+                    ->icon('heroicon-o-currency-dollar')
+                    ->collapsed(false),
+                NavigationGroup::make()
+                    ->label('📢 Marketing')
+                    ->icon('heroicon-o-megaphone')
+                    ->collapsed(false),
+                NavigationGroup::make()
+                    ->label('👥 Usuarios')
+                    ->icon('heroicon-o-users')
+                    ->collapsed(false),
+                NavigationGroup::make()
+                    ->label('⚙️ Administración')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->collapsed(true),
             ])
             ->middleware([
                 EncryptCookies::class,

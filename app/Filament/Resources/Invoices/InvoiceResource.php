@@ -24,7 +24,7 @@ class InvoiceResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'invoice_number';
 
-    // protected static ?string $navigationGroup = 'Ventas';
+    protected static UnitEnum|string|null $navigationGroup = 'Ventas';
 
     protected static ?string $navigationLabel = 'Facturas';
 

@@ -8,7 +8,6 @@ use App\Filament\Resources\Tags\Pages\ListTags;
 use App\Filament\Resources\Tags\Schemas\TagForm;
 use App\Filament\Resources\Tags\Tables\TagsTable;
 use App\Models\Tag;
-use App\Enums\NavigationGroup;
 use BackedEnum;
 use UnitEnum;
 use Filament\Resources\Resource;
@@ -24,7 +23,7 @@ class TagResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    // protected static ?string $navigationGroup = 'Catálogo';
+    protected static UnitEnum|string|null $navigationGroup = 'Catálogo';
 
     protected static ?string $navigationLabel = 'Etiquetas';
 

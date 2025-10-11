@@ -24,7 +24,7 @@ class OrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'order_number';
 
-    // protected static ?string $navigationGroup = 'Ventas';
+    protected static UnitEnum|string|null $navigationGroup = 'Ventas';
 
     protected static ?string $navigationLabel = 'Pedidos';
 
