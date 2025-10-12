@@ -7,7 +7,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Tag;
-use App\Models\ProductVariant;
+use App\Models\Variant;
 use App\Models\ProductImage;
 use App\Models\Inventory;
 use Illuminate\Support\Str;
@@ -122,20 +122,13 @@ class ProductSeeder extends Seeder
         foreach ($products as $productData) {
             $product = Product::create($productData);
 
-            // Crear variantes para algunos productos
+            // Asociar variantes a productos
             if ($product->slug === 'nike-air-max-270') {
-                $sizes = ['8', '9', '10', '11', '12'];
-                foreach ($sizes as $size) {
-                    ProductVariant::create([
-                        'product_id' => $product->id,
-                        'name' => "Size {$size}",
-                        'sku' => "NAM270-BLK-{$size}",
-                        'stock' => rand(5, 15),
-                        'attributes' => ['size' => $size, 'color' => 'Black'],
-                        'is_default' => $size === '10',
-                        'is_active' => true,
-                    ]);
-                }
+                $sizeVariants = Variant::whereHas('variantGroup', function($query) {
+                    $query->where('name', 'Talla');
+                })->take(5)->get();
+                
+                $product->variants()->attach($sizeVariants->pluck('id'));
             }
 
             // Crear imágenes de ejemplo

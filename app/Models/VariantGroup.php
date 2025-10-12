@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class VariantGroup extends Model
@@ -26,6 +27,13 @@ class VariantGroup extends Model
     public function variants(): HasMany
     {
         return $this->hasMany(Variant::class);
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_variants')
+                    ->withPivot('variant_id')
+                    ->withTimestamps();
     }
 
     // Scope para grupos activos

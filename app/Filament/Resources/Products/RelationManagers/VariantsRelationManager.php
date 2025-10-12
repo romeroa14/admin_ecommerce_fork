@@ -194,7 +194,9 @@ class VariantsRelationManager extends RelationManager
                     ->using(function (array $data) {
                         // Obtener el producto actual desde el RelationManager
                         $product = $this->getOwnerRecord();
-                        $product->variants()->attach($data['variant_id']);
+                        $product->variants()->attach($data['variant_id'], [
+                            'variant_group_id' => $data['variant_group_id']
+                        ]);
                     })
                     ->successNotificationTitle('Variante asociada exitosamente'),
             ])  

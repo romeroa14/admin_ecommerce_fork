@@ -31,6 +31,7 @@ class Variant extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_variants')
+                    ->withPivot('variant_group_id')
                     ->withTimestamps();
     }
 
