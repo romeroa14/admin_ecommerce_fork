@@ -32,7 +32,7 @@ class ReviewResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Reseñas';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 14;
 
     public static function form(Schema $schema): Schema
     {

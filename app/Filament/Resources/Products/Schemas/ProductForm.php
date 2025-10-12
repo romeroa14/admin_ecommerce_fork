@@ -192,51 +192,7 @@ class ProductForm
                     ])
                     ->collapsible(),
 
-                Section::make('Variantes del Producto')
-                    ->schema([
-                        Repeater::make('product_variants')
-                            ->label('Variantes del Producto')
-                            ->schema([
-                                Grid::make(2)
-                                    ->schema([
-                                        TextInput::make('name')
-                                            ->label('Nombre de la Variante')
-                                            ->required(),
-
-                                        TextInput::make('sku')
-                                            ->label('SKU de la Variante')
-                                            ->required(),
-                                    ]),
-
-                                Grid::make(2)
-                                    ->schema([
-                                        TextInput::make('price')
-                                            ->label('Precio de la Variante')
-                                            ->numeric()
-                                            ->prefix('$')
-                                            ->step(0.01),
-
-                                        TextInput::make('stock')
-                                            ->label('Stock de la Variante')
-                                            ->numeric()
-                                            ->default(0)
-                                            ->minValue(0),
-                                    ]),
-
-                                Toggle::make('is_default')
-                                    ->label('Variante por Defecto'),
-
-                                KeyValue::make('attributes')
-                                    ->label('Atributos (Talla, Color, etc.)')
-                                    ->keyLabel('Atributo')
-                                    ->valueLabel('Valor')
-                                    ->columnSpanFull(),
-                            ])
-                            ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
-                            ->columnSpanFull(),
-                    ])
-                    ->collapsible(),
+                
 
                 Section::make('SEO y Metadatos')
                     ->schema([

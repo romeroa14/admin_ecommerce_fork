@@ -32,7 +32,7 @@ class CouponResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Cupones';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 11;
 
     public static function form(Schema $schema): Schema
     {

@@ -14,16 +14,11 @@ return new class extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->string('name'); // e.g., "Small - Red"
-            $table->string('sku')->unique();
-            $table->decimal('price', 10, 2)->nullable(); // Si es null, usa precio del producto
-            $table->decimal('compare_price', 10, 2)->nullable();
-            $table->integer('stock')->default(0);
-            $table->json('attributes')->nullable(); // {"size": "S", "color": "Red"}
-            $table->string('image')->nullable();
-            $table->boolean('is_default')->default(false);
-            $table->boolean('is_active')->default(true);
+            $table->foreignId('variant_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            
+            // Índices para optimización
+            $table->index(['product_id', 'variant_id']);
         });
     }
 

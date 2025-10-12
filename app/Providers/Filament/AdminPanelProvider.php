@@ -56,13 +56,13 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-megaphone')
                     ->collapsed(false),
                 NavigationGroup::make()
-                    ->label('👥 Usuarios')
-                    ->icon('heroicon-o-users')
-                    ->collapsed(false),
-                NavigationGroup::make()
                     ->label('⚙️ Administración')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->collapsed(true),
+                NavigationGroup::make()
+                    ->label('👥 Usuarios')
+                    ->icon('heroicon-o-users')
+                    ->collapsed(false),
             ])
             ->middleware([
                 EncryptCookies::class,

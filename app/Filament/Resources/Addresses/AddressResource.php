@@ -31,7 +31,7 @@ class AddressResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Direcciones';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 18;
 
     public static function form(Schema $schema): Schema
     {

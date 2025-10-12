@@ -24,6 +24,7 @@ class BrandResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static UnitEnum|string|null $navigationGroup = 'Catálogo';
+    
 
     protected static ?string $navigationLabel = 'Marcas';
 

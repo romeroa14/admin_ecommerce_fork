@@ -51,9 +51,10 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function variants(): HasMany
+    public function variants(): BelongsToMany
     {
-        return $this->hasMany(ProductVariant::class);
+        return $this->belongsToMany(Variant::class, 'product_variants')
+                    ->withTimestamps();
     }
 
     public function images(): HasMany

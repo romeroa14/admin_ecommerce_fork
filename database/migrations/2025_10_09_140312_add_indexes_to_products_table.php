@@ -22,11 +22,9 @@ return new class extends Migration
             $table->index(['updated_at']);
         });
 
-        Schema::table('product_variants', function (Blueprint $table) {
-            $table->index(['product_id', 'is_active']);
-            $table->index(['sku']);
-            $table->index(['is_default']);
-        });
+        // Schema::table('product_variants', function (Blueprint $table) {
+        //     $table->index(['product_id', 'variant_id']);
+        // });
 
         Schema::table('product_images', function (Blueprint $table) {
             $table->index(['product_id', 'is_primary']);
@@ -75,11 +73,9 @@ return new class extends Migration
             $table->dropIndex(['updated_at']);
         });
 
-        Schema::table('product_variants', function (Blueprint $table) {
-            $table->dropIndex(['product_id', 'is_active']);
-            $table->dropIndex(['sku']);
-            $table->dropIndex(['is_default']);
-        });
+        // Schema::table('product_variants', function (Blueprint $table) {
+        //     $table->dropIndex(['product_id', 'variant_id']);
+        // });
 
         Schema::table('product_images', function (Blueprint $table) {
             $table->dropIndex(['product_id', 'is_primary']);

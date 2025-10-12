@@ -20,6 +20,8 @@ class RoleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
+    protected static UnitEnum|string|null $navigationGroup = 'Usuarios';
+
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Roles';
@@ -28,7 +30,7 @@ class RoleResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Roles';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 19;
 
     public static function form(Schema $schema): Schema
     {
