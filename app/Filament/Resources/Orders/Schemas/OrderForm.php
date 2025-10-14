@@ -36,8 +36,50 @@ class OrderForm
                                     ->relationship('user', 'name')
                                     ->searchable()
                                     ->preload()
-                                    ->required(),
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        $set('cart_id', null);
+                                    }),
                             ]),
+
+                        Select::make('cart_id')
+                            ->label('Carrito del Cliente')
+                            ->options(function (callable $get) {
+                                $userId = $get('user_id');
+                                if (!$userId) {
+                                    return [];
+                                }
+                                
+                                $carts = \App\Models\Cart::where('user_id', $userId)
+                                    ->whereNotNull('items')
+                                    ->whereRaw("jsonb_array_length(items::jsonb) > 0")
+                                    ->get();
+                                
+                                $options = [];
+                                foreach ($carts as $cart) {
+                                    $itemsCount = $cart->getItemsCount();
+                                    $total = $cart->total;
+                                    $options[$cart->id] = "Carrito #{$cart->id} - {$itemsCount} items - €{$total}";
+                                }
+                                
+                                return $options;
+                            })
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                if ($state) {
+                                    $cart = \App\Models\Cart::find($state);
+                                    if ($cart) {
+                                        $set('subtotal', $cart->subtotal);
+                                        $set('discount_amount', $cart->discount_amount);
+                                        $set('tax_amount', $cart->tax_amount);
+                                        $set('total_amount', $cart->total);
+                                    }
+                                }
+                            })
+                            ->helperText('Selecciona un carrito activo del cliente para importar los productos y totales'),
 
                         Grid::make(2)
                             ->schema([
@@ -75,21 +117,101 @@ class OrderForm
                             ->schema([
                                 Select::make('shipping_address_id')
                                     ->label('Dirección de Envío')
-                                    ->relationship('shippingAddress', 'address_line_1')
+                                    ->options(function (callable $get) {
+                                        $userId = $get('user_id');
+                                        if (!$userId) {
+                                            return [];
+                                        }
+                                        
+                                        $addresses = Address::where('user_id', $userId)->get();
+                                        $options = [];
+                                        foreach ($addresses as $address) {
+                                            $options[$address->id] = $address->first_name . ' ' . $address->last_name . ' - ' . $address->address_line_1;
+                                        }
+                                        return $options;
+                                    })
                                     ->searchable()
                                     ->preload()
-                                    ->getOptionLabelFromRecordUsing(fn (Address $record): string => 
-                                        $record->first_name . ' ' . $record->last_name . ' - ' . $record->address_line_1
-                                    ),
+                                    ->createOptionForm([
+                                        \Filament\Forms\Components\TextInput::make('first_name')
+                                            ->label('Nombre')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('last_name')
+                                            ->label('Apellido')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('address_line_1')
+                                            ->label('Dirección')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('city')
+                                            ->label('Ciudad')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('postal_code')
+                                            ->label('Código Postal')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('country')
+                                            ->label('País')
+                                            ->required()
+                                            ->default('España'),
+                                    ])
+                                    ->createOptionUsing(function (array $data, callable $get) {
+                                        $userId = $get('user_id');
+                                        if (!$userId) {
+                                            throw new \Exception('Debe seleccionar un cliente primero');
+                                        }
+                                        
+                                        $data['user_id'] = $userId;
+                                        $data['type'] = 'shipping';
+                                        return Address::create($data)->id;
+                                    }),
 
                                 Select::make('billing_address_id')
                                     ->label('Dirección de Facturación')
-                                    ->relationship('billingAddress', 'address_line_1')
+                                    ->options(function (callable $get) {
+                                        $userId = $get('user_id');
+                                        if (!$userId) {
+                                            return [];
+                                        }
+                                        
+                                        $addresses = Address::where('user_id', $userId)->get();
+                                        $options = [];
+                                        foreach ($addresses as $address) {
+                                            $options[$address->id] = $address->first_name . ' ' . $address->last_name . ' - ' . $address->address_line_1;
+                                        }
+                                        return $options;
+                                    })
                                     ->searchable()
                                     ->preload()
-                                    ->getOptionLabelFromRecordUsing(fn (Address $record): string => 
-                                        $record->first_name . ' ' . $record->last_name . ' - ' . $record->address_line_1
-                                    ),
+                                    ->createOptionForm([
+                                        \Filament\Forms\Components\TextInput::make('first_name')
+                                            ->label('Nombre')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('last_name')
+                                            ->label('Apellido')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('address_line_1')
+                                            ->label('Dirección')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('city')
+                                            ->label('Ciudad')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('postal_code')
+                                            ->label('Código Postal')
+                                            ->required(),
+                                        \Filament\Forms\Components\TextInput::make('country')
+                                            ->label('País')
+                                            ->required()
+                                            ->default('España'),
+                                    ])
+                                    ->createOptionUsing(function (array $data, callable $get) {
+                                        $userId = $get('user_id');
+                                        if (!$userId) {
+                                            throw new \Exception('Debe seleccionar un cliente primero');
+                                        }
+                                        
+                                        $data['user_id'] = $userId;
+                                        $data['type'] = 'billing';
+                                        return Address::create($data)->id;
+                                    }),
                             ]),
                     ])
                     ->collapsible(),
@@ -127,15 +249,21 @@ class OrderForm
                                     ->label('Subtotal')
                                     ->required()
                                     ->numeric()
-                                    ->prefix('$')
-                                    ->step(0.01),
+                                    ->prefix('€')
+                                    ->step(0.01)
+                                    ->disabled()
+                                    ->dehydrated(),
 
                                 TextInput::make('discount_amount')
                                     ->label('Descuento')
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix('€')
                                     ->step(0.01)
-                                    ->default(0),
+                                    ->default(0)
+                                    ->live()
+                                    ->afterStateUpdated(function (callable $set, callable $get) {
+                                        self::calculateTotal($set, $get);
+                                    }),
                             ]),
 
                         Grid::make(2)
@@ -143,24 +271,34 @@ class OrderForm
                                 TextInput::make('tax_amount')
                                     ->label('Impuestos')
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix('€')
                                     ->step(0.01)
-                                    ->default(0),
+                                    ->default(0)
+                                    ->live()
+                                    ->afterStateUpdated(function (callable $set, callable $get) {
+                                        self::calculateTotal($set, $get);
+                                    }),
 
                                 TextInput::make('shipping_amount')
                                     ->label('Envío')
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix('€')
                                     ->step(0.01)
-                                    ->default(0),
+                                    ->default(0)
+                                    ->live()
+                                    ->afterStateUpdated(function (callable $set, callable $get) {
+                                        self::calculateTotal($set, $get);
+                                    }),
                             ]),
 
                         TextInput::make('total_amount')
                             ->label('Total')
                             ->required()
                             ->numeric()
-                            ->prefix('$')
+                            ->prefix('€')
                             ->step(0.01)
+                            ->disabled()
+                            ->dehydrated()
                             ->columnSpanFull(),
 
                         Placeholder::make('total_calculation')
@@ -171,11 +309,11 @@ class OrderForm
                                 $tax = $get('tax_amount') ?? 0;
                                 $shipping = $get('shipping_amount') ?? 0;
                                 $total = $subtotal - $discount + $tax + $shipping;
-                                return 'Subtotal: $' . number_format($subtotal, 2) . 
-                                       ' - Descuento: $' . number_format($discount, 2) . 
-                                       ' + Impuestos: $' . number_format($tax, 2) . 
-                                       ' + Envío: $' . number_format($shipping, 2) . 
-                                       ' = Total: $' . number_format($total, 2);
+                                return 'Subtotal: €' . number_format($subtotal, 2) . 
+                                       ' - Descuento: €' . number_format($discount, 2) . 
+                                       ' + Impuestos: €' . number_format($tax, 2) . 
+                                       ' + Envío: €' . number_format($shipping, 2) . 
+                                       ' = Total: €' . number_format($total, 2);
                             })
                             ->columnSpanFull(),
                     ])
@@ -217,5 +355,16 @@ class OrderForm
                     ])
                     ->collapsible(),
             ]);
+    }
+
+    private static function calculateTotal(callable $set, callable $get): void
+    {
+        $subtotal = $get('subtotal') ?? 0;
+        $discount = $get('discount_amount') ?? 0;
+        $tax = $get('tax_amount') ?? 0;
+        $shipping = $get('shipping_amount') ?? 0;
+        $total = $subtotal - $discount + $tax + $shipping;
+        
+        $set('total_amount', $total);
     }
 }

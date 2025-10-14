@@ -51,11 +51,11 @@ return new class extends Migration
             $table->index(['status']);
         });
 
-        Schema::table('discounts', function (Blueprint $table) {
-            $table->index(['is_active', 'starts_at', 'expires_at']);
-            $table->index(['code']);
-            $table->index(['type']);
-        });
+        // Schema::table('discounts', function (Blueprint $table) {
+        //     $table->index(['is_active', 'starts_at', 'expires_at']);
+        //     $table->index(['code']);
+        //     $table->index(['type']);
+        // });
     }
 
     /**

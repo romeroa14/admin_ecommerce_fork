@@ -5,6 +5,10 @@ namespace App\Filament\Resources\Products\Tables;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Cart;
+use App\Models\User;
+use App\Models\VariantGroup;
+use App\Models\Variant;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -19,10 +23,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
 use Filament\Tables\Table;
 use Filament\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Filament\Notifications\Notification;
 
 class ProductsTable
 {
@@ -217,6 +223,100 @@ class ProductsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                Action::make('add_to_cart')
+                    ->label('Agregar al Carrito')
+                    ->icon('heroicon-o-shopping-cart')
+                    ->color('success')
+                    ->form([
+                        Select::make('user_id')
+                            ->label('Usuario')
+                            ->options(User::all()->pluck('name', 'id'))
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        TextInput::make('quantity')
+                            ->label('Cantidad')
+                            ->numeric()
+                            ->required()
+                            ->minValue(1)
+                            ->default(1),
+                        Repeater::make('variants')
+                            ->label('Variantes')
+                            ->schema([
+                                Select::make('variant_group_id')
+                                    ->label('Grupo de Variante')
+                                    ->options(VariantGroup::all()->pluck('name', 'id'))
+                                    ->required()
+                                    ->searchable()
+                                    ->preload()
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        $set('variant_id', null);
+                                    }),
+                                Select::make('variant_id')
+                                    ->label('Variante')
+                                    ->options(function (callable $get) {
+                                        $groupId = $get('variant_group_id');
+                                        if (!$groupId) {
+                                            return [];
+                                        }
+                                        return Variant::where('variant_group_id', $groupId)
+                                            ->where('status', 'active')
+                                            ->get()
+                                            ->pluck('name', 'id')
+                                            ->toArray();
+                                    })
+                                    ->required()
+                                    ->searchable()
+                                    ->preload(),
+                            ])
+                            ->defaultItems(0)
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => 
+                                $state['variant_group_id'] && $state['variant_id'] 
+                                    ? "Grupo: {$state['variant_group_id']} - Variante: {$state['variant_id']}"
+                                    : null
+                            ),
+                    ])
+                    ->action(function (Product $record, array $data): void {
+                        // Buscar o crear carrito para el usuario
+                        $cart = Cart::firstOrCreate(
+                            ['user_id' => $data['user_id']],
+                            [
+                                'session_id' => 'session_' . $data['user_id'],
+                                'subtotal' => 0,
+                                'discount_amount' => 0,
+                                'tax_amount' => 0,
+                                'total' => 0,
+                                'expires_at' => now()->addDays(7),
+                            ]
+                        );
+                        
+                        // Procesar variantes
+                        $variants = [];
+                        foreach ($data['variants'] ?? [] as $variantData) {
+                            if ($variantData['variant_group_id'] && $variantData['variant_id']) {
+                                $variantGroup = VariantGroup::find($variantData['variant_group_id']);
+                                $variant = Variant::find($variantData['variant_id']);
+                                if ($variantGroup && $variant) {
+                                    $variants[$variantGroup->name] = $variant->name;
+                                }
+                            }
+                        }
+                        
+                        // Agregar producto al carrito con variantes
+                        $cart->addProduct($record->id, $data['quantity'], $variants);
+                        
+                        Notification::make()
+                            ->title('Producto agregado al carrito')
+                            ->body("Se agregó {$data['quantity']} x {$record->name} al carrito de {$cart->user->name}")
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading('Agregar al Carrito')
+                    ->modalDescription('Selecciona el usuario, cantidad y variantes para agregar este producto al carrito.')
+                    ->modalSubmitActionLabel('Agregar'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

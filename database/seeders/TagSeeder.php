@@ -37,13 +37,16 @@ class TagSeeder extends Seeder
         ];
 
         foreach ($tags as $tag) {
-            Tag::create([
-                'name' => $tag['name'],
-                'slug' => Str::slug($tag['name']),
-                'type' => $tag['type'],
-                'color' => $tag['color'],
-                'is_active' => true,
-            ]);
+            Tag::firstOrCreate(
+                ['slug' => Str::slug($tag['name'])],
+                [
+                    'name' => $tag['name'],
+                    'slug' => Str::slug($tag['name']),
+                    'type' => $tag['type'],
+                    'color' => $tag['color'],
+                    'is_active' => true,
+                ]
+            );
         }
 
         $this->command->info('✅ Etiquetas creadas exitosamente!');

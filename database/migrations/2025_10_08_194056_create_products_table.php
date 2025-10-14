@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->decimal('compare_price', 10, 2)->nullable();
             $table->decimal('cost', 10, 2)->nullable();
+            $table->decimal('discount_percentage', 5, 2)->default(0);
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('brand_id')->nullable()->constrained()->onDelete('set null');
             $table->integer('stock')->default(0);

@@ -64,6 +64,15 @@ class ProductForm
                                     ->numeric()
                                     ->prefix('$')
                                     ->step(0.01),
+
+                                TextInput::make('discount_percentage')
+                                    ->label('Descuento (%)')
+                                    ->numeric()
+                                    ->suffix('%')
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                                    ->default(0)
+                                    ->step(0.01),
                             ]),
 
                         Grid::make(2)

@@ -51,13 +51,19 @@ class VariantSeeder extends Seeder
         ];
 
         foreach ($variants as $variant) {
-            Variant::create([
-                'name' => $variant['name'],
-                'variant_group_id' => $variant['variant_group_id'],
-                'description' => $variant['description'],
-                'status' => 'active',
-                'sort_order' => $variant['sort_order'],
-            ]);
+            Variant::firstOrCreate(
+                [
+                    'name' => $variant['name'],
+                    'variant_group_id' => $variant['variant_group_id']
+                ],
+                [
+                    'name' => $variant['name'],
+                    'variant_group_id' => $variant['variant_group_id'],
+                    'description' => $variant['description'],
+                    'status' => 'active',
+                    'sort_order' => $variant['sort_order'],
+                ]
+            );
         }
 
         $this->command->info('✅ Variantes genéricas creadas exitosamente!');

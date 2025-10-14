@@ -18,6 +18,7 @@ class Product extends Model
         'price',
         'compare_price',
         'cost',
+        'discount_percentage',
         'category_id',
         'brand_id',
         'stock',
@@ -37,6 +38,7 @@ class Product extends Model
         'price' => 'decimal:2',
         'compare_price' => 'decimal:2',
         'cost' => 'decimal:2',
+        'discount_percentage' => 'decimal:2',
         'is_featured' => 'boolean',
         'track_inventory' => 'boolean',
     ];

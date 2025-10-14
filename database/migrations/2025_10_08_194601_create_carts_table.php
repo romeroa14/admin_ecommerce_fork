@@ -16,10 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('session_id')->nullable(); // Para usuarios no logueados
             $table->foreignId('coupon_id')->nullable()->constrained()->onDelete('set null');
-            $table->decimal('subtotal', 10, 2)->default(0);
-            $table->decimal('discount_amount', 10, 2)->default(0);
-            $table->decimal('tax_amount', 10, 2)->default(0);
-            $table->decimal('total', 10, 2)->default(0);
+            $table->json('items')->nullable(); // Array de items del carrito
+            // Los totales se calculan dinámicamente, no se almacenan en el carrito
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });

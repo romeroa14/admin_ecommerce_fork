@@ -19,7 +19,7 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear categorías
+        // Crear categorías (usar firstOrCreate para evitar duplicados)
         $categories = [
             ['name' => 'Electronics', 'slug' => 'electronics', 'description' => 'Electronic devices and gadgets'],
             ['name' => 'Clothing', 'slug' => 'clothing', 'description' => 'Fashion and apparel'],
@@ -28,10 +28,13 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($categories as $categoryData) {
-            Category::create($categoryData);
+            Category::firstOrCreate(
+                ['slug' => $categoryData['slug']],
+                $categoryData
+            );
         }
 
-        // Crear marcas
+        // Crear marcas (usar firstOrCreate para evitar duplicados)
         $brands = [
             ['name' => 'Apple', 'slug' => 'apple', 'description' => 'Technology company'],
             ['name' => 'Nike', 'slug' => 'nike', 'description' => 'Sports brand'],
@@ -40,10 +43,13 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($brands as $brandData) {
-            Brand::create($brandData);
+            Brand::firstOrCreate(
+                ['slug' => $brandData['slug']],
+                $brandData
+            );
         }
 
-        // Crear tags
+        // Crear tags (usar firstOrCreate para evitar duplicados)
         $tags = [
             ['name' => 'New', 'slug' => 'new', 'type' => 'general', 'color' => '#10B981'],
             ['name' => 'Sale', 'slug' => 'sale', 'type' => 'promotion', 'color' => '#EF4444'],
@@ -52,7 +58,10 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($tags as $tagData) {
-            Tag::create($tagData);
+            Tag::firstOrCreate(
+                ['slug' => $tagData['slug']],
+                $tagData
+            );
         }
 
         // Crear productos de ejemplo
@@ -66,6 +75,7 @@ class ProductSeeder extends Seeder
                 'price' => 999.99,
                 'compare_price' => 1099.99,
                 'cost' => 800.00,
+                'discount_percentage' => 10.00,
                 'category_id' => Category::where('slug', 'electronics')->first()->id,
                 'brand_id' => Brand::where('slug', 'apple')->first()->id,
                 'stock' => 50,
@@ -85,6 +95,7 @@ class ProductSeeder extends Seeder
                 'short_description' => 'Comfortable running shoes',
                 'price' => 150.00,
                 'compare_price' => 180.00,
+                'discount_percentage' => 15.00,
                 'cost' => 100.00,
                 'category_id' => Category::where('slug', 'clothing')->first()->id,
                 'brand_id' => Brand::where('slug', 'nike')->first()->id,
@@ -106,6 +117,7 @@ class ProductSeeder extends Seeder
                 'price' => 799.99,
                 'compare_price' => 899.99,
                 'cost' => 600.00,
+                'discount_percentage' => 5.00,
                 'category_id' => Category::where('slug', 'electronics')->first()->id,
                 'brand_id' => Brand::where('slug', 'samsung')->first()->id,
                 'stock' => 30,
@@ -120,15 +132,23 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $productData) {
-            $product = Product::create($productData);
+            $product = Product::firstOrCreate(
+                ['sku' => $productData['sku']],
+                $productData
+            );
 
-            // Asociar variantes a productos
+            // Asociar variantes a productos (usar sync para evitar duplicados)
             if ($product->slug === 'nike-air-max-270') {
                 $sizeVariants = Variant::whereHas('variantGroup', function($query) {
                     $query->where('name', 'Talla');
                 })->take(5)->get();
                 
-                $product->variants()->attach($sizeVariants->pluck('id'));
+                // Crear array con variant_group_id para sync
+                $variantsData = [];
+                foreach ($sizeVariants as $variant) {
+                    $variantsData[$variant->id] = ['variant_group_id' => $variant->variant_group_id];
+                }
+                $product->variants()->sync($variantsData);
             }
 
             // Crear imágenes de ejemplo
@@ -150,11 +170,12 @@ class ProductSeeder extends Seeder
                 'notes' => 'Initial stock',
             ]);
 
-            // Asignar tags
-            $product->tags()->attach(Tag::where('name', 'New')->first()->id);
+            // Asignar tags (usar sync para evitar duplicados)
+            $tagIds = [Tag::where('name', 'New')->first()->id];
             if ($product->is_featured) {
-                $product->tags()->attach(Tag::where('name', 'Featured')->first()->id);
+                $tagIds[] = Tag::where('name', 'Featured')->first()->id;
             }
+            $product->tags()->sync($tagIds);
         }
 
         $this->command->info('Products seeded successfully!');

@@ -44,7 +44,10 @@ class VariantGroupSeeder extends Seeder
         ];
 
         foreach ($groups as $group) {
-            VariantGroup::create($group);
+            VariantGroup::firstOrCreate(
+                ['name' => $group['name']],
+                $group
+            );
         }
 
         $this->command->info('✅ Grupos de variantes creados exitosamente!');

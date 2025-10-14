@@ -12,6 +12,7 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'cart_id',
         'shipping_address_id',
         'billing_address_id',
         'coupon_id',
@@ -46,6 +47,11 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function cart(): BelongsTo
+    {
+        return $this->belongsTo(Cart::class);
     }
 
     public function shippingAddress(): BelongsTo

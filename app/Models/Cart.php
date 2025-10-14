@@ -12,18 +12,12 @@ class Cart extends Model
         'user_id',
         'session_id',
         'coupon_id',
-        'subtotal',
-        'discount_amount',
-        'tax_amount',
-        'total',
+        'items',
         'expires_at',
     ];
 
     protected $casts = [
-        'subtotal' => 'decimal:2',
-        'discount_amount' => 'decimal:2',
-        'tax_amount' => 'decimal:2',
-        'total' => 'decimal:2',
+        'items' => 'array',
         'expires_at' => 'datetime',
     ];
 
@@ -33,35 +27,109 @@ class Cart extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function items(): HasMany
+
+    public function order(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasMany(CartItem::class);
+        return $this->hasOne(Order::class);
     }
 
-    // Métodos de cálculo automático
-    public function calculateTotals(): void
+    public function orderItems(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        $items = $this->items;
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Agregar producto al carrito
+     */
+    public function addProduct(int $productId, int $quantity = 1, array $variants = []): void
+    {
+        $items = $this->items ?? [];
         
-        $this->subtotal = $items->sum('subtotal');
-        $this->tax_amount = $this->subtotal * 0.21; // IVA 21%
-        $this->total = $this->subtotal + $this->tax_amount - $this->discount_amount;
+        // Buscar si el producto ya existe
+        $existingIndex = $this->findItemIndex($productId, $variants);
         
+        if ($existingIndex !== null) {
+            // Actualizar cantidad
+            $items[$existingIndex]['quantity'] += $quantity;
+        } else {
+            // Agregar nuevo item
+            $product = \App\Models\Product::find($productId);
+            if ($product) {
+                $items[] = [
+                    'product_id' => $productId,
+                    'quantity' => $quantity,
+                    'price' => $product->price,
+                    'discount_percentage' => $product->discount_percentage ?? 0,
+                    'variants' => $variants,
+                    'added_at' => now()->toISOString(),
+                ];
+            }
+        }
+        
+        $this->items = $items;
         $this->save();
+    }
+
+    /**
+     * Calcular totales del carrito (solo para mostrar, no se guardan)
+     */
+    public function getTotals(): array
+    {
+        $items = $this->items ?? [];
+        $subtotal = 0;
+        $totalDiscount = 0;
+        
+        foreach ($items as $item) {
+            $price = $item['price'] ?? 0;
+            $quantity = $item['quantity'] ?? 1;
+            $discountPercentage = $item['discount_percentage'] ?? 0;
+            
+            $itemDiscount = ($price * $discountPercentage) / 100;
+            $totalDiscount += $itemDiscount * $quantity;
+            
+            $itemSubtotal = ($price - $itemDiscount) * $quantity;
+            $subtotal += $itemSubtotal;
+        }
+        
+        $taxAmount = $subtotal * 0.21; // IVA 21%
+        $total = $subtotal + $taxAmount;
+        
+        return [
+            'subtotal' => round($subtotal, 2),
+            'discount_amount' => round($totalDiscount, 2),
+            'tax_amount' => round($taxAmount, 2),
+            'total' => round($total, 2),
+        ];
     }
 
     public function isEmpty(): bool
     {
-        return $this->items()->count() === 0;
+        return empty($this->items);
     }
 
     public function getFormattedTotal(): string
     {
-        return '€' . number_format($this->total, 2);
+        $totals = $this->getTotals();
+        return '€' . number_format($totals['total'], 2);
     }
 
     public function getItemsCount(): int
     {
-        return $this->items()->sum('quantity');
+        $items = $this->items ?? [];
+        return array_sum(array_column($items, 'quantity'));
+    }
+
+    private function findItemIndex(int $productId, array $variants): ?int
+    {
+        $items = $this->items ?? [];
+        
+        foreach ($items as $index => $item) {
+            if ($item['product_id'] == $productId && 
+                json_encode($item['variants'] ?? []) === json_encode($variants)) {
+                return $index;
+            }
+        }
+        
+        return null;
     }
 }

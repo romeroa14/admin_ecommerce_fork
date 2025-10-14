@@ -34,12 +34,14 @@ class CartsTable
 
                 \Filament\Tables\Columns\TextColumn::make('subtotal')
                     ->label('Subtotal')
+                    ->getStateUsing(fn ($record) => $record->getTotals()['subtotal'])
                     ->money('EUR')
                     ->sortable()
                     ->alignEnd(),
 
                 \Filament\Tables\Columns\TextColumn::make('discount_amount')
                     ->label('Descuento')
+                    ->getStateUsing(fn ($record) => $record->getTotals()['discount_amount'])
                     ->money('EUR')
                     ->sortable()
                     ->alignEnd()
@@ -47,12 +49,14 @@ class CartsTable
 
                 \Filament\Tables\Columns\TextColumn::make('tax_amount')
                     ->label('Impuestos')
+                    ->getStateUsing(fn ($record) => $record->getTotals()['tax_amount'])
                     ->money('EUR')
                     ->sortable()
                     ->alignEnd(),
 
                 \Filament\Tables\Columns\TextColumn::make('total')
                     ->label('Total')
+                    ->getStateUsing(fn ($record) => $record->getTotals()['total'])
                     ->money('EUR')
                     ->sortable()
                     ->alignEnd()
@@ -73,11 +77,14 @@ class CartsTable
 
                 \Filament\Tables\Filters\Filter::make('has_items')
                     ->label('Con Items')
-                    ->query(fn ($query) => $query->whereHas('items')),
+                    ->query(fn ($query) => $query->whereNotNull('items')->whereRaw("jsonb_array_length(items::jsonb) > 0")),
 
                 \Filament\Tables\Filters\Filter::make('empty_carts')
                     ->label('Carritos Vacíos')
-                    ->query(fn ($query) => $query->whereDoesntHave('items')),
+                    ->query(fn ($query) => $query->where(function ($q) {
+                        $q->whereNull('items')
+                          ->orWhereRaw("jsonb_array_length(items::jsonb) = 0");
+                    })),
 
                 \Filament\Tables\Filters\Filter::make('expired')
                     ->label('Expirados')
