@@ -27,6 +27,10 @@ class Cart extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
+    }
 
     public function order(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
