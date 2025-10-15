@@ -59,7 +59,8 @@ class OrderForm
                                 $options = [];
                                 foreach ($carts as $cart) {
                                     $itemsCount = $cart->getItemsCount();
-                                    $total = $cart->total;
+                                    $totals = $cart->getTotals();
+                                    $total = $totals['total'];
                                     $options[$cart->id] = "Carrito #{$cart->id} - {$itemsCount} items - €{$total}";
                                 }
                                 
@@ -72,10 +73,13 @@ class OrderForm
                                 if ($state) {
                                     $cart = \App\Models\Cart::find($state);
                                     if ($cart) {
-                                        $set('subtotal', $cart->subtotal);
-                                        $set('discount_amount', $cart->discount_amount);
-                                        $set('tax_amount', $cart->tax_amount);
-                                        $set('total_amount', $cart->total);
+                                        // Obtener totales calculados del carrito
+                                        $totals = $cart->getTotals();
+                                        
+                                        $set('subtotal', $totals['subtotal']);
+                                        $set('discount_amount', $totals['discount_amount']);
+                                        $set('tax_amount', $totals['tax_amount']);
+                                        $set('total_amount', $totals['total']);
                                     }
                                 }
                             })
@@ -241,8 +245,55 @@ class OrderForm
                     ])
                     ->collapsible(),
 
-                Section::make('Totales')
+                Section::make('Totales del Pedido')
                     ->schema([
+                        // Placeholder::make('totals_info')
+                        //     ->label('')
+                        //     ->content(function (Get $get): string {
+                        //         $cartId = $get('cart_id');
+                        //         if (!$cartId) {
+                        //             return '<div style="text-align: center; padding: 20px; color: #6b7280; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        //                         <p style="margin: 0;">Selecciona un carrito para ver los totales</p>
+                        //                     </div>';
+                        //         }
+                                
+                        //         $cart = \App\Models\Cart::find($cartId);
+                        //         if (!$cart) {
+                        //             return '<div style="text-align: center; padding: 20px; color: #ef4444; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca;">
+                        //                         <p style="margin: 0;">Carrito no encontrado</p>
+                        //                     </div>';
+                        //         }
+                                
+                        //         $totals = $cart->getTotals();
+                        //         $itemsCount = $cart->getItemsCount();
+                                
+                        //         return "
+                        //             <div style='background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;'>
+                        //                 <h3 style='margin: 0 0 15px 0; color: #374151; font-size: 18px;'>Resumen del Carrito ({$itemsCount} items)</h3>
+                        //                 <div style='margin-bottom: 15px;'>
+                        //                     <div style='display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;'>
+                        //                         <span style='font-weight: 500;'>Subtotal:</span>
+                        //                         <span style='font-weight: 600;'>€{$totals['subtotal']}</span>
+                        //                     </div>
+                        //                     <div style='display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;'>
+                        //                         <span style='font-weight: 500;'>Descuento:</span>
+                        //                         <span style='font-weight: 600; color: #f59e0b;'>-€{$totals['discount_amount']}</span>
+                        //                     </div>
+                        //                     <div style='display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;'>
+                        //                         <span style='font-weight: 500;'>Impuestos (21%):</span>
+                        //                         <span style='font-weight: 600;'>€{$totals['tax_amount']}</span>
+                        //                     </div>
+                        //                 </div>
+                        //                 <div style='display: flex; justify-content: space-between; padding: 12px 0; border-top: 2px solid #22c55e; background: #f0fdf4; border-radius: 6px; padding: 12px;'>
+                        //                     <span style='font-weight: bold; font-size: 18px; color: #059669;'>Total del Carrito:</span>
+                        //                     <span style='font-weight: bold; font-size: 20px; color: #059669;'>€{$totals['total']}</span>
+                        //                 </div>
+                        //             </div>
+                        //         ";
+                        //     })
+                        //     ->html()
+                        //     ->columnSpanFull(),
+
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('subtotal')
@@ -292,7 +343,7 @@ class OrderForm
                             ]),
 
                         TextInput::make('total_amount')
-                            ->label('Total')
+                            ->label('Total Final')
                             ->required()
                             ->numeric()
                             ->prefix('€')
@@ -302,7 +353,7 @@ class OrderForm
                             ->columnSpanFull(),
 
                         Placeholder::make('total_calculation')
-                            ->label('Cálculo del Total')
+                            ->label('Cálculo del Total Final')
                             ->content(function (Get $get): string {
                                 $subtotal = $get('subtotal') ?? 0;
                                 $discount = $get('discount_amount') ?? 0;
@@ -313,7 +364,7 @@ class OrderForm
                                        ' - Descuento: €' . number_format($discount, 2) . 
                                        ' + Impuestos: €' . number_format($tax, 2) . 
                                        ' + Envío: €' . number_format($shipping, 2) . 
-                                       ' = Total: €' . number_format($total, 2);
+                                       ' = Total Final: €' . number_format($total, 2);
                             })
                             ->columnSpanFull(),
                     ])
