@@ -12,14 +12,6 @@ class CurrencySelector extends Widget
 
     protected int | string | array $columnSpan = 'full';
 
-    public function getViewData(): array
-    {
-        return [
-            'currencies' => Currency::active()->ordered()->get(),
-            'currentCurrency' => $this->getCurrentCurrency(),
-        ];
-    }
-
     public function getCurrentCurrency()
     {
         $currencyId = Session::get('selected_currency');
@@ -30,18 +22,9 @@ class CurrencySelector extends Widget
         return Currency::default()->first();
     }
 
-    public function updateCurrency($currencyId)
+    public function getCurrencies()
     {
-        if ($currencyId) {
-            $currency = Currency::find($currencyId);
-            if ($currency) {
-                Session::put('selected_currency', $currency->id);
-                Session::put('selected_currency_code', $currency->code);
-                Session::put('selected_currency_symbol', $currency->symbol);
-                Session::put('selected_currency_position', $currency->symbol_position);
-                
-                return redirect()->to(request()->url());
-            }
-        }
+        return Currency::active()->ordered()->get();
     }
 }
+
