@@ -2,21 +2,20 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\CurrencySelector;
 use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
+use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
-use Filament\Navigation\NavigationGroup;
+use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -32,37 +31,15 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Dashboard::class,
+                Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
-            ->navigationGroups([
-                NavigationGroup::make()
-                    ->label('🛍️ Catálogo')
-                    ->icon('heroicon-o-shopping-bag')
-                    ->collapsed(false),
-                NavigationGroup::make()
-                    ->label('💰 Ventas')
-                    ->icon('heroicon-o-currency-dollar')
-                    ->collapsed(false),
-                NavigationGroup::make()
-                    ->label('📢 Marketing')
-                    ->icon('heroicon-o-megaphone')
-                    ->collapsed(false),
-                NavigationGroup::make()
-                    ->label('⚙️ Administración')
-                    ->icon('heroicon-o-cog-6-tooth')
-                    ->collapsed(true),
-                NavigationGroup::make()
-                    ->label('👥 Usuarios')
-                    ->icon('heroicon-o-users')
-                    ->collapsed(false),
+                Widgets\AccountWidget::class,
+                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -77,6 +54,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->renderHook(
+                'panels::topbar.end',
+                fn (): string => view('filament.widgets.currency-selector', [
+                    'currentCurrency' => \App\Helpers\CurrencyHelper::getCurrentCurrency(),
+                    'currencies' => \App\Models\Currency::active()->ordered()->get()
+                ])->render()
+            );
     }
 }

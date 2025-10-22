@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
+use App\Helpers\CurrencyHelper;
 
 class CartsTable
 {
@@ -32,36 +33,32 @@ class CartsTable
                     ->badge()
                     ->color('info'),
 
-                \Filament\Tables\Columns\TextColumn::make('subtotal')
-                    ->label('Subtotal')
-                    ->getStateUsing(fn ($record) => $record->getTotals()['subtotal'])
-                    ->money('EUR')
-                    ->sortable()
-                    ->alignEnd(),
+                        \Filament\Tables\Columns\TextColumn::make('subtotal')
+                            ->label('Subtotal')
+                            ->getStateUsing(fn ($record) => CurrencyHelper::formatAmount($record->getTotals()['subtotal']))
+                            ->sortable()
+                            ->alignEnd(),
 
-                \Filament\Tables\Columns\TextColumn::make('discount_amount')
-                    ->label('Descuento')
-                    ->getStateUsing(fn ($record) => $record->getTotals()['discount_amount'])
-                    ->money('EUR')
-                    ->sortable()
-                    ->alignEnd()
-                    ->color('warning'),
+                        \Filament\Tables\Columns\TextColumn::make('discount_amount')
+                            ->label('Descuento')
+                            ->getStateUsing(fn ($record) => CurrencyHelper::formatAmount($record->getTotals()['discount_amount']))
+                            ->sortable()
+                            ->alignEnd()
+                            ->color('warning'),
 
-                \Filament\Tables\Columns\TextColumn::make('tax_amount')
-                    ->label('Impuestos')
-                    ->getStateUsing(fn ($record) => $record->getTotals()['tax_amount'])
-                    ->money('EUR')
-                    ->sortable()
-                    ->alignEnd(),
+                        \Filament\Tables\Columns\TextColumn::make('tax_amount')
+                            ->label('Impuestos')
+                            ->getStateUsing(fn ($record) => CurrencyHelper::formatAmount($record->getTotals()['tax_amount']))
+                            ->sortable()
+                            ->alignEnd(),
 
-                \Filament\Tables\Columns\TextColumn::make('total')
-                    ->label('Total')
-                    ->getStateUsing(fn ($record) => $record->getTotals()['total'])
-                    ->money('EUR')
-                    ->sortable()
-                    ->alignEnd()
-                    ->weight('bold')
-                    ->color('success'),
+                        \Filament\Tables\Columns\TextColumn::make('total')
+                            ->label('Total')
+                            ->getStateUsing(fn ($record) => CurrencyHelper::formatAmount($record->getTotals()['total']))
+                            ->sortable()
+                            ->alignEnd()
+                            ->weight('bold')
+                            ->color('success'),
 
                 \Filament\Tables\Columns\TextColumn::make('created_at')
                     ->label('Creado')
