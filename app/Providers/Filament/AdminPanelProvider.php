@@ -56,7 +56,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->renderHook(
-                'panels::topbar.start',
+                'panels::topbar.end',
                 fn (): string => view('filament.widgets.currency-selector-inline', [
                     'currencies' => \App\Models\Currency::active()->ordered()->get(),
                     'currentCurrency' => \App\Helpers\CurrencyHelper::getCurrentCurrency(),
