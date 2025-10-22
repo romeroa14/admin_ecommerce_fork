@@ -56,11 +56,27 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->renderHook(
-                'panels::topbar.end',
-                fn (): string => view('filament.widgets.currency-selector', [
-                    'currentCurrency' => \App\Helpers\CurrencyHelper::getCurrentCurrency(),
-                    'currencies' => \App\Models\Currency::active()->ordered()->get()
-                ])->render()
+                'panels::topbar.start',
+                fn (): string => '
+                <div class="flex items-center space-x-3 px-4 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Moneda:</span>
+                        <span class="text-lg font-bold text-primary-600 dark:text-primary-400">' . (\App\Helpers\CurrencyHelper::getCurrentCurrencySymbol()) . '</span>
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white">' . (\App\Helpers\CurrencyHelper::getCurrentCurrencyCode()) . '</span>
+                    </div>
+                    <form method="POST" action="' . route('currency.update') . '" class="flex items-center space-x-2">
+                        ' . csrf_field() . '
+                        <select name="currency_id" onchange="this.form.submit()" class="text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white">
+                            <option value="">Cambiar...</option>
+                            ' . \App\Models\Currency::active()->ordered()->get()->map(function($currency) {
+                                $current = \App\Helpers\CurrencyHelper::getCurrentCurrency();
+                                $selected = $current && $current->id == $currency->id ? 'selected' : '';
+                                return "<option value=\"{$currency->id}\" {$selected}>{$currency->symbol} {$currency->code}</option>";
+                            })->join('') . '
+                        </select>
+                    </form>
+                </div>'
             );
     }
 }
