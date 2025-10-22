@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('shipping_address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->foreignId('billing_address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->foreignId('coupon_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('shipping_id')->nullable()->constrained()->onDelete('set null');
             $table->enum('status', ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled', 'refunded'])->default('pending');
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
             $table->string('payment_method')->nullable();

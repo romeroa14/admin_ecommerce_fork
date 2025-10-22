@@ -16,6 +16,7 @@ class Order extends Model
         'shipping_address_id',
         'billing_address_id',
         'coupon_id',
+        'shipping_id',
         'status',
         'payment_status',
         'payment_method',
@@ -67,6 +68,11 @@ class Order extends Model
     public function coupon(): BelongsTo
     {
         return $this->belongsTo(Coupon::class);
+    }
+
+    public function shipping(): BelongsTo
+    {
+        return $this->belongsTo(Shipping::class);
     }
 
     public function items(): HasMany
@@ -337,6 +343,11 @@ class Order extends Model
             $this->discount_amount = $cartTotals['discount_amount'];
             $this->tax_amount = $cartTotals['tax_amount'];
             
+            // Calcular envío si hay método de envío seleccionado
+            if ($this->shipping_id) {
+                $this->calculateShippingCost();
+            }
+            
             // El total del carrito ya incluye impuestos, solo agregamos envío
             $this->total_amount = $cartTotals['total'] + $this->shipping_amount;
         } else {
@@ -349,6 +360,50 @@ class Order extends Model
     }
 
     /**
+     * Calcular costo de envío basado en el método seleccionado
+     */
+    public function calculateShippingCost()
+    {
+        if (!$this->shipping) {
+            $this->shipping_amount = 0;
+            return;
+        }
+
+        // Obtener peso total del carrito (si está disponible)
+        $totalWeight = $this->getTotalWeight();
+        
+        // Obtener zona de envío (por defecto España)
+        $zone = $this->shippingAddress->country ?? 'España';
+        
+        // Calcular costo usando el método de envío
+        $this->shipping_amount = $this->shipping->calculateShippingCost(
+            $this->subtotal,
+            $totalWeight,
+            $zone
+        );
+    }
+
+    /**
+     * Obtener peso total del carrito
+     */
+    public function getTotalWeight()
+    {
+        if (!$this->cart || empty($this->cart->items)) {
+            return 0;
+        }
+
+        $totalWeight = 0;
+        foreach ($this->cart->items as $item) {
+            $product = \App\Models\Product::find($item['product_id']);
+            if ($product && isset($product->weight)) {
+                $totalWeight += ($product->weight ?? 0) * $item['quantity'];
+            }
+        }
+
+        return $totalWeight;
+    }
+
+    /**
      * Crear pedido desde carrito
      */
     public static function createFromCart(Cart $cart, array $additionalData = [])
@@ -358,11 +413,12 @@ class Order extends Model
             'user_id' => $cart->user_id,
             'cart_id' => $cart->id,
             'coupon_id' => $cart->coupon_id,
+            'shipping_id' => $additionalData['shipping_id'] ?? null,
             'status' => 'pending',
             'payment_status' => 'pending',
         ], $additionalData));
 
-        // Calcular totales automáticamente
+        // Calcular totales automáticamente (incluye envío si está seleccionado)
         $order->calculateTotals();
 
         // Crear items del pedido desde el carrito

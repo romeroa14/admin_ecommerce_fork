@@ -14,6 +14,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Log;
 
 class OrderForm
 {
@@ -242,6 +243,61 @@ class OrderForm
                                     ->searchable()
                                     ->preload(),
                             ]),
+
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('shipping_id')
+                                    ->label('Método de Envío')
+                                    ->relationship('shipping', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        Log::info('OrderForm: Método de envío seleccionado', ['shipping_id' => $state]);
+                                        
+                                        if ($state) {
+                                            $shipping = \App\Models\Shipping::find($state);
+                                            if ($shipping) {
+                                                // Obtener subtotal del carrito o del formulario
+                                                $subtotal = $get('subtotal') ?? 0;
+                                                
+                                                Log::info('OrderForm: Valores antes del cálculo', [
+                                                    'shipping_method' => $shipping->name,
+                                                    'subtotal' => $subtotal,
+                                                    'base_price' => $shipping->base_price
+                                                ]);
+                                                
+                                                // Calcular costo de envío
+                                                $shippingCost = $shipping->calculateShippingCost($subtotal);
+                                                
+                                                Log::info('OrderForm: Costo calculado', ['shipping_cost' => $shippingCost]);
+                                                
+                                                // Establecer el costo de envío
+                                                $set('shipping_amount', $shippingCost);
+                                                
+                                                // Recalcular total final
+                                                self::calculateTotal($set, $get);
+                                            }
+                                        } else {
+                                            // Si no hay método de envío seleccionado, costo = 0
+                                            Log::info('OrderForm: No hay método de envío seleccionado, costo = 0');
+                                            $set('shipping_amount', 0);
+                                            self::calculateTotal($set, $get);
+                                        }
+                                    })
+                                    ->helperText('Selecciona el método de envío para calcular automáticamente el costo'),
+
+                                TextInput::make('shipping_amount')
+                                    ->label('Costo de Envío')
+                                    ->numeric()
+                                    ->prefix('€')
+                                    ->step(0.01)
+                                    ->live()
+                                    ->afterStateUpdated(function (callable $set, callable $get) {
+                                        self::calculateTotal($set, $get);
+                                    })
+                                    ->helperText('Se calcula automáticamente, pero puedes editarlo manualmente'),
+                            ]),
                     ])
                     ->collapsible(),
 
@@ -317,30 +373,17 @@ class OrderForm
                                     }),
                             ]),
 
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('tax_amount')
-                                    ->label('Impuestos')
-                                    ->numeric()
-                                    ->prefix('€')
-                                    ->step(0.01)
-                                    ->default(0)
-                                    ->live()
-                                    ->afterStateUpdated(function (callable $set, callable $get) {
-                                        self::calculateTotal($set, $get);
-                                    }),
-
-                                TextInput::make('shipping_amount')
-                                    ->label('Envío')
-                                    ->numeric()
-                                    ->prefix('€')
-                                    ->step(0.01)
-                                    ->default(0)
-                                    ->live()
-                                    ->afterStateUpdated(function (callable $set, callable $get) {
-                                        self::calculateTotal($set, $get);
-                                    }),
-                            ]),
+                        TextInput::make('tax_amount')
+                            ->label('Impuestos')
+                            ->numeric()
+                            ->prefix('€')
+                            ->step(0.01)
+                            ->default(0)
+                            ->live()
+                            ->afterStateUpdated(function (callable $set, callable $get) {
+                                self::calculateTotal($set, $get);
+                            })
+                            ->columnSpanFull(),
 
                         TextInput::make('total_amount')
                             ->label('Total Final')
@@ -360,12 +403,45 @@ class OrderForm
                                 $tax = $get('tax_amount') ?? 0;
                                 $shipping = $get('shipping_amount') ?? 0;
                                 $total = $subtotal - $discount + $tax + $shipping;
-                                return 'Subtotal: €' . number_format($subtotal, 2) . 
-                                       ' - Descuento: €' . number_format($discount, 2) . 
-                                       ' + Impuestos: €' . number_format($tax, 2) . 
-                                       ' + Envío: €' . number_format($shipping, 2) . 
-                                       ' = Total Final: €' . number_format($total, 2);
+                                
+                                // Obtener información del método de envío
+                                $shippingId = $get('shipping_id');
+                                $shippingInfo = '';
+                                if ($shippingId) {
+                                    $shippingMethod = \App\Models\Shipping::find($shippingId);
+                                    if ($shippingMethod) {
+                                        $shippingInfo = " ({$shippingMethod->name})";
+                                    }
+                                }
+                                
+                                return "
+                                    <div style='background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;'>
+                                        <h4 style='margin: 0 0 10px 0; color: #1e293b; font-size: 16px;'>Desglose del Total</h4>
+                                        <div style='display: flex; justify-content: space-between; margin: 5px 0;'>
+                                            <span>Subtotal:</span>
+                                            <span style='font-weight: 600;'>€" . number_format($subtotal, 2) . "</span>
+                                        </div>
+                                        <div style='display: flex; justify-content: space-between; margin: 5px 0; color: #f59e0b;'>
+                                            <span>Descuento:</span>
+                                            <span style='font-weight: 600;'>-€" . number_format($discount, 2) . "</span>
+                                        </div>
+                                        <div style='display: flex; justify-content: space-between; margin: 5px 0;'>
+                                            <span>Impuestos (21%):</span>
+                                            <span style='font-weight: 600;'>€" . number_format($tax, 2) . "</span>
+                                        </div>
+                                        <div style='display: flex; justify-content: space-between; margin: 5px 0; color: #3b82f6;'>
+                                            <span>Envío{$shippingInfo}:</span>
+                                            <span style='font-weight: 600;'>€" . number_format($shipping, 2) . "</span>
+                                        </div>
+                                        <hr style='margin: 10px 0; border: none; border-top: 2px solid #22c55e;'>
+                                        <div style='display: flex; justify-content: space-between; margin: 5px 0; font-size: 18px; font-weight: bold; color: #059669;'>
+                                            <span>Total Final:</span>
+                                            <span>€" . number_format($total, 2) . "</span>
+                                        </div>
+                                    </div>
+                                ";
                             })
+                            ->html()
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),

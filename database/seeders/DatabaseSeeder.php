@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             VariantGroupSeeder::class,
             VariantSeeder::class,
+            ShippingSeeder::class,
             CartSeeder::class,
         ]);
 

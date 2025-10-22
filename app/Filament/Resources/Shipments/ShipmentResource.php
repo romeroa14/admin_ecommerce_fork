@@ -26,11 +26,11 @@ class ShipmentResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = 'Ventas';
 
-    protected static ?string $navigationLabel = 'Envíos';
+    protected static ?string $navigationLabel = 'Tracking de Envíos';
 
     protected static ?string $modelLabel = 'Envío';
 
-    protected static ?string $pluralModelLabel = 'Envíos';
+    protected static ?string $pluralModelLabel = 'Tracking de Envíos';
 
     protected static ?int $navigationSort = 7;
 
