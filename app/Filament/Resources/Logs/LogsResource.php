@@ -24,7 +24,7 @@ class LogsResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Administración';
+    protected static UnitEnum|string|null $navigationGroup = 'Configuraciones';
 
     protected static ?string $navigationLabel = 'Logs';
 

@@ -118,4 +118,20 @@ class Shipment extends Model
             default => null,
         };
     }
+
+    public static function generateTrackingNumber(): string
+    {
+        $prefix = 'TRK';
+        $year = now()->year;
+        $month = now()->format('m');
+        $day = now()->format('d');
+        
+        $lastShipment = self::whereDate('created_at', now())
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        $sequence = $lastShipment ? (int) substr($lastShipment->tracking_number, -4) + 1 : 1;
+        
+        return "{$prefix}-{$year}{$month}{$day}-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+    }
 }

@@ -16,13 +16,12 @@ return new class extends Migration
             $table->string('order_number')->unique();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('cart_id')->nullable()->constrained()->onDelete('set null');
+            $table->unsignedBigInteger('payment_id')->nullable();
             $table->foreignId('shipping_address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->foreignId('billing_address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->foreignId('coupon_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('shipping_id')->nullable()->constrained()->onDelete('set null');
-            $table->enum('status', ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled', 'refunded'])->default('pending');
-            $table->enum('payment_status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
-            $table->string('payment_method')->nullable();
+            $table->enum('status', ['pending', 'processing', 'confirmed', 'cancelled', 'refunded'])->default('pending');
             $table->decimal('subtotal', 10, 2);
             $table->decimal('discount_amount', 10, 2)->default(0);
             $table->decimal('tax_amount', 10, 2)->default(0);
@@ -35,6 +34,11 @@ return new class extends Migration
             $table->timestamp('delivered_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
+        });
+
+        // Agregar foreign key constraint después de crear la tabla
+        Schema::table('orders', function (Blueprint $table) {
+            $table->foreign('payment_id')->references('id')->on('payments')->onDelete('set null');
         });
     }
 

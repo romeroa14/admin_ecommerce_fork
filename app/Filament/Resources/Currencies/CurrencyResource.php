@@ -23,7 +23,7 @@ class CurrencyResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Configuración';
+    protected static string|UnitEnum|null $navigationGroup = 'Configuraciones';
 
     protected static ?string $navigationLabel = 'Monedas';
 

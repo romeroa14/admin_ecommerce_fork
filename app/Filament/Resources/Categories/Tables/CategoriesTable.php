@@ -17,22 +17,52 @@ class CategoriesTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('slug')
-                    ->searchable(),
-                ImageColumn::make('image'),
-                TextColumn::make('parent.name')
-                    ->searchable(),
-                IconColumn::make('is_active')
-                    ->boolean(),
-                TextColumn::make('order')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Nombre')
+                    ->searchable()
                     ->sortable()
+                    ->weight('bold'),
+
+                TextColumn::make('slug')
+                    ->label('Slug')
+                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+
+                ImageColumn::make('image')
+                    ->label('Imagen')
+                    ->circular()
+                    ->size(40),
+
+                TextColumn::make('parent.name')
+                    ->label('Categoría Padre')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
+
+                IconColumn::make('is_active')
+                    ->label('Activa')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+
+                TextColumn::make('order')
+                    ->label('Orden')
+                    ->numeric()
+                    ->sortable()
+                    ->alignCenter(),
+
+                TextColumn::make('products_count')
+                    ->label('Productos')
+                    ->counts('products')
+                    ->sortable()
+                    ->alignCenter()
+                    ->badge()
+                    ->color('primary'),
+
+                TextColumn::make('created_at')
+                    ->label('Creado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -14,33 +14,65 @@ class ShipmentsTable
     {
         return $table
             ->columns([
-                TextColumn::make('order.id')
-                    ->searchable(),
                 TextColumn::make('tracking_number')
-                    ->searchable(),
+                    ->label('Número de Seguimiento')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold')
+                    ->copyable()
+                    ->copyMessage('Número copiado'),
+
+                TextColumn::make('order.order_number')
+                    ->label('Pedido')
+                    ->searchable()
+                    ->sortable()
+                    ->url(fn ($record) => route('filament.admin.resources.orders.view', $record->order_id)),
+
+                TextColumn::make('order.user.name')
+                    ->label('Cliente')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('carrier')
-                    ->searchable(),
-                TextColumn::make('service_level')
-                    ->searchable(),
+                    ->label('Transportista')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
+
                 TextColumn::make('status')
-                    ->searchable(),
+                    ->label('Estado')
+                    ->badge()
+                    ->colors([
+                        'warning' => 'pending',
+                        'info' => 'shipped',
+                        'success' => 'delivered',
+                        'danger' => 'failed',
+                    ]),
+
                 TextColumn::make('shipping_cost')
-                    ->numeric()
+                    ->label('Costo de Envío')
+                    ->money('EUR')
                     ->sortable(),
+
                 TextColumn::make('shipped_at')
+                    ->label('Fecha de Envío')
                     ->dateTime()
                     ->sortable(),
+
                 TextColumn::make('delivered_at')
+                    ->label('Fecha de Entrega')
                     ->dateTime()
                     ->sortable(),
+
                 TextColumn::make('estimated_delivery')
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('created_at')
+                    ->label('Entrega Estimada')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                    ->color(fn ($record) => $record->estimated_delivery < now() ? 'danger' : 'gray'),
+
+                TextColumn::make('created_at')
+                    ->label('Creado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

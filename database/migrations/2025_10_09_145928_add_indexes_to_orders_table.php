@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             // Índices para mejorar el rendimiento de consultas comunes
-            $table->index(['status', 'payment_status']);
+            $table->index(['status']);
             $table->index(['user_id', 'status']);
-            $table->index(['payment_method', 'status']);
             $table->index(['created_at', 'status']);
             $table->index(['total_amount', 'status']);
             $table->index(['order_number']);
@@ -74,9 +73,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropIndex(['status', 'payment_status']);
+            $table->dropIndex(['status']);
             $table->dropIndex(['user_id', 'status']);
-            $table->dropIndex(['payment_method', 'status']);
             $table->dropIndex(['created_at', 'status']);
             $table->dropIndex(['total_amount', 'status']);
             $table->dropIndex(['order_number']);

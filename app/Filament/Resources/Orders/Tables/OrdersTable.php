@@ -53,30 +53,7 @@ class OrdersTable
                     ])
                     ->sortable(),
 
-                BadgeColumn::make('payment_status')
-                    ->label('Estado de Pago')
-                    ->colors([
-                        'warning' => 'pending',
-                        'success' => 'paid',
-                        'danger' => 'failed',
-                        'secondary' => 'refunded',
-                    ])
-                    ->sortable(),
-
-                TextColumn::make('payment_method')
-                    ->label('Método de Pago')
-                    ->badge()
-                    ->color('gray')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'credit_card' => 'Tarjeta de Crédito',
-                        'debit_card' => 'Tarjeta de Débito',
-                        'paypal' => 'PayPal',
-                        'stripe' => 'Stripe',
-                        'bank_transfer' => 'Transferencia',
-                        'cash' => 'Efectivo',
-                        default => $state,
-                    })
-                    ->toggleable(),
+                
 
                 TextColumn::make('total_amount')
                     ->label('Total')
@@ -86,7 +63,12 @@ class OrdersTable
 
                 TextColumn::make('items_count')
                     ->label('Items')
-                    ->counts('items')
+                    ->getStateUsing(function ($record) {
+                        if ($record->cart && $record->cart->items) {
+                            return $record->cart->getItemsCount();
+                        }
+                        return 0;
+                    })
                     ->badge()
                     ->color('info'),
 

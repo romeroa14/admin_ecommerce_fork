@@ -13,16 +13,22 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('payment_method_id')->nullable();
             $table->string('transaction_id')->unique()->nullable();
-            $table->string('payment_method'); // credit_card, paypal, stripe, etc.
+            $table->string('payment_method')->nullable(); // Mantener para compatibilidad
             $table->decimal('amount', 10, 2);
-            $table->string('currency')->default('USD');
-            $table->enum('status', ['pending', 'processing', 'completed', 'failed', 'refunded'])->default('pending');
+            $table->string('currency')->default('EUR');
+            $table->enum('status', ['pending', 'processing', 'completed', 'failed', 'cancelled', 'refunded'])->default('pending');
             $table->text('payment_details')->nullable(); // JSON con detalles del pago
             $table->string('gateway_response')->nullable();
             $table->text('error_message')->nullable();
             $table->timestamp('paid_at')->nullable();
+            $table->timestamp('payment_date')->nullable();
+            $table->decimal('refund_amount', 10, 2)->nullable();
+            $table->timestamp('refund_date')->nullable();
+            $table->string('refund_reason')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

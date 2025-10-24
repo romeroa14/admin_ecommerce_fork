@@ -86,33 +86,26 @@ class OrderForm
                             })
                             ->helperText('Selecciona un carrito activo del cliente para importar los productos y totales'),
 
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('status')
-                                    ->label('Estado del Pedido')
-                                    ->options([
-                                        'pending' => 'Pendiente',
-                                        'processing' => 'Procesando',
-                                        'confirmed' => 'Confirmado',
-                                        'shipped' => 'Enviado',
-                                        'delivered' => 'Entregado',
-                                        'cancelled' => 'Cancelado',
-                                        'refunded' => 'Reembolsado',
-                                    ])
-                                    ->required()
-                                    ->default('pending'),
-
-                                Select::make('payment_status')
-                                    ->label('Estado del Pago')
-                                    ->options([
-                                        'pending' => 'Pendiente',
-                                        'paid' => 'Pagado',
-                                        'failed' => 'Fallido',
-                                        'refunded' => 'Reembolsado',
-                                    ])
-                                    ->required()
-                                    ->default('pending'),
-                            ]),
+                        Select::make('status')
+                            ->label('Estado del Pedido')
+                            ->options([
+                                'pending' => 'Pendiente',
+                                'processing' => 'Procesando',
+                                'confirmed' => 'Confirmado',
+                                'cancelled' => 'Cancelado',
+                                'refunded' => 'Reembolsado',
+                            ])
+                            ->required()
+                            ->default('pending')
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                // Si el estado es 'confirmed', marcar para crear factura automáticamente
+                                if ($state === 'confirmed') {
+                                    $set('auto_create_invoice', true);
+                                } else {
+                                    $set('auto_create_invoice', false);
+                                }
+                            }),
                     ])
                     ->collapsible(),
 
@@ -223,26 +216,11 @@ class OrderForm
 
                 Section::make('Información de Pago')
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                Select::make('payment_method')
-                                    ->label('Método de Pago')
-                                    ->options([
-                                        'credit_card' => 'Tarjeta de Crédito',
-                                        'debit_card' => 'Tarjeta de Débito',
-                                        'paypal' => 'PayPal',
-                                        'stripe' => 'Stripe',
-                                        'bank_transfer' => 'Transferencia Bancaria',
-                                        'cash' => 'Efectivo',
-                                    ])
-                                    ->searchable(),
-
-                                Select::make('coupon_id')
-                                    ->label('Cupón de Descuento')
-                                    ->relationship('coupon', 'code')
-                                    ->searchable()
-                                    ->preload(),
-                            ]),
+                        Select::make('coupon_id')
+                            ->label('Cupón de Descuento')
+                            ->relationship('coupon', 'code')
+                            ->searchable()
+                            ->preload(),
 
                         Grid::make(2)
                             ->schema([
@@ -459,6 +437,10 @@ class OrderForm
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
+
+                // Campo oculto para controlar la creación automática de factura
+                \Filament\Forms\Components\Hidden::make('auto_create_invoice')
+                    ->default(false),
 
                 Section::make('Fechas Importantes')
                     ->schema([

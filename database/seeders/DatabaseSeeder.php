@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             VariantSeeder::class,
             ShippingSeeder::class,
             CartSeeder::class,
+            PaymentMethodSeeder::class,
         ]);
 
         User::factory()->create([

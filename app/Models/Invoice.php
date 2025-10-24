@@ -87,13 +87,6 @@ class Invoice extends Model
         };
     }
 
-    // Método para generar número de factura
-    public static function generateInvoiceNumber()
-    {
-        $lastInvoice = self::orderBy('id', 'desc')->first();
-        $number = $lastInvoice ? (int) substr($lastInvoice->invoice_number, -6) + 1 : 1;
-        return 'INV-' . str_pad($number, 6, '0', STR_PAD_LEFT);
-    }
 
     // Método para marcar como pagada
     public function markAsPaid()
@@ -122,5 +115,19 @@ class Invoice extends Model
             $this->status = 'cancelled';
             $this->save();
         }
+    }
+
+    public static function generateInvoiceNumber(): string
+    {
+        $year = now()->year;
+        $month = now()->format('m');
+        $lastInvoice = self::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        $sequence = $lastInvoice ? (int) substr($lastInvoice->invoice_number, -4) + 1 : 1;
+        
+        return "INV-{$year}{$month}-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
     }
 }

@@ -10,6 +10,7 @@ class Payment extends Model
 {
     protected $fillable = [
         'order_id',
+        'payment_method_id',
         'transaction_id',
         'payment_method',
         'amount',
@@ -19,6 +20,11 @@ class Payment extends Model
         'gateway_response',
         'error_message',
         'paid_at',
+        'payment_date',
+        'refund_amount',
+        'refund_date',
+        'refund_reason',
+        'notes',
     ];
 
     protected $casts = [
@@ -30,6 +36,11 @@ class Payment extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function paymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class);
     }
 
     public function refunds(): HasMany
@@ -101,5 +112,21 @@ class Payment extends Model
     public function canBeRefunded()
     {
         return $this->is_successful && $this->total_refunded < $this->amount;
+    }
+
+    public static function generateTransactionId(): string
+    {
+        $prefix = 'TXN';
+        $year = now()->year;
+        $month = now()->format('m');
+        $day = now()->format('d');
+        
+        $lastPayment = self::whereDate('created_at', now())
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        $sequence = $lastPayment ? (int) substr($lastPayment->transaction_id, -4) + 1 : 1;
+        
+        return "{$prefix}-{$year}{$month}{$day}-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
     }
 }

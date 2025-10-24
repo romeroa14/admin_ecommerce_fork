@@ -14,37 +14,55 @@ class InvoicesTable
     {
         return $table
             ->columns([
-                TextColumn::make('order.id')
-                    ->searchable(),
                 TextColumn::make('invoice_number')
-                    ->searchable(),
-                TextColumn::make('invoice_date')
-                    ->date()
-                    ->sortable(),
-                TextColumn::make('due_date')
-                    ->date()
-                    ->sortable(),
-                TextColumn::make('subtotal')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('tax_amount')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('discount_amount')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('total_amount')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->searchable(),
-                TextColumn::make('pdf_path')
-                    ->searchable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Número de Factura')
+                    ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                    ->weight('bold')
+                    ->copyable()
+                    ->copyMessage('Número copiado'),
+
+                TextColumn::make('order.order_number')
+                    ->label('Pedido')
+                    ->searchable()
+                    ->sortable()
+                    ->url(fn ($record) => route('filament.admin.resources.orders.view', $record->order_id)),
+
+                TextColumn::make('order.user.name')
+                    ->label('Cliente')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('invoice_date')
+                    ->label('Fecha de Factura')
+                    ->date()
+                    ->sortable(),
+
+                TextColumn::make('due_date')
+                    ->label('Fecha de Vencimiento')
+                    ->date()
+                    ->sortable()
+                    ->color(fn ($record) => $record->due_date < now() ? 'danger' : 'gray'),
+
+                TextColumn::make('total_amount')
+                    ->label('Total')
+                    ->money('EUR')
+                    ->sortable()
+                    ->weight('bold'),
+
+                TextColumn::make('status')
+                    ->label('Estado')
+                    ->badge()
+                    ->colors([
+                        'secondary' => 'draft',
+                        'info' => 'sent',
+                        'success' => 'paid',
+                        'warning' => 'overdue',
+                        'danger' => 'cancelled',
+                    ]),
+
+                TextColumn::make('created_at')
+                    ->label('Creado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
