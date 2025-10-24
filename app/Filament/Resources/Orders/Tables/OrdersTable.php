@@ -57,7 +57,9 @@ class OrdersTable
 
                 TextColumn::make('total_amount')
                     ->label('Total')
-                    ->money('USD')
+                    ->getStateUsing(function ($record) {
+                        return \App\Helpers\CurrencyHelper::formatAmount($record->total_amount);
+                    })
                     ->sortable()
                     ->weight('bold'),
 

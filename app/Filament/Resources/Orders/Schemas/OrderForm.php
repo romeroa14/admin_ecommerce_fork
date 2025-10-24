@@ -62,7 +62,8 @@ class OrderForm
                                     $itemsCount = $cart->getItemsCount();
                                     $totals = $cart->getTotals();
                                     $total = $totals['total'];
-                                    $options[$cart->id] = "Carrito #{$cart->id} - {$itemsCount} items - €{$total}";
+                                    $currencySymbol = \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol();
+                                    $options[$cart->id] = "Carrito #{$cart->id} - {$itemsCount} items - {$currencySymbol}{$total}";
                                 }
                                 
                                 return $options;
@@ -268,7 +269,7 @@ class OrderForm
                                 TextInput::make('shipping_amount')
                                     ->label('Costo de Envío')
                                     ->numeric()
-                                    ->prefix('€')
+                                    ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
                                     ->live()
                                     ->afterStateUpdated(function (callable $set, callable $get) {
@@ -281,52 +282,7 @@ class OrderForm
 
                 Section::make('Totales del Pedido')
                     ->schema([
-                        // Placeholder::make('totals_info')
-                        //     ->label('')
-                        //     ->content(function (Get $get): string {
-                        //         $cartId = $get('cart_id');
-                        //         if (!$cartId) {
-                        //             return '<div style="text-align: center; padding: 20px; color: #6b7280; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
-                        //                         <p style="margin: 0;">Selecciona un carrito para ver los totales</p>
-                        //                     </div>';
-                        //         }
-                                
-                        //         $cart = \App\Models\Cart::find($cartId);
-                        //         if (!$cart) {
-                        //             return '<div style="text-align: center; padding: 20px; color: #ef4444; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca;">
-                        //                         <p style="margin: 0;">Carrito no encontrado</p>
-                        //                     </div>';
-                        //         }
-                                
-                        //         $totals = $cart->getTotals();
-                        //         $itemsCount = $cart->getItemsCount();
-                                
-                        //         return "
-                        //             <div style='background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;'>
-                        //                 <h3 style='margin: 0 0 15px 0; color: #374151; font-size: 18px;'>Resumen del Carrito ({$itemsCount} items)</h3>
-                        //                 <div style='margin-bottom: 15px;'>
-                        //                     <div style='display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;'>
-                        //                         <span style='font-weight: 500;'>Subtotal:</span>
-                        //                         <span style='font-weight: 600;'>€{$totals['subtotal']}</span>
-                        //                     </div>
-                        //                     <div style='display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;'>
-                        //                         <span style='font-weight: 500;'>Descuento:</span>
-                        //                         <span style='font-weight: 600; color: #f59e0b;'>-€{$totals['discount_amount']}</span>
-                        //                     </div>
-                        //                     <div style='display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;'>
-                        //                         <span style='font-weight: 500;'>Impuestos (21%):</span>
-                        //                         <span style='font-weight: 600;'>€{$totals['tax_amount']}</span>
-                        //                     </div>
-                        //                 </div>
-                        //                 <div style='display: flex; justify-content: space-between; padding: 12px 0; border-top: 2px solid #22c55e; background: #f0fdf4; border-radius: 6px; padding: 12px;'>
-                        //                     <span style='font-weight: bold; font-size: 18px; color: #059669;'>Total del Carrito:</span>
-                        //                     <span style='font-weight: bold; font-size: 20px; color: #059669;'>€{$totals['total']}</span>
-                        //                 </div>
-                        //             </div>
-                        //         ";
-                        //     })
-                        //     ->html()
-                        //     ->columnSpanFull(),
+                        
 
                         Grid::make(2)
                             ->schema([
@@ -334,7 +290,7 @@ class OrderForm
                                     ->label('Subtotal')
                                     ->required()
                                     ->numeric()
-                                    ->prefix('€')
+                                    ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
                                     ->disabled()
                                     ->dehydrated(),
@@ -342,7 +298,7 @@ class OrderForm
                                 TextInput::make('discount_amount')
                                     ->label('Descuento')
                                     ->numeric()
-                                    ->prefix('€')
+                                    ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
                                     ->default(0)
                                     ->live()
@@ -354,7 +310,7 @@ class OrderForm
                         TextInput::make('tax_amount')
                             ->label('Impuestos')
                             ->numeric()
-                            ->prefix('€')
+                            ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                             ->step(0.01)
                             ->default(0)
                             ->live()
@@ -367,7 +323,7 @@ class OrderForm
                             ->label('Total Final')
                             ->required()
                             ->numeric()
-                            ->prefix('€')
+                            ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                             ->step(0.01)
                             ->disabled()
                             ->dehydrated()
@@ -392,29 +348,32 @@ class OrderForm
                                     }
                                 }
                                 
+                                // Obtener símbolo de moneda actual
+                                $currencySymbol = \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol();
+                                
                                 return "
                                     <div style='background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;'>
                                         <h4 style='margin: 0 0 10px 0; color: #1e293b; font-size: 16px;'>Desglose del Total</h4>
                                         <div style='display: flex; justify-content: space-between; margin: 5px 0;'>
                                             <span>Subtotal:</span>
-                                            <span style='font-weight: 600;'>€" . number_format($subtotal, 2) . "</span>
+                                            <span style='font-weight: 600;'>{$currencySymbol}" . number_format($subtotal, 2) . "</span>
                                         </div>
                                         <div style='display: flex; justify-content: space-between; margin: 5px 0; color: #f59e0b;'>
                                             <span>Descuento:</span>
-                                            <span style='font-weight: 600;'>-€" . number_format($discount, 2) . "</span>
+                                            <span style='font-weight: 600;'>-{$currencySymbol}" . number_format($discount, 2) . "</span>
                                         </div>
                                         <div style='display: flex; justify-content: space-between; margin: 5px 0;'>
                                             <span>Impuestos (21%):</span>
-                                            <span style='font-weight: 600;'>€" . number_format($tax, 2) . "</span>
+                                            <span style='font-weight: 600;'>{$currencySymbol}" . number_format($tax, 2) . "</span>
                                         </div>
                                         <div style='display: flex; justify-content: space-between; margin: 5px 0; color: #3b82f6;'>
                                             <span>Envío{$shippingInfo}:</span>
-                                            <span style='font-weight: 600;'>€" . number_format($shipping, 2) . "</span>
+                                            <span style='font-weight: 600;'>{$currencySymbol}" . number_format($shipping, 2) . "</span>
                                         </div>
                                         <hr style='margin: 10px 0; border: none; border-top: 2px solid #22c55e;'>
                                         <div style='display: flex; justify-content: space-between; margin: 5px 0; font-size: 18px; font-weight: bold; color: #059669;'>
                                             <span>Total Final:</span>
-                                            <span>€" . number_format($total, 2) . "</span>
+                                            <span>{$currencySymbol}" . number_format($total, 2) . "</span>
                                         </div>
                                     </div>
                                 ";

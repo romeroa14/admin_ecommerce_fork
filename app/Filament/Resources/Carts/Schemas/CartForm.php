@@ -49,26 +49,28 @@ class CartForm
                                         }
 
                                         $totals = $record->getTotals();
+                                        $currencySymbol = \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol();
+                                        
                                         return "
                                             <div style='background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;'>
                                                 <h3 style='margin: 0 0 15px 0; color: #374151; font-size: 18px;'></h3>
                                                 <div style='margin-bottom: 15px;'>
                                                     <div style='display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;'>
                                                         <span style='font-weight: 500;'>Subtotal:</span>
-                                                        <span style='font-weight: 600;'>€{$totals['subtotal']}</span>
+                                                        <span style='font-weight: 600;'>{$currencySymbol}{$totals['subtotal']}</span>
                                                     </div>
                                                     <div style='display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;'>
                                                         <span style='font-weight: 500;'>Descuento:</span>
-                                                        <span style='font-weight: 600; color: #f59e0b;'>-€{$totals['discount_amount']}</span>
+                                                        <span style='font-weight: 600; color: #f59e0b;'>-{$currencySymbol}{$totals['discount_amount']}</span>
                                                     </div>
                                                     <div style='display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;'>
                                                         <span style='font-weight: 500;'>Impuestos (21%):</span>
-                                                        <span style='font-weight: 600;'>€{$totals['tax_amount']}</span>
+                                                        <span style='font-weight: 600;'>{$currencySymbol}{$totals['tax_amount']}</span>
                                                     </div>
                                                 </div>
                                                 <div style='display: flex; justify-content: space-between; padding: 12px 0; border-top: 2px solid #22c55e; background: #f0fdf4; border-radius: 6px; padding: 12px;'>
                                                     <span style='font-weight: bold; font-size: 18px; color: #059669;'>Total:</span>
-                                                    <span style='font-weight: bold; font-size: 20px; color: #059669;'>€{$totals['total']}</span>
+                                                    <span style='font-weight: bold; font-size: 20px; color: #059669;'>{$currencySymbol}{$totals['total']}</span>
                                                 </div>
                                             </div>
                                         ";
