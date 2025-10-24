@@ -62,6 +62,6 @@ class ProductResource extends Resource
 
     public static function getImporter(): string
     {
-        return \App\Filament\Imports\ProductImporter::class;
+        return \App\Filament\Imports\UltraSimpleImporter::class;
     }
 }
