@@ -31,7 +31,7 @@ class PaymentForm
                                     if ($order) {
                                         // Auto-llenar datos del pedido
                                         $set('amount', $order->total_amount);
-                                        $set('currency', $order->user->currency ?? 'EUR');
+                                        $set('currency', $order->user->currency ?? current_currency_code());
                                     }
                                 }
                             }),
@@ -54,13 +54,13 @@ class PaymentForm
                             ->label('Monto')
                             ->required()
                             ->numeric()
-                            ->prefix('€')
+                            ->prefix(current_currency_symbol())
                             ->step(0.01),
 
                         TextInput::make('currency')
                             ->label('Moneda')
                             ->required()
-                            ->default('EUR')
+                            ->default(current_currency_code())
                             ->maxLength(3),
                     ])
                     ->collapsible(),

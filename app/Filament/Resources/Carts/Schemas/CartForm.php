@@ -49,7 +49,7 @@ class CartForm
                                         }
 
                                         $totals = $record->getTotals();
-                                        $currencySymbol = \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol();
+                                            $currencySymbol = \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol();
                                         
                                         return "
                                             <div style='background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;'>

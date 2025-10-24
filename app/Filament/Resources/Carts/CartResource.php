@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Carts;
 
-use App\Filament\Resources\Carts\Pages\CreateCart;
 use App\Filament\Resources\Carts\Pages\EditCart;
 use App\Filament\Resources\Carts\Pages\ListCarts;
 use App\Filament\Resources\Carts\Schemas\CartForm;
@@ -54,7 +53,6 @@ class CartResource extends Resource
     {
         return [
             'index' => ListCarts::route('/'),
-            'create' => CreateCart::route('/create'),
             'edit' => EditCart::route('/{record}/edit'),
         ];
     }

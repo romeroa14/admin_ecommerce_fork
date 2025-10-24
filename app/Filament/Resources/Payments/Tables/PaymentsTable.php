@@ -43,12 +43,17 @@ class PaymentsTable
 
                 TextColumn::make('amount')
                     ->label('Monto')
-                    ->money('EUR')
+                    ->getStateUsing(function ($record) {
+                        return current_currency_symbol() . ' ' . $record->amount;
+                    })
                     ->sortable()
                     ->alignEnd(),
 
                 TextColumn::make('currency')
                     ->label('Moneda')
+                    ->getStateUsing(function ($record) {
+                        return current_currency_symbol() . ' ' . current_currency_code();
+                    })
                     ->badge()
                     ->color('info'),
 

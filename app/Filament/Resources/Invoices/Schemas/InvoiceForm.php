@@ -62,7 +62,7 @@ class InvoiceForm
                             ->label('Subtotal')
                             ->required()
                             ->numeric()
-                            ->prefix('€')
+                            ->prefix(current_currency_symbol())
                             ->disabled()
                             ->dehydrated(),
 
@@ -70,7 +70,7 @@ class InvoiceForm
                             ->label('Impuestos')
                             ->required()
                             ->numeric()
-                            ->prefix('€')
+                            ->prefix(current_currency_symbol())
                             ->disabled()
                             ->dehydrated(),
 
@@ -78,7 +78,7 @@ class InvoiceForm
                             ->label('Descuento')
                             ->required()
                             ->numeric()
-                            ->prefix('€')
+                            ->prefix(current_currency_symbol())
                             ->disabled()
                             ->dehydrated(),
 
@@ -86,7 +86,7 @@ class InvoiceForm
                             ->label('Total')
                             ->required()
                             ->numeric()
-                            ->prefix('€')
+                            ->prefix(current_currency_symbol())
                             ->disabled()
                             ->dehydrated(),
                     ])

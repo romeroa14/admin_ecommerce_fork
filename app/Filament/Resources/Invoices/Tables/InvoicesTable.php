@@ -46,7 +46,9 @@ class InvoicesTable
 
                 TextColumn::make('total_amount')
                     ->label('Total')
-                    ->money('EUR')
+                    ->getStateUsing(function ($record) {
+                        return current_currency_symbol() . ' ' . $record->total_amount;
+                    })
                     ->sortable()
                     ->weight('bold'),
 
