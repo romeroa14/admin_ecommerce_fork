@@ -59,4 +59,9 @@ class ProductResource extends Resource
             'edit' => EditProduct::route('/{record}/edit'),
         ];
     }
+
+    public static function getImporter(): string
+    {
+        return \App\Filament\Imports\ProductImporter::class;
+    }
 }
