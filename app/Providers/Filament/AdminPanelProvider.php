@@ -11,6 +11,8 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationBuilder;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -40,6 +42,18 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make('Catálogo')
+                    ->collapsed(false),
+                NavigationGroup::make('Ventas')
+                    ->collapsed(false),
+                NavigationGroup::make('Marketing')
+                    ->collapsed(true),
+                NavigationGroup::make('Usuarios')
+                    ->collapsed(true),
+                NavigationGroup::make('Configuraciones')
+                    ->collapsed(true),
             ])
             ->middleware([
                 EncryptCookies::class,
