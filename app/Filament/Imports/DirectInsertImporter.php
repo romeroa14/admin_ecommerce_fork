@@ -8,11 +8,11 @@ use App\Models\Brand;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
-use Filament\Forms\Components\Select;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
-class ProductImporter extends Importer
+class DirectInsertImporter extends Importer
 {
     protected static ?string $model = Product::class;
 
@@ -24,27 +24,6 @@ class ProductImporter extends Importer
     public static function getCsvHeaderOffset(): int
     {
         return 0;
-    }
-
-    public static function getOptionsFormComponents(): array
-    {
-        return [
-            Select::make('category_id')
-                ->label('Categoría')
-                ->options(Category::all()->pluck('name', 'id'))
-                ->required()
-                ->searchable()
-                ->preload()
-                ->helperText('Selecciona la categoría para todos los productos que se importen'),
-
-            Select::make('brand_id')
-                ->label('Marca')
-                ->options(Brand::all()->pluck('name', 'id'))
-                ->required()
-                ->searchable()
-                ->preload()
-                ->helperText('Selecciona la marca para todos los productos que se importen'),
-        ];
     }
 
     public static function getColumns(): array
@@ -113,6 +92,13 @@ class ProductImporter extends Importer
                 ->rules(['nullable', 'boolean'])
                 ->castStateUsing(fn (?string $state): bool => $state !== '0' && $state !== 'false' && $state !== 'no'),
 
+            ImportColumn::make('category_name')
+                ->label('Categoría')
+                ->rules(['nullable', 'string']),
+
+            ImportColumn::make('brand_name')
+                ->label('Marca')
+                ->rules(['nullable', 'string']),
 
             ImportColumn::make('meta_title')
                 ->label('Meta Título')
@@ -130,82 +116,101 @@ class ProductImporter extends Importer
 
     public function resolveRecord(): ?Product
     {
-        Log::info('ProductImporter resolveRecord', [
-            'data' => $this->data
-        ]);
-
-        // Crear nuevo producto
-        $product = new Product();
-        
-        // Campos básicos
-        $product->name = $this->data['name'] ?? 'Producto Sin Nombre';
-        $product->description = $this->data['description'] ?? 'Descripción por defecto';
-        $product->short_description = $this->data['short_description'] ?? 'Descripción corta';
-        
-        // Precios
-        $product->price = $this->data['price'] ?? 0;
-        $product->compare_price = $this->data['compare_price'] ?? null;
-        $product->cost = $this->data['cost'] ?? 0;
-        $product->discount_percentage = $this->data['discount_percentage'] ?? null;
-        
-        // SKU y Stock
-        $product->sku = $this->data['sku'] ?? 'SKU-' . Str::upper(Str::slug($product->name, '')) . '-' . time();
-        $product->stock = $this->data['stock'] ?? 0;
-        $product->low_stock_threshold = $this->data['low_stock_threshold'] ?? 5;
-        
-        // Estado y configuración
-        $product->status = $this->data['status'] ?? 'active';
-        $product->is_featured = $this->data['is_featured'] ?? false;
-        $product->track_inventory = $this->data['track_inventory'] ?? true;
-        
-        // SEO
-        $product->meta_title = $this->data['meta_title'] ?? null;
-        $product->meta_description = $this->data['meta_description'] ?? null;
-        $product->meta_keywords = $this->data['meta_keywords'] ? explode(',', $this->data['meta_keywords']) : null;
-        
-        // Generar slug único
-        $product->slug = Str::slug($product->name) . '-' . time();
-        
-        // Las relaciones se manejarán en beforeSave usando las opciones seleccionadas
-
-        Log::info('ProductImporter product created', [
-            'name' => $product->name,
-            'price' => $product->price,
-            'stock' => $product->stock,
-            'sku' => $product->sku
-        ]);
-
-        return $product;
+        // No crear el producto aquí, solo retornar null
+        // El procesamiento se hará en beforeSave()
+        return null;
     }
 
     protected function beforeSave(): void
     {
-        Log::info('ProductImporter beforeSave', [
-            'record_name' => $this->record->name ?? 'NO_RECORD',
-            'options' => $this->options
-        ]);
-
-        // Usar las opciones seleccionadas en el formulario
-        if (isset($this->options['category_id'])) {
-            $this->record->category_id = $this->options['category_id'];
-        }
-
-        if (isset($this->options['brand_id'])) {
-            $this->record->brand_id = $this->options['brand_id'];
-        }
+        // Procesar cada fila del CSV y hacer INSERT directo
+        $this->processCsvRow();
     }
 
     protected function afterSave(): void
     {
-        Log::info('ProductImporter afterSave - PRODUCTO GUARDADO', [
-            'record_id' => $this->record->id,
-            'record_name' => $this->record->name,
-            'was_created' => $this->record->wasRecentlyCreated
-        ]);
+        // No hacer nada aquí ya que el procesamiento se hizo en beforeSave
+    }
+
+    private function processCsvRow(): void
+    {
+        try {
+            Log::info('DirectInsertImporter - Procesando fila', [
+                'data' => $this->data
+            ]);
+
+            // Preparar datos para el INSERT
+            $productData = $this->prepareProductData();
+            
+            // Hacer INSERT directo a la base de datos
+            $productId = DB::table('products')->insertGetId($productData);
+            
+            Log::info('DirectInsertImporter - PRODUCTO INSERTADO DIRECTAMENTE', [
+                'product_id' => $productId,
+                'name' => $productData['name'],
+                'sku' => $productData['sku']
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('DirectInsertImporter - ERROR en INSERT directo', [
+                'error' => $e->getMessage(),
+                'data' => $this->data
+            ]);
+        }
+    }
+
+    private function prepareProductData(): array
+    {
+        // Manejar categoría
+        $categoryId = 1; // Por defecto
+        if (isset($this->data['category_name']) && !empty($this->data['category_name'])) {
+            $category = Category::firstOrCreate(
+                ['name' => $this->data['category_name']],
+                ['slug' => Str::slug($this->data['category_name'])]
+            );
+            $categoryId = $category->id;
+        }
+
+        // Manejar marca
+        $brandId = 1; // Por defecto
+        if (isset($this->data['brand_name']) && !empty($this->data['brand_name'])) {
+            $brand = Brand::firstOrCreate(
+                ['name' => $this->data['brand_name']],
+                ['slug' => Str::slug($this->data['brand_name'])]
+            );
+            $brandId = $brand->id;
+        }
+
+        // Preparar datos para INSERT
+        $productData = [
+            'name' => $this->data['name'] ?? 'Producto Sin Nombre',
+            'slug' => Str::slug($this->data['name'] ?? 'producto') . '-' . time(),
+            'sku' => $this->data['sku'] ?? 'SKU-' . Str::upper(Str::slug($this->data['name'] ?? 'producto', '')) . '-' . time(),
+            'description' => $this->data['description'] ?? 'Descripción por defecto',
+            'short_description' => $this->data['short_description'] ?? 'Descripción corta',
+            'price' => $this->data['price'] ?? 0,
+            'compare_price' => $this->data['compare_price'] ?? null,
+            'cost' => $this->data['cost'] ?? 0,
+            'discount_percentage' => $this->data['discount_percentage'] ?? null,
+            'category_id' => $categoryId,
+            'brand_id' => $brandId,
+            'stock' => $this->data['stock'] ?? 0,
+            'low_stock_threshold' => $this->data['low_stock_threshold'] ?? 5,
+            'track_inventory' => $this->data['track_inventory'] ?? true,
+            'status' => $this->data['status'] ?? 'active',
+            'is_featured' => $this->data['is_featured'] ?? false,
+            'meta_title' => $this->data['meta_title'] ?? null,
+            'meta_description' => $this->data['meta_description'] ?? null,
+            'meta_keywords' => $this->data['meta_keywords'] ? json_encode(explode(',', $this->data['meta_keywords'])) : null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        return $productData;
     }
 
     public static function getCompletedNotificationBody(Import $import): string
     {
-        return 'Importación completada: ' . $import->successful_rows . ' productos importados exitosamente!';
+        return 'INSERT DIRECTO COMPLETADO: ' . $import->successful_rows . ' productos insertados directamente en la base de datos!';
     }
 }
