@@ -29,6 +29,31 @@ class ProductImporter extends Importer
     public static function getOptionsFormComponents(): array
     {
         return [
+            \Filament\Schemas\Components\Section::make('Información de Importación')
+                ->description('Guía para importar productos correctamente')
+                ->schema([
+                    \Filament\Forms\Components\Placeholder::make('import_instructions')
+                        ->label('')
+                        ->content(new \Illuminate\Support\HtmlString('
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <span class="text-sm font-medium text-gray-700">Importación por Categorías</span>
+                                </div>
+                                <div class="pl-4 space-y-2 text-sm text-gray-600">
+                                    <p>• Selecciona una categoría específica para todos los productos del CSV</p>
+                                    <p>• Selecciona una marca específica para todos los productos del CSV</p>
+                                    <p>• El CSV debe contener solo datos de productos (sin columnas de categoría/marca)</p>
+                                    <p>• Si necesitas importar productos de diferentes categorías, hazlo en importaciones separadas</p>
+                                </div>
+                            </div>
+                        '))
+                        ->columnSpanFull(),
+                ])
+                ->collapsible()
+                ->collapsed(false)
+                ->columnSpanFull(),
+
             Select::make('category_id')
                 ->label('Categoría')
                 ->options(Category::all()->pluck('name', 'id'))
