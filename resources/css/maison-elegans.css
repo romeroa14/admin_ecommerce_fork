@@ -1,0 +1,278 @@
+/* Maison Elegans - Panel de Administración Personalizado */
+
+/* Variables de colores */
+:root {
+    --maison-primary: #64181C;
+    --maison-primary-light: #7a1f24;
+    --maison-primary-dark: #4f1416;
+    --maison-white: #ffffff;
+    --maison-gray-light: #f8f9fa;
+    --maison-gray: #6c757d;
+    --maison-gray-dark: #343a40;
+}
+
+/* Estilos del sidebar */
+.fi-sidebar {
+    background-color: var(--maison-white) !important;
+    border-right: 1px solid #e9ecef !important;
+}
+
+.fi-sidebar-nav-item {
+    color: var(--maison-primary) !important;
+}
+
+.fi-sidebar-nav-item:hover {
+    background-color: rgba(100, 24, 28, 0.1) !important;
+    color: var(--maison-primary-dark) !important;
+}
+
+.fi-sidebar-nav-item-active {
+    background-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+.fi-sidebar-nav-item-active:hover {
+    background-color: var(--maison-primary-dark) !important;
+}
+
+/* Estilos del header/topbar */
+.fi-topbar {
+    background-color: var(--maison-white) !important;
+    border-bottom: 1px solid #e9ecef !important;
+}
+
+.fi-topbar-nav-item {
+    color: var(--maison-primary) !important;
+}
+
+.fi-topbar-nav-item:hover {
+    background-color: rgba(100, 24, 28, 0.1) !important;
+}
+
+/* Estilos de botones primarios */
+.fi-btn-primary {
+    background-color: var(--maison-primary) !important;
+    border-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+.fi-btn-primary:hover {
+    background-color: var(--maison-primary-dark) !important;
+    border-color: var(--maison-primary-dark) !important;
+}
+
+/* Estilos de badges y estados */
+.fi-badge-primary {
+    background-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+/* Estilos de formularios */
+.fi-input:focus {
+    border-color: var(--maison-primary) !important;
+    box-shadow: 0 0 0 3px rgba(100, 24, 28, 0.1) !important;
+}
+
+.fi-select:focus {
+    border-color: var(--maison-primary) !important;
+    box-shadow: 0 0 0 3px rgba(100, 24, 28, 0.1) !important;
+}
+
+/* Estilos de tablas */
+.fi-ta-header-cell {
+    background-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+.fi-ta-row:hover {
+    background-color: rgba(100, 24, 28, 0.05) !important;
+}
+
+/* Estilos de navegación */
+.fi-nav-item {
+    color: var(--maison-primary) !important;
+}
+
+.fi-nav-item:hover {
+    background-color: rgba(100, 24, 28, 0.1) !important;
+}
+
+.fi-nav-item-active {
+    background-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+/* Estilos de widgets */
+.fi-wi-stats-overview-stat {
+    background-color: var(--maison-white) !important;
+    border: 1px solid #e9ecef !important;
+}
+
+.fi-wi-stats-overview-stat-value {
+    color: var(--maison-primary) !important;
+}
+
+/* Estilos de modales */
+.fi-modal-header {
+    background-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+.fi-modal-close-button {
+    color: var(--maison-white) !important;
+}
+
+/* Estilos de notificaciones */
+.fi-no-success {
+    background-color: #d1fae5 !important;
+    border-color: #10b981 !important;
+    color: #065f46 !important;
+}
+
+.fi-no-danger {
+    background-color: #fee2e2 !important;
+    border-color: #ef4444 !important;
+    color: #991b1b !important;
+}
+
+/* Estilos de paginación */
+.fi-pagination-item-active {
+    background-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+.fi-pagination-item:hover {
+    background-color: rgba(100, 24, 28, 0.1) !important;
+    color: var(--maison-primary) !important;
+}
+
+/* Estilos de filtros */
+.fi-fo-field-wrp-label {
+    color: var(--maison-primary) !important;
+}
+
+/* Estilos de acciones */
+.fi-ac-btn-primary {
+    background-color: var(--maison-primary) !important;
+    border-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+.fi-ac-btn-primary:hover {
+    background-color: var(--maison-primary-dark) !important;
+    border-color: var(--maison-primary-dark) !important;
+}
+
+/* Estilos del logo */
+.fi-brand {
+    filter: none !important;
+}
+
+/* Estilos de la página de login */
+.fi-login-page {
+    background: linear-gradient(135deg, var(--maison-primary) 0%, var(--maison-primary-dark) 100%) !important;
+}
+
+.fi-login-page .fi-card {
+    background-color: var(--maison-white) !important;
+    border: 1px solid #e9ecef !important;
+}
+
+.fi-login-page .fi-btn-primary {
+    background-color: var(--maison-primary) !important;
+    border-color: var(--maison-primary) !important;
+}
+
+/* Estilos de dashboard */
+.fi-dashboard {
+    background-color: var(--maison-gray-light) !important;
+}
+
+/* Estilos de grupos de navegación */
+.fi-sidebar-nav-group-label {
+    color: var(--maison-primary) !important;
+    font-weight: 600 !important;
+}
+
+/* Estilos de breadcrumbs */
+.fi-breadcrumbs-item {
+    color: var(--maison-primary) !important;
+}
+
+.fi-breadcrumbs-item:hover {
+    color: var(--maison-primary-dark) !important;
+}
+
+/* Estilos de tabs */
+.fi-tabs-item-active {
+    background-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+.fi-tabs-item:hover {
+    background-color: rgba(100, 24, 28, 0.1) !important;
+    color: var(--maison-primary) !important;
+}
+
+/* Estilos de tooltips */
+.fi-tooltip {
+    background-color: var(--maison-primary) !important;
+    color: var(--maison-white) !important;
+}
+
+/* Estilos de dropdowns */
+.fi-dropdown-item:hover {
+    background-color: rgba(100, 24, 28, 0.1) !important;
+    color: var(--maison-primary) !important;
+}
+
+/* Estilos de checkboxes y radios */
+.fi-checkbox:checked {
+    background-color: var(--maison-primary) !important;
+    border-color: var(--maison-primary) !important;
+}
+
+.fi-radio:checked {
+    background-color: var(--maison-primary) !important;
+    border-color: var(--maison-primary) !important;
+}
+
+/* Estilos de switches */
+.fi-switch:checked {
+    background-color: var(--maison-primary) !important;
+}
+
+/* Estilos de sliders */
+.fi-slider-track {
+    background-color: var(--maison-primary) !important;
+}
+
+/* Estilos de progress bars */
+.fi-progress-bar {
+    background-color: var(--maison-primary) !important;
+}
+
+/* Estilos de alerts */
+.fi-alert-success {
+    background-color: #d1fae5 !important;
+    border-color: #10b981 !important;
+    color: #065f46 !important;
+}
+
+.fi-alert-danger {
+    background-color: #fee2e2 !important;
+    border-color: #ef4444 !important;
+    color: #991b1b !important;
+}
+
+.fi-alert-warning {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+
+.fi-alert-info {
+    background-color: #dbeafe !important;
+    border-color: #3b82f6 !important;
+    color: #1e40af !important;
+}

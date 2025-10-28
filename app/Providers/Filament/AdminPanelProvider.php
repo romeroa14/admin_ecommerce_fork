@@ -10,6 +10,8 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationBuilder;
@@ -31,8 +33,22 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => [
+                    50 => '#fef2f2',
+                    100 => '#fee2e2',
+                    200 => '#fecaca',
+                    300 => '#fca5a5',
+                    400 => '#f87171',
+                    500 => '#64181C', // Color principal vinotinto
+                    600 => '#5a1619',
+                    700 => '#4f1416',
+                    800 => '#441213',
+                    900 => '#391010',
+                    950 => '#2e0d0e',
+                ],
             ])
+            ->brandLogo(asset('storage/Logos/maisonelegans.png'))
+            ->brandLogoHeight('3rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -77,6 +93,10 @@ class AdminPanelProvider extends PanelProvider
                     'currencies' => \App\Models\Currency::active()->ordered()->get(),
                     'currentCurrency' => \App\Helpers\CurrencyHelper::getCurrentCurrency(),
                 ])->render()
+            )
+            ->renderHook(
+                'panels::head.end',
+                fn (): string => '<link rel="stylesheet" href="' . asset('build/assets/maison-elegans.css') . '">'
             );
     }
 }

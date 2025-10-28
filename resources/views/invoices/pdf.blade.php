@@ -30,7 +30,7 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 30px;
-            border-bottom: 2px solid #2563eb;
+            border-bottom: 2px solid #64181C;
             padding-bottom: 20px;
         }
         
@@ -41,7 +41,7 @@
         .company-name {
             font-size: 24px;
             font-weight: bold;
-            color: #2563eb;
+            color: #64181C;
             margin-bottom: 5px;
         }
         
@@ -58,7 +58,7 @@
         .invoice-title {
             font-size: 28px;
             font-weight: bold;
-            color: #2563eb;
+            color: #64181C;
             margin-bottom: 10px;
         }
         
@@ -87,7 +87,7 @@
         .section-title {
             font-size: 14px;
             font-weight: bold;
-            color: #2563eb;
+            color: #64181C;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -97,7 +97,7 @@
             background: #f8fafc;
             padding: 15px;
             border-radius: 5px;
-            border-left: 4px solid #2563eb;
+            border-left: 4px solid #64181C;
         }
         
         .customer-name {
@@ -120,7 +120,7 @@
             background: #f8fafc;
             padding: 15px;
             border-radius: 5px;
-            border-left: 4px solid #10b981;
+            border-left: 4px solid #64181C;
         }
         
         .order-number {
@@ -143,7 +143,7 @@
         }
         
         .items-table th {
-            background: #2563eb;
+            background: #64181C;
             color: white;
             padding: 12px 8px;
             text-align: left;
@@ -202,7 +202,7 @@
         }
         
         .total-row {
-            background: #2563eb;
+            background: #64181C;
             color: white;
             font-weight: bold;
             font-size: 14px;
@@ -261,13 +261,19 @@
         <!-- Header -->
         <div class="header">
             <div class="company-info">
-                <div class="company-name">{{ config('app.name', 'Mi Empresa') }}</div>
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <img src="{{ asset('storage/Logos/maisonelegans.png') }}" alt="Maison Elegans" style="height: 60px; margin-right: 15px;">
+                    {{-- <div>
+                        <div class="company-name">Maison Elegans</div>
+                        <div style="font-size: 14px; color: #666; font-style: italic;">Elegancia y Sofisticación</div>
+                    </div> --}}
+                </div>
                 <div class="company-details">
-                    Dirección de la empresa<br>
-                    Ciudad, País<br>
-                    Teléfono: +1 234 567 890<br>
-                    Email: info@empresa.com<br>
-                    Web: www.empresa.com
+                    Av. Principal 123, Centro Comercial<br>
+                    Caracas, Venezuela<br>
+                    Teléfono: +58 212 555-0123<br>
+                    Email: info@maisonelegans.com<br>
+                    Web: www.maisonelegans.com
                 </div>
             </div>
             <div class="invoice-info">
