@@ -48,6 +48,8 @@ class AdminPanelProvider extends PanelProvider
                     ->collapsed(false),
                 NavigationGroup::make('Ventas')
                     ->collapsed(false),
+                NavigationGroup::make('Envios')
+                    ->collapsed(false),
                 NavigationGroup::make('Marketing')
                     ->collapsed(true),
                 NavigationGroup::make('Usuarios')

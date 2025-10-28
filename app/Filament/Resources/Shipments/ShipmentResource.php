@@ -24,7 +24,7 @@ class ShipmentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'tracking_number';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Ventas';
+    protected static UnitEnum|string|null $navigationGroup = 'Envios';
 
     protected static ?string $navigationLabel = 'Tracking de Envíos';
 
@@ -32,7 +32,7 @@ class ShipmentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Tracking de Envíos';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {

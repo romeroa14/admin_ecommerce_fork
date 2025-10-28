@@ -132,24 +132,24 @@ class ProductForm
                                         return Category::create($data)->getKey();
                                     }),
 
-                                Select::make('brand_id')
-                                    ->label('Marca')
-                                    ->relationship('brand', 'name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->createOptionForm([
-                                        TextInput::make('name')
-                                            ->required(),
-                                        TextInput::make('slug')
-                                            ->required()
-                                            ->unique(),
-                                        Textarea::make('description'),
-                                        Toggle::make('is_active')
-                                            ->default(true),
-                                    ])
-                                    ->createOptionUsing(function (array $data): int {
-                                        return Brand::create($data)->getKey();
-                                    }),
+                                // Select::make('brand_id')
+                                //     ->label('Marca')
+                                //     ->relationship('brand', 'name')
+                                //     ->searchable()
+                                //     ->preload()
+                                //     ->createOptionForm([
+                                //         TextInput::make('name')
+                                //             ->required(),
+                                //         TextInput::make('slug')
+                                //             ->required()
+                                //             ->unique(),
+                                //         Textarea::make('description'),
+                                //         Toggle::make('is_active')
+                                //             ->default(true),
+                                //     ])
+                                //     ->createOptionUsing(function (array $data): int {
+                                //         return Brand::create($data)->getKey();
+                                //     }),
                             ]),
 
                         TagsInput::make('tags')
@@ -199,7 +199,6 @@ class ProductForm
                         FileUpload::make('images')
                             ->label('Imágenes del Producto')
                             ->multiple()
-                            ->image()
                             ->maxFiles(10)
                             ->directory('products')
                             ->disk('public')

@@ -23,13 +23,15 @@ class ShippingResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Configuraciones';
+    protected static string|UnitEnum|null $navigationGroup = 'Envios';
 
     protected static ?string $navigationLabel = 'Métodos de Envío';
 
     protected static ?string $modelLabel = 'Método de Envío';
 
     protected static ?string $pluralModelLabel = 'Métodos de Envío';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {

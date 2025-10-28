@@ -54,8 +54,8 @@ class ProductsTable
 
                 ImageColumn::make('images')
                     ->label('Imagen')
-                    ->circular()
-                    ->size(50)
+                    ->square()
+                    ->size(100)
                     ->defaultImageUrl(url('/images/placeholder-product.png'))
                     ->getStateUsing(function ($record) {
                         // Si hay imágenes, tomar la primera
