@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Products\Schemas;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Tag;
+use App\Models\Currency;
+use App\Helpers\CurrencyHelper;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -29,6 +31,8 @@ class ProductForm
             ->components([
                 Section::make('Información Básica del Producto')
                     ->schema([
+                        
+
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('name')
@@ -56,14 +60,16 @@ class ProductForm
                                     ->label('Precio')
                                     ->required()
                                     ->numeric()
-                                    ->prefix('$')
-                                    ->step(0.01),
+                                    ->prefix(fn () => CurrencyHelper::getCurrentCurrencySymbol())
+                                    ->step(0.01)
+                                    ->helperText(fn () => 'Moneda actual: ' . CurrencyHelper::getCurrentCurrencyCode()),
 
                                 TextInput::make('compare_price')
                                     ->label('Precio de Comparación')
                                     ->numeric()
-                                    ->prefix('$')
-                                    ->step(0.01),
+                                    ->prefix(fn () => CurrencyHelper::getCurrentCurrencySymbol())
+                                    ->step(0.01)
+                                    ->helperText(fn () => 'Moneda actual: ' . CurrencyHelper::getCurrentCurrencyCode()),
 
                                 TextInput::make('discount_percentage')
                                     ->label('Descuento (%)')
@@ -80,8 +86,9 @@ class ProductForm
                                 TextInput::make('cost')
                                     ->label('Precio de Costo')
                                     ->numeric()
-                                    ->prefix('$')
-                                    ->step(0.01),
+                                    ->prefix(fn () => CurrencyHelper::getCurrentCurrencySymbol())
+                                    ->step(0.01)
+                                    ->helperText(fn () => 'Moneda actual: ' . CurrencyHelper::getCurrentCurrencyCode()),
 
                                 TextInput::make('low_stock_threshold')
                                     ->label('Umbral de Stock Bajo')
