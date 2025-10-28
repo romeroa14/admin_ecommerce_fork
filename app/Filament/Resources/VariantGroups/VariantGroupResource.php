@@ -29,7 +29,7 @@ class VariantGroupResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Grupos de Variantes';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'name';
 

@@ -30,7 +30,7 @@ class CartResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Carritos';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {

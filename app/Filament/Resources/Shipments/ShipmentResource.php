@@ -32,7 +32,7 @@ class ShipmentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Tracking de Envíos';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 6;
 
     public static function form(Schema $schema): Schema
     {
