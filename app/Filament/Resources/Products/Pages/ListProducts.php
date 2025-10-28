@@ -22,6 +22,7 @@ class ListProducts extends ListRecords
             CreateAction::make(),
             ImportAction::make()
                 ->importer(ProductResource::getImporter())
+                ->label('Importar Productos')
                 ->color('success')
                 ->icon('heroicon-o-arrow-up-tray'),
         ];

@@ -11,42 +11,83 @@
     --maison-gray-dark: #343a40;
 }
 
-/* Estilos del sidebar */
-.fi-sidebar {
-    background-color: var(--maison-white) !important;
-    border-right: 1px solid #e9ecef !important;
-}
-
-.fi-sidebar-nav-item {
-    color: var(--maison-primary) !important;
-}
-
-.fi-sidebar-nav-item:hover {
-    background-color: rgba(100, 24, 28, 0.1) !important;
-    color: var(--maison-primary-dark) !important;
-}
-
-.fi-sidebar-nav-item-active {
+/* Estilos del sidebar - Selectores más específicos */
+.fi-sidebar,
+.fi-sidebar-nav,
+.fi-sidebar-nav-group,
+.fi-sidebar-nav-group-content {
     background-color: var(--maison-primary) !important;
+    border-right: 1px solid var(--maison-primary-dark) !important;
+}
+
+.fi-sidebar-nav-item,
+.fi-sidebar-nav-item-label,
+.fi-sidebar-nav-item-icon {
     color: var(--maison-white) !important;
 }
 
-.fi-sidebar-nav-item-active:hover {
-    background-color: var(--maison-primary-dark) !important;
+.fi-sidebar-nav-item:hover,
+.fi-sidebar-nav-item:hover .fi-sidebar-nav-item-label,
+.fi-sidebar-nav-item:hover .fi-sidebar-nav-item-icon {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--maison-white) !important;
 }
 
-/* Estilos del header/topbar */
-.fi-topbar {
-    background-color: var(--maison-white) !important;
-    border-bottom: 1px solid #e9ecef !important;
+.fi-sidebar-nav-item-active,
+.fi-sidebar-nav-item-active .fi-sidebar-nav-item-label,
+.fi-sidebar-nav-item-active .fi-sidebar-nav-item-icon {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: var(--maison-white) !important;
 }
 
+.fi-sidebar-nav-item-active:hover,
+.fi-sidebar-nav-item-active:hover .fi-sidebar-nav-item-label,
+.fi-sidebar-nav-item-active:hover .fi-sidebar-nav-item-icon {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Estilos del header/topbar - Selectores más específicos */
+.fi-topbar,
+.fi-topbar-nav,
 .fi-topbar-nav-item {
-    color: var(--maison-primary) !important;
+    background-color: var(--maison-primary) !important;
+    border-bottom: 1px solid var(--maison-primary-dark) !important;
 }
 
-.fi-topbar-nav-item:hover {
-    background-color: rgba(100, 24, 28, 0.1) !important;
+.fi-topbar-nav-item,
+.fi-topbar-nav-item-label,
+.fi-topbar-nav-item-icon,
+.fi-topbar-nav-item-button {
+    color: var(--maison-white) !important;
+}
+
+.fi-topbar-nav-item:hover,
+.fi-topbar-nav-item:hover .fi-topbar-nav-item-label,
+.fi-topbar-nav-item:hover .fi-topbar-nav-item-icon {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--maison-white) !important;
+}
+
+/* Estilos específicos para elementos del topbar */
+.fi-topbar-search,
+.fi-topbar-search-input,
+.fi-topbar-search-button {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--maison-white) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.fi-topbar-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.fi-topbar-user-menu,
+.fi-topbar-user-menu-button {
+    color: var(--maison-white) !important;
+}
+
+.fi-topbar-user-menu:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Estilos de botones primarios */
@@ -185,13 +226,69 @@
 
 /* Estilos de dashboard */
 .fi-dashboard {
-    background-color: var(--maison-gray-light) !important;
+    background-color: var(--maison-primary) !important;
 }
 
-/* Estilos de grupos de navegación */
-.fi-sidebar-nav-group-label {
-    color: var(--maison-primary) !important;
+/* Estilos del contenido principal */
+.fi-main {
+    background-color: var(--maison-primary) !important;
+}
+
+/* Estilos del panel principal */
+.fi-panel {
+    background-color: var(--maison-primary) !important;
+}
+
+/* Estilos del contenido de páginas */
+.fi-page {
+    background-color: var(--maison-white) !important;
+    border-radius: 8px !important;
+    margin: 16px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Estilos de las tarjetas */
+.fi-card {
+    background-color: var(--maison-white) !important;
+    border: 1px solid #e9ecef !important;
+}
+
+/* Estilos de las tablas */
+.fi-ta {
+    background-color: var(--maison-white) !important;
+}
+
+/* Estilos de los formularios */
+.fi-fo {
+    background-color: var(--maison-white) !important;
+}
+
+/* Estilos de los widgets */
+.fi-wi {
+    background-color: var(--maison-white) !important;
+}
+
+/* Estilos de grupos de navegación - Selectores más específicos */
+.fi-sidebar-nav-group-label,
+.fi-sidebar-nav-group-label-text {
+    color: var(--maison-white) !important;
     font-weight: 600 !important;
+    background-color: transparent !important;
+}
+
+.fi-sidebar-nav-group-content {
+    background-color: transparent !important;
+}
+
+/* Estilos específicos para el logo y brand */
+.fi-brand,
+.fi-brand-logo,
+.fi-brand-text {
+    color: var(--maison-white) !important;
+}
+
+.fi-brand-logo img {
+    filter: brightness(0) invert(1) !important;
 }
 
 /* Estilos de breadcrumbs */
@@ -275,4 +372,52 @@
     background-color: #dbeafe !important;
     border-color: #3b82f6 !important;
     color: #1e40af !important;
+}
+
+/* Estilos adicionales para forzar la aplicación */
+[data-sidebar] {
+    background-color: var(--maison-primary) !important;
+}
+
+[data-sidebar] * {
+    color: var(--maison-white) !important;
+}
+
+[data-topbar] {
+    background-color: var(--maison-primary) !important;
+}
+
+[data-topbar] * {
+    color: var(--maison-white) !important;
+}
+
+/* Estilos específicos para Filament v4 */
+.fi-sidebar-nav-item[data-active="true"] {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: var(--maison-white) !important;
+}
+
+.fi-sidebar-nav-item[data-active="true"] * {
+    color: var(--maison-white) !important;
+}
+
+/* Forzar estilos en elementos específicos */
+.fi-sidebar .fi-sidebar-nav-item {
+    color: var(--maison-white) !important;
+}
+
+.fi-topbar .fi-topbar-nav-item {
+    color: var(--maison-white) !important;
+}
+
+/* Estilos para el contenido principal */
+.fi-main-content {
+    background-color: var(--maison-primary) !important;
+}
+
+.fi-main-content .fi-page {
+    background-color: var(--maison-white) !important;
+    border-radius: 8px !important;
+    margin: 16px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
 }

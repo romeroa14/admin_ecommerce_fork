@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Widgets\CurrencySelector;
+use App\Filament\Widgets\RevenueWidget;
+use App\Filament\Widgets\CartsWidget;
+use App\Filament\Widgets\ActiveUsersWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -49,16 +51,18 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandLogo(asset('storage/Logos/maisonelegans.png'))
             ->brandLogoHeight('3rem')
+            
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                RevenueWidget::class,
+                CartsWidget::class,
+                ActiveUsersWidget::class,
             ])
+            
             ->navigationGroups([
                 NavigationGroup::make('Catálogo')
                     ->collapsed(false),
@@ -93,10 +97,7 @@ class AdminPanelProvider extends PanelProvider
                     'currencies' => \App\Models\Currency::active()->ordered()->get(),
                     'currentCurrency' => \App\Helpers\CurrencyHelper::getCurrentCurrency(),
                 ])->render()
-            )
-            ->renderHook(
-                'panels::head.end',
-                fn (): string => '<link rel="stylesheet" href="' . asset('build/assets/maison-elegans.css') . '">'
-            );
+                );
+            
     }
 }
