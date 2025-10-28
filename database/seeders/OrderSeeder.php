@@ -139,9 +139,9 @@ class OrderSeeder extends Seeder
                 'shipping_address_id' => $shippingAddress->id,
                 'billing_address_id' => $billingAddress->id,
                 'coupon_id' => Coupon::first()->id,
-                'status' => 'delivered',
-                'payment_status' => 'paid',
-                'payment_method' => 'credit_card',
+                'status' => 'confirmed',
+                'is_paid' => true,
+                'paid_at' => now()->subDays(5),
                 'subtotal' => 299.98,
                 'discount_amount' => 29.99,
                 'tax_amount' => 22.50,
@@ -158,9 +158,9 @@ class OrderSeeder extends Seeder
                 'user_id' => $user->id,
                 'shipping_address_id' => $shippingAddress->id,
                 'billing_address_id' => $billingAddress->id,
-                'status' => 'shipped',
-                'payment_status' => 'paid',
-                'payment_method' => 'paypal',
+                'status' => 'processing',
+                'is_paid' => true,
+                'paid_at' => now()->subDays(3),
                 'subtotal' => 149.99,
                 'discount_amount' => 0.00,
                 'tax_amount' => 12.00,
@@ -177,8 +177,8 @@ class OrderSeeder extends Seeder
                 'shipping_address_id' => $shippingAddress->id,
                 'billing_address_id' => $billingAddress->id,
                 'status' => 'pending',
-                'payment_status' => 'pending',
-                'payment_method' => 'stripe',
+                'is_paid' => false,
+                'paid_at' => null,
                 'subtotal' => 79.99,
                 'discount_amount' => 0.00,
                 'tax_amount' => 6.40,
@@ -218,11 +218,11 @@ class OrderSeeder extends Seeder
             }
 
             // Crear pago si el pedido está pagado
-            if ($order->payment_status === 'paid') {
+            if ($order->is_paid) {
                 Payment::create([
                     'order_id' => $order->id,
                     'transaction_id' => 'TXN-' . strtoupper(Str::random(10)),
-                    'payment_method' => $order->payment_method,
+                    'payment_method' => 'credit_card',
                     'amount' => $order->total_amount,
                     'currency' => 'USD',
                     'status' => 'completed',
@@ -257,7 +257,7 @@ class OrderSeeder extends Seeder
             }
 
             // Crear factura si el pedido está pagado
-            if ($order->payment_status === 'paid') {
+            if ($order->is_paid) {
                 Invoice::create([
                     'order_id' => $order->id,
                     'invoice_number' => Invoice::generateInvoiceNumber(),

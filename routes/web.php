@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\InvoiceController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,3 +24,7 @@ Route::post('/currency/update', function () {
     
     return redirect()->back();
 })->name('currency.update');
+
+// Rutas para facturas
+Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+Route::get('/invoices/{invoice}/view', [InvoiceController::class, 'view'])->name('invoices.view');

@@ -51,13 +51,7 @@ class PaymentsTable
                     ->sortable()
                     ->alignEnd(),
 
-                TextColumn::make('currency')
-                    ->label('Moneda')
-                    ->getStateUsing(function ($record) {
-                        return current_currency_symbol() . ' ' . current_currency_code();
-                    })
-                    ->badge()
-                    ->color('info'),
+                
 
                 BadgeColumn::make('status')
                     ->label('Estado')
@@ -106,7 +100,7 @@ class PaymentsTable
                     ]),
             ])
             ->recordActions([
-                ViewAction::make(),
+                // ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_payment_status')
                     ->label(fn (Payment $record) => $record->status === 'completed' ? 'Marcar como Pendiente' : 'Marcar como Completado')

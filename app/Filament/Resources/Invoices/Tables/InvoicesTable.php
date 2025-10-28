@@ -5,8 +5,11 @@ namespace App\Filament\Resources\Invoices\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use App\Models\Invoice;
 
 class InvoicesTable
 {
@@ -14,6 +17,11 @@ class InvoicesTable
     {
         return $table
             ->columns([
+                TextColumn::make('invoice_date')
+                    ->label('Fecha de Factura')
+                    ->date()
+                    ->sortable(),
+                    
                 TextColumn::make('invoice_number')
                     ->label('Número de Factura')
                     ->searchable()
@@ -33,16 +41,9 @@ class InvoicesTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('invoice_date')
-                    ->label('Fecha de Factura')
-                    ->date()
-                    ->sortable(),
+                
 
-                TextColumn::make('due_date')
-                    ->label('Fecha de Vencimiento')
-                    ->date()
-                    ->sortable()
-                    ->color(fn ($record) => $record->due_date < now() ? 'danger' : 'gray'),
+                
 
                 TextColumn::make('total_amount')
                     ->label('Total')
@@ -74,6 +75,18 @@ class InvoicesTable
             ])
             ->recordActions([
                 EditAction::make(),
+                Action::make('view_invoice')
+                    ->label('Ver Factura')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->url(fn (Invoice $record) => route('invoices.view', $record))
+                    ->openUrlInNewTab(),
+                Action::make('download_pdf')
+                    ->label('Descargar PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('success')
+                    ->url(fn (Invoice $record) => route('invoices.pdf', $record))
+                    ->openUrlInNewTab(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
