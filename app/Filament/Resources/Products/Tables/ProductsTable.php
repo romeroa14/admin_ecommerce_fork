@@ -9,6 +9,7 @@ use App\Models\Cart;
 use App\Models\User;
 use App\Models\VariantGroup;
 use App\Models\Variant;
+use App\Helpers\CurrencyHelper;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -68,13 +69,13 @@ class ProductsTable
 
                 TextColumn::make('price')
                     ->label('Precio')
-                    ->money('USD')
+                    ->formatStateUsing(fn ($state) => CurrencyHelper::formatAmount($state))
                     ->sortable()
                     ->weight('bold'),
 
                 TextColumn::make('compare_price')
                     ->label('Precio de Comparación')
-                    ->money('USD')
+                    ->formatStateUsing(fn ($state) => $state ? CurrencyHelper::formatAmount($state) : '-')
                     ->sortable()
                     ->toggleable(),
 
@@ -202,11 +203,13 @@ class ProductsTable
                         TextInput::make('min_price')
                             ->label('Precio Mínimo')
                             ->numeric()
-                            ->prefix('$'),
+                            ->prefix(fn () => CurrencyHelper::getCurrentCurrencySymbol())
+                            ->helperText(fn () => 'Moneda: ' . CurrencyHelper::getCurrentCurrencyCode()),
                         TextInput::make('max_price')
                             ->label('Precio Máximo')
                             ->numeric()
-                            ->prefix('$'),
+                            ->prefix(fn () => CurrencyHelper::getCurrentCurrencySymbol())
+                            ->helperText(fn () => 'Moneda: ' . CurrencyHelper::getCurrentCurrencyCode()),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

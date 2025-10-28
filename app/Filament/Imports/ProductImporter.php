@@ -5,6 +5,8 @@ namespace App\Filament\Imports;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Currency;
+use App\Helpers\CurrencyHelper;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
@@ -62,13 +64,21 @@ class ProductImporter extends Importer
                 ->preload()
                 ->helperText('Selecciona la categoría para todos los productos que se importen'),
 
-            Select::make('brand_id')
-                ->label('Marca')
-                ->options(Brand::all()->pluck('name', 'id'))
-                ->required()
-                ->searchable()
-                ->preload()
-                ->helperText('Selecciona la marca para todos los productos que se importen'),
+                Select::make('brand_id')
+                    ->label('Marca')
+                    ->options(Brand::all()->pluck('name', 'id'))
+                    ->required()
+                    ->searchable()
+                    ->preload()
+                    ->helperText('Selecciona la marca para todos los productos que se importen'),
+
+                Select::make('currency_id')
+                    ->label('Moneda de Importación')
+                    ->options(Currency::active()->get()->pluck('name', 'id'))
+                    ->default(CurrencyHelper::getCurrentCurrency()?->id)
+                    ->searchable()
+                    ->preload()
+                    ->helperText('Selecciona la moneda para los precios en el CSV'),
         ];
     }
 
@@ -218,6 +228,44 @@ class ProductImporter extends Importer
         if (isset($this->options['brand_id'])) {
             $this->record->brand_id = $this->options['brand_id'];
         }
+
+        // Manejar conversión de monedas si es necesario
+        if (isset($this->options['currency_id'])) {
+            $importCurrency = Currency::find($this->options['currency_id']);
+            $currentCurrency = CurrencyHelper::getCurrentCurrency();
+            
+            if ($importCurrency && $currentCurrency && $importCurrency->id !== $currentCurrency->id) {
+                // Convertir precios de la moneda de importación a la moneda actual
+                $this->record->price = CurrencyHelper::convertAmount(
+                    $this->record->price, 
+                    $importCurrency, 
+                    $currentCurrency
+                );
+                
+                if ($this->record->compare_price) {
+                    $this->record->compare_price = CurrencyHelper::convertAmount(
+                        $this->record->compare_price, 
+                        $importCurrency, 
+                        $currentCurrency
+                    );
+                }
+                
+                if ($this->record->cost) {
+                    $this->record->cost = CurrencyHelper::convertAmount(
+                        $this->record->cost, 
+                        $importCurrency, 
+                        $currentCurrency
+                    );
+                }
+                
+                Log::info('ProductImporter: Precios convertidos', [
+                    'from_currency' => $importCurrency->code,
+                    'to_currency' => $currentCurrency->code,
+                    'original_price' => $this->data['price'],
+                    'converted_price' => $this->record->price
+                ]);
+            }
+        }
     }
 
     protected function afterSave(): void
@@ -229,8 +277,25 @@ class ProductImporter extends Importer
         ]);
     }
 
+    public static function getCompletedNotificationTitle(Import $import): string
+    {
+        return '🎉 Importación de Productos Completada';
+    }
+
     public static function getCompletedNotificationBody(Import $import): string
     {
-        return 'Importación completada: ' . $import->successful_rows . ' productos importados exitosamente!';
+        $successful = number_format($import->successful_rows);
+        $failed = number_format($import->getFailedRowsCount());
+        $total = number_format($import->total_rows);
+
+        $body = "¡Importación completada exitosamente! {$successful} de {$total} productos han sido agregados a tu catálogo.";
+
+        if ($failed > 0) {
+            $body .= " {$failed} productos no pudieron ser importados. Revisa los errores para más detalles.";
+        } else {
+            $body .= " Todos los productos se importaron sin errores.";
+        }
+
+        return $body;
     }
 }
