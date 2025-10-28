@@ -22,6 +22,9 @@ return new class extends Migration
             $table->foreignId('coupon_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('shipping_id')->nullable()->constrained()->onDelete('set null');
             $table->enum('status', ['pending', 'processing', 'confirmed', 'cancelled', 'refunded'])->default('pending');
+            $table->boolean('is_paid')->default(false);
+            $table->timestamp('paid_at')->nullable();
+            $table->boolean('is_delivered')->default(false);
             $table->decimal('subtotal', 10, 2);
             $table->decimal('discount_amount', 10, 2)->default(0);
             $table->decimal('tax_amount', 10, 2)->default(0);

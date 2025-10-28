@@ -19,6 +19,9 @@ class Order extends Model
         'coupon_id',
         'shipping_id',
         'status',
+        'is_paid',
+        'paid_at',
+        'is_delivered',
         'subtotal',
         'discount_amount',
         'tax_amount',
@@ -38,6 +41,9 @@ class Order extends Model
         'tax_amount' => 'decimal:2',
         'shipping_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'is_paid' => 'boolean',
+        'is_delivered' => 'boolean',
+        'paid_at' => 'datetime',
         'confirmed_at' => 'datetime',
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
@@ -151,7 +157,7 @@ class Order extends Model
     // Accessor para verificar si está pagado
     public function getIsPaidAttribute()
     {
-        return $this->payment_status === 'paid';
+        return $this->getAttribute('is_paid') ?? false;
     }
 
     // Accessor para verificar si está entregado

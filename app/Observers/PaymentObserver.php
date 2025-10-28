@@ -18,6 +18,18 @@ class PaymentObserver
     {
         // Si el pago cambió a 'completed', crear factura y shipment
         if ($payment->wasChanged('status') && $payment->status === 'completed') {
+            // Marcar el pedido como pagado y confirmar si estaba pendiente
+            $order = $payment->order;
+            if ($order) {
+                $order->is_paid = true;
+                $order->paid_at = now();
+                if ($order->status === 'pending') {
+                    $order->status = 'confirmed';
+                    $order->confirmed_at = now();
+                }
+                $order->save();
+            }
+
             $this->createInvoice($payment);
             $this->createShipment($payment);
         }
@@ -43,7 +55,7 @@ class PaymentObserver
             'discount_amount' => $order->discount_amount,
             'total_amount' => $order->total_amount,
             'status' => 'sent', // Directamente enviada ya que el pago está completo
-            'billing_address' => $order->billingAddress?->getFullAddress(),
+            'billing_address' => $order->billingAddress?->full_address,
             'notes' => "Factura generada automáticamente tras confirmación de pago para el pedido #{$order->order_number}",
         ]);
     }
@@ -74,7 +86,7 @@ class PaymentObserver
             'carrier' => $shipping->name,
             'status' => 'pending',
             'estimated_delivery' => now()->addDays($shipping->estimated_days_min ?? 3),
-            'shipping_address' => $order->shippingAddress?->getFullAddress(),
+            'shipping_address' => $order->shippingAddress?->full_address,
             'notes' => "Envío creado automáticamente tras confirmación de pago para el pedido #{$order->order_number}",
         ]);
     }

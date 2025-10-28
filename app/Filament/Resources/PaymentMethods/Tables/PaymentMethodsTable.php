@@ -47,24 +47,7 @@ class PaymentMethodsTable
                     ->trueColor('success')
                     ->falseColor('danger'),
 
-                TextColumn::make('sort_order')
-                    ->label('Orden')
-                    ->sortable()
-                    ->alignCenter(),
-
-                BadgeColumn::make('requires_gateway')
-                    ->label('Gateway')
-                    ->colors([
-                        'success' => true,
-                        'gray' => false,
-                    ])
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Sí' : 'No'),
-
-                TextColumn::make('payments_count')
-                    ->label('Pagos')
-                    ->counts('payments')
-                    ->sortable()
-                    ->alignCenter(),
+                
 
                 TextColumn::make('created_at')
                     ->label('Creado')

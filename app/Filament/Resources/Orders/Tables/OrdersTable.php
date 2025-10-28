@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Orders\Tables;
 use App\Models\Order;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -19,6 +20,7 @@ use Filament\Tables\Table;
 use Filament\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Schema;
 
 class OrdersTable
 {
@@ -26,6 +28,12 @@ class OrdersTable
     {
         return $table
             ->columns([
+                TextColumn::make('created_at')
+                    ->label('Fecha de Creación')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(),
+
                 TextColumn::make('order_number')
                     ->label('Número de Pedido')
                     ->searchable()
@@ -40,29 +48,6 @@ class OrdersTable
                     ->sortable()
                     ->limit(30),
 
-                BadgeColumn::make('status')
-                    ->label('Estado')
-                    ->colors([
-                        'warning' => 'pending',
-                        'info' => 'processing',
-                        'success' => 'confirmed',
-                        'primary' => 'shipped',
-                        'success' => 'delivered',
-                        'danger' => 'cancelled',
-                        'secondary' => 'refunded',
-                    ])
-                    ->sortable(),
-
-                
-
-                TextColumn::make('total_amount')
-                    ->label('Total')
-                    ->getStateUsing(function ($record) {
-                        return \App\Helpers\CurrencyHelper::formatAmount($record->total_amount);
-                    })
-                    ->sortable()
-                    ->weight('bold'),
-
                 TextColumn::make('items_count')
                     ->label('Items')
                     ->getStateUsing(function ($record) {
@@ -74,11 +59,24 @@ class OrdersTable
                     ->badge()
                     ->color('info'),
 
-                TextColumn::make('created_at')
-                    ->label('Fecha de Creación')
-                    ->dateTime()
+
+
+
+
+                TextColumn::make('total_amount')
+                    ->label('Total')
+                    ->getStateUsing(function ($record) {
+                        return \App\Helpers\CurrencyHelper::formatAmount($record->total_amount);
+                    })
                     ->sortable()
-                    ->toggleable(),
+                    ->weight('bold'),
+
+                
+
+
+
+
+
 
                 TextColumn::make('confirmed_at')
                     ->label('Confirmado')
@@ -158,11 +156,11 @@ class OrdersTable
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
 
@@ -182,11 +180,11 @@ class OrdersTable
                         return $query
                             ->when(
                                 $data['min_amount'],
-                                fn (Builder $query, $amount): Builder => $query->where('total_amount', '>=', $amount),
+                                fn(Builder $query, $amount): Builder => $query->where('total_amount', '>=', $amount),
                             )
                             ->when(
                                 $data['max_amount'],
-                                fn (Builder $query, $amount): Builder => $query->where('total_amount', '<=', $amount),
+                                fn(Builder $query, $amount): Builder => $query->where('total_amount', '<=', $amount),
                             );
                     }),
             ])
