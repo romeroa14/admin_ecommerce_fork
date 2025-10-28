@@ -157,7 +157,7 @@ class Order extends Model
     // Accessor para verificar si está pagado
     public function getIsPaidAttribute()
     {
-        return $this->getAttribute('is_paid') ?? false;
+        return (bool) $this->getRawOriginal('is_paid');
     }
 
     // Accessor para verificar si está entregado
