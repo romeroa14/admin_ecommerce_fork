@@ -27,17 +27,6 @@ class CategoriesTable
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                ImageColumn::make('image')
-                    ->label('Imagen')
-                    ->circular()
-                    ->size(40),
-
-                TextColumn::make('parent.name')
-                    ->label('Categoría Padre')
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
-                    ->color('info'),
 
                 IconColumn::make('is_active')
                     ->label('Activa')
@@ -47,11 +36,7 @@ class CategoriesTable
                     ->trueColor('success')
                     ->falseColor('danger'),
 
-                TextColumn::make('order')
-                    ->label('Orden')
-                    ->numeric()
-                    ->sortable()
-                    ->alignCenter(),
+                
 
                 TextColumn::make('products_count')
                     ->label('Productos')

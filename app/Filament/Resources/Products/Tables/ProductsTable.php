@@ -37,6 +37,21 @@ class ProductsTable
     {
         return $table
             ->columns([
+                TextColumn::make('category.name')
+                    ->label('Categoría')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
+
+                TextColumn::make('sku')
+                    ->label('SKU')
+                    ->searchable()
+                    ->sortable()
+                    ->copyable()
+                    ->copyMessage('SKU copiado')
+                    ->copyMessageDuration(1500),
+
                 ImageColumn::make('images')
                     ->label('Imagen')
                     ->circular()
@@ -59,13 +74,7 @@ class ProductsTable
                     ->weight('bold')
                     ->limit(50),
 
-                TextColumn::make('sku')
-                    ->label('SKU')
-                    ->searchable()
-                    ->sortable()
-                    ->copyable()
-                    ->copyMessage('SKU copiado')
-                    ->copyMessageDuration(1500),
+                
 
                 TextColumn::make('price')
                     ->label('Precio')
@@ -73,11 +82,7 @@ class ProductsTable
                     ->sortable()
                     ->weight('bold'),
 
-                TextColumn::make('compare_price')
-                    ->label('Precio de Comparación')
-                    ->formatStateUsing(fn ($state) => $state ? CurrencyHelper::formatAmount($state) : '-')
-                    ->sortable()
-                    ->toggleable(),
+                
 
                 TextColumn::make('stock')
                     ->label('Stock')
@@ -90,19 +95,9 @@ class ProductsTable
                         default => 'success',
                     }),
 
-                TextColumn::make('category.name')
-                    ->label('Categoría')
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
-                    ->color('info'),
+                
 
-                TextColumn::make('brand.name')
-                    ->label('Marca')
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
-                    ->color('gray'),
+                
 
                 BadgeColumn::make('status')
                     ->label('Estado')
@@ -119,29 +114,8 @@ class ProductsTable
                     })
                     ->sortable(),
 
-                IconColumn::make('is_featured')
-                    ->label('Destacado')
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(),
+                
 
-                IconColumn::make('track_inventory')
-                    ->label('Rastrear Inventario')
-                    ->boolean()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('created_at')
-                    ->label('Creado')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('updated_at')
-                    ->label('Actualizado')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')

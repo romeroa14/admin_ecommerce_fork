@@ -27,10 +27,5 @@ class ListProducts extends ListRecords
         ];
     }
 
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            \App\Filament\Widgets\CurrencySelector::class,
-        ];
-    }
+    
 }
