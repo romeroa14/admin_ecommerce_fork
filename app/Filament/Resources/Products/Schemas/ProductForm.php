@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Models\Category;
-use App\Models\Brand;
 use App\Models\Tag;
 use App\Models\Currency;
 use App\Helpers\CurrencyHelper;
@@ -31,7 +30,7 @@ class ProductForm
             ->components([
                 Section::make('Información Básica del Producto')
                     ->schema([
-                        
+
 
                         Grid::make(2)
                             ->schema([
@@ -39,7 +38,7 @@ class ProductForm
                                     ->label('Nombre del Producto')
                                     ->required()
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (Set $set, $state) => $set('slug', Str::slug($state))),
+                                    ->afterStateUpdated(fn(Set $set, $state) => $set('slug', Str::slug($state))),
 
                                 TextInput::make('slug')
                                     ->label('Slug')
@@ -60,16 +59,16 @@ class ProductForm
                                     ->label('Precio')
                                     ->required()
                                     ->numeric()
-                                    ->prefix(fn () => CurrencyHelper::getCurrentCurrencySymbol())
+                                    ->prefix(fn() => CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
-                                    ->helperText(fn () => 'Moneda actual: ' . CurrencyHelper::getCurrentCurrencyCode()),
+                                    ->helperText(fn() => 'Moneda actual: ' . CurrencyHelper::getCurrentCurrencyCode()),
 
                                 TextInput::make('compare_price')
                                     ->label('Precio de Comparación')
                                     ->numeric()
-                                    ->prefix(fn () => CurrencyHelper::getCurrentCurrencySymbol())
+                                    ->prefix(fn() => CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
-                                    ->helperText(fn () => 'Moneda actual: ' . CurrencyHelper::getCurrentCurrencyCode()),
+                                    ->helperText(fn() => 'Moneda actual: ' . CurrencyHelper::getCurrentCurrencyCode()),
 
                                 TextInput::make('discount_percentage')
                                     ->label('Descuento (%)')
@@ -86,9 +85,9 @@ class ProductForm
                                 TextInput::make('cost')
                                     ->label('Precio de Costo')
                                     ->numeric()
-                                    ->prefix(fn () => CurrencyHelper::getCurrentCurrencySymbol())
+                                    ->prefix(fn() => CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
-                                    ->helperText(fn () => 'Moneda actual: ' . CurrencyHelper::getCurrentCurrencyCode()),
+                                    ->helperText(fn() => 'Moneda actual: ' . CurrencyHelper::getCurrentCurrencyCode()),
 
                                 TextInput::make('low_stock_threshold')
                                     ->label('Umbral de Stock Bajo')
@@ -131,25 +130,6 @@ class ProductForm
                                     ->createOptionUsing(function (array $data): int {
                                         return Category::create($data)->getKey();
                                     }),
-
-                                // Select::make('brand_id')
-                                //     ->label('Marca')
-                                //     ->relationship('brand', 'name')
-                                //     ->searchable()
-                                //     ->preload()
-                                //     ->createOptionForm([
-                                //         TextInput::make('name')
-                                //             ->required(),
-                                //         TextInput::make('slug')
-                                //             ->required()
-                                //             ->unique(),
-                                //         Textarea::make('description'),
-                                //         Toggle::make('is_active')
-                                //             ->default(true),
-                                //     ])
-                                //     ->createOptionUsing(function (array $data): int {
-                                //         return Brand::create($data)->getKey();
-                                //     }),
                             ]),
 
                         TagsInput::make('tags')
@@ -190,6 +170,11 @@ class ProductForm
                                 Toggle::make('is_featured')
                                     ->label('Producto Destacado')
                                     ->default(false),
+
+                                Toggle::make('is_on_demand')
+                                    ->label('Contrapedido')
+                                    ->default(false)
+                                    ->helperText('Si se marca, el stock no se descuenta automáticamente.'),
                             ]),
                     ])
                     ->collapsible(),
@@ -207,7 +192,7 @@ class ProductForm
                     ])
                     ->collapsible(),
 
-                
+
 
                 Section::make('SEO y Metadatos')
                     ->schema([

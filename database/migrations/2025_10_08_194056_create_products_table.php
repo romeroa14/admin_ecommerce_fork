@@ -28,6 +28,7 @@ return new class extends Migration
             $table->integer('low_stock_threshold')->default(10);
             $table->boolean('track_inventory')->default(true);
             $table->enum('status', ['active', 'draft', 'archived'])->default('draft');
+            $table->boolean('is_on_demand')->default(false);
             $table->boolean('is_featured')->default(false);
             $table->json('images')->nullable();
             $table->string('meta_title')->nullable();

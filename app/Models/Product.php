@@ -26,6 +26,7 @@ class Product extends Model
         'track_inventory',
         'status',
         'is_featured',
+        'is_on_demand',
         'images',
         'meta_title',
         'meta_description',
@@ -40,8 +41,11 @@ class Product extends Model
         'cost' => 'decimal:2',
         'discount_percentage' => 'decimal:2',
         'is_featured' => 'boolean',
+        'is_on_demand' => 'boolean',
         'track_inventory' => 'boolean',
     ];
+
+
 
     public function category(): BelongsTo
     {
@@ -56,15 +60,15 @@ class Product extends Model
     public function variants(): BelongsToMany
     {
         return $this->belongsToMany(Variant::class, 'product_variants')
-                    ->withPivot('variant_group_id')
-                    ->withTimestamps();
+            ->withPivot('variant_group_id')
+            ->withTimestamps();
     }
 
     public function variantGroups(): BelongsToMany
     {
         return $this->belongsToMany(VariantGroup::class, 'product_variants')
-                    ->withPivot('variant_id')
-                    ->withTimestamps();
+            ->withPivot('variant_id')
+            ->withTimestamps();
     }
 
     public function images(): HasMany
@@ -110,7 +114,7 @@ class Product extends Model
     // Accessor para obtener la imagen principal
     public function getPrimaryImageAttribute()
     {
-        return $this->images()->where('is_primary', true)->first() 
+        return $this->images()->where('is_primary', true)->first()
             ?? $this->images()->ordered()->first();
     }
 
@@ -118,7 +122,7 @@ class Product extends Model
     public function getDiscountedPriceAttribute()
     {
         $activeDiscounts = $this->discounts()->valid()->get();
-        
+
         if ($activeDiscounts->isEmpty()) {
             return $this->price;
         }
@@ -144,7 +148,7 @@ class Product extends Model
         if ($this->variants()->exists()) {
             return $this->variants()->sum('stock');
         }
-        
+
         return $this->inventories()->sum('quantity');
     }
 
