@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\Category;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -42,6 +43,15 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+
+            // Categories - available in navbar dropdown
+            'categories' => function () {
+                return Category::active()
+                    ->ordered()
+                    ->take(8) // Limit to 8 main categories in navbar
+                    ->get(['id', 'name', 'slug', 'icon'])
+                    ->toArray();
+            },
 
             // Cart items - available in navbar via page.props.items
             'items' => function () use ($request) {
