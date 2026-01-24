@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Products\Tables;
 
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\Brand;
 use App\Models\Cart;
 use App\Models\User;
 use App\Models\VariantGroup;
@@ -133,12 +132,7 @@ class ProductsTable
                     ->searchable()
                     ->preload(),
 
-                SelectFilter::make('brand_id')
-                    ->label('Marca')
-                    ->relationship('brand', 'name')
-                    ->searchable()
-                    ->preload(),
-
+                
                 TernaryFilter::make('is_featured')
                     ->label('Productos Destacados')
                     ->placeholder('Todos los productos')

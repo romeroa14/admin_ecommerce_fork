@@ -20,7 +20,6 @@ class Product extends Model
         'cost',
         'discount_percentage',
         'category_id',
-        'brand_id',
         'stock',
         'low_stock_threshold',
         'track_inventory',
@@ -45,16 +44,35 @@ class Product extends Model
         'track_inventory' => 'boolean',
     ];
 
+    protected $rules = [
+        'name' => 'required|string|max:255',
+        'slug' => 'required|string|max:255',
+        'sku' => 'required|string|max:255',
+        'description' => 'required|string',
+        'short_description' => 'required|string',
+        'price' => 'required|numeric',
+        'compare_price' => 'required|numeric',
+        'cost' => 'required|numeric',
+        'discount_percentage' => 'required|numeric',
+        'category_id' => 'required|exists:categories,id',
+        'stock' => 'required|numeric',
+        'low_stock_threshold' => 'required|numeric',
+        'track_inventory' => 'required|boolean',
+        'status' => 'required|in:active,inactive',
+        'is_featured' => 'required|boolean',
+        'is_on_demand' => 'required|boolean',
+        'images' => 'required|array',
+        'meta_title' => 'required|string|max:255',
+        'meta_description' => 'required|string',
+        'meta_keywords' => 'required|array',
+    ];
+    
+
 
 
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
-    }
-
-    public function brand(): BelongsTo
-    {
-        return $this->belongsTo(Brand::class);
     }
 
     public function variants(): BelongsToMany
