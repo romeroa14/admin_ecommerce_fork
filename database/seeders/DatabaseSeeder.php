@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             VariantSeeder::class,
             ShippingSeeder::class,
             CartSeeder::class,
+            UpdateCategoryIconsSeeder::class,
             PaymentMethodSeeder::class,
         ]);
 

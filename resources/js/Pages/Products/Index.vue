@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 import { ref, computed, watch } from 'vue';
 
 // @ts-ignore
@@ -10,6 +11,7 @@ const props = defineProps({
     products: Object,
     categories: Array,
     filters: Object,
+    currentCategory: Object, // When viewing a specific category
 });
 
 // Modal state
@@ -92,10 +94,26 @@ const maxPercentage = computed(() => (maxPrice.value / 10000) * 100);
 
         <div class="bg-gray-50 py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Breadcrumbs -->
+                <Breadcrumbs 
+                    v-if="currentCategory"
+                    :items="[
+                        { label: 'Categorías', href: '/categories' },
+                        { label: currentCategory.name }
+                    ]"
+                />
+                
                 <!-- Header -->
                 <div class="text-center mb-8">
-                    <h1 class="text-3xl md:text-4xl font-extrabold text-[#040054]">Catálogo de Productos</h1>
-                    <p class="mt-2 text-lg text-gray-600">Encuentra lo que buscas al mejor precio</p>
+                    <div v-if="currentCategory" class="flex items-center justify-center space-x-3 mb-4">
+                        <span v-if="currentCategory.icon" class="text-5xl">{{ currentCategory.icon }}</span>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-[#040054]">
+                        {{ currentCategory ? currentCategory.name : 'Catálogo de Productos' }}
+                    </h1>
+                    <p class="mt-2 text-lg text-gray-600">
+                        {{ currentCategory ? currentCategory.description || `Todos los productos de ${currentCategory.name}` : 'Encuentra lo que buscas al mejor precio' }}
+                    </p>
                 </div>
 
                 <!-- Filter Button and Results -->
