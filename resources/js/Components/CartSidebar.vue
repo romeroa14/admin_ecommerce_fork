@@ -54,7 +54,7 @@ const proceedToCheckout = () => {
 </script>
 
 <template>
-    <!-- Overlay -->
+    <!-- Overlay with Blur Effect -->
     <Transition
         enter-active-class="transition-opacity ease-linear duration-300"
         enter-from-class="opacity-0"
@@ -65,7 +65,7 @@ const proceedToCheckout = () => {
     >
         <div 
             v-if="isOpen"
-            class="fixed inset-0 bg-black bg-opacity-50 z-40"
+            class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm z-40"
             @click="emit('close')"
         ></div>
     </Transition>
