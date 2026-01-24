@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 
 // Helper to avoid TS errors with global route
 // @ts-ignore
@@ -75,8 +76,17 @@ const buyNow = () => {
     <AppLayout>
         <Head :title="product.name" />
 
-        <!-- Sales Letter Style Container -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumbs -->
+            <Breadcrumbs
+                :items="[
+                    { label: product.category ? product.category.name : 'Productos', href: product.category ? `/categories/${product.category.slug}` : '/products' },
+                    { label: product.name }
+                ]"
+            />
+
+            <!-- Sales Letter Style Container -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 lg:p-10">
                 
                 <!-- Gallery Section -->
@@ -215,6 +225,7 @@ const buyNow = () => {
                     <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">¿Por qué elegir nuestro {{ product.name }}?</h2>
                     
                     <div class="prose prose-lg prose-indigo mx-auto" v-html="product.description"></div>
+                </div>
                 </div>
             </div>
         </div>

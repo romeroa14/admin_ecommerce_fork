@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import CartSidebar from '@/Components/CartSidebar.vue';
 
 // @ts-ignore
 const route = window.route;
@@ -13,6 +14,9 @@ const itemsCount = computed(() => {
     // @ts-ignore
     return page.props.items ? page.props.items.length : 0;
 });
+
+// Cart sidebar state
+const isCartOpen = ref(false);
 
 const announcements = [
     '💎 Descuentos Únicos',
@@ -131,15 +135,18 @@ const announcements = [
                             </svg>
                         </button>
 
-                        <!-- Cart -->
-                        <Link href="/cart" class="relative p-2 text-gray-600 hover:text-[#F41D27] transition-colors">
+                        <!-- Cart Button -->
+                        <button 
+                            @click="isCartOpen = true"
+                            class="relative p-2 text-gray-600 hover:text-[#F41D27] transition-colors"
+                        >
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
-                            <span v-if="itemsCount > 0" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-[#F41D27] rounded-full">
+                            <span v-if="itemsCount > 0" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-[#F41D27] rounded-full animate-pulse">
                                 {{ itemsCount }}
                             </span>
-                        </Link>
+                        </button>
 
                         <!-- Mobile Menu Button -->
                         <button class="md:hidden p-2 text-gray-600">
@@ -156,6 +163,12 @@ const announcements = [
         <main>
             <slot />
         </main>
+
+        <!-- Cart Sidebar -->
+        <CartSidebar 
+            :is-open="isCartOpen" 
+            @close="isCartOpen = false"
+        />
 
         <!-- Footer -->
         <footer class="bg-[#040054] text-white mt-20">
