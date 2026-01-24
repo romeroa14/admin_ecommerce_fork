@@ -67,13 +67,28 @@ const announcements = [
                     <!-- Actions -->
                     <div class="flex items-center space-x-4">
                         <!-- User Account -->
-                        <div v-if="user" class="hidden md:flex items-center space-x-2">
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            <span class="text-sm text-gray-700">{{ user.name }}</span>
+                        <div v-if="user" class="hidden md:flex items-center space-x-2 relative group">
+                            <Link :href="route('account.dashboard')" class="flex items-center space-x-2 text-gray-700 hover:text-[#F41D27] transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span class="text-sm font-medium">{{ user.name }}</span>
+                            </Link>
+                            <!-- Dropdown Menu -->
+                            <div class="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                                <Link :href="route('account.dashboard')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Mi Cuenta
+                                </Link>
+                                <Link href="/mis-pedidos" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Mis Pedidos
+                                </Link>
+                                <hr class="my-2 border-gray-200">
+                                <Link :href="route('logout')" method="post" as="button" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    Cerrar Sesión
+                                </Link>
+                            </div>
                         </div>
-                        <Link v-else href="/admin/login" class="hidden md:flex items-center space-x-1 text-gray-700 hover:text-[#F41D27] transition-colors">
+                        <Link v-else :href="route('login')" class="hidden md:flex items-center space-x-1 text-gray-700 hover:text-[#F41D27] transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>

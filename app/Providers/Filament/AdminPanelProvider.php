@@ -34,6 +34,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            // IMPORTANT: Use separate guard for Filament to avoid session conflicts with frontend
+            ->authGuard('filament')
             ->colors([
                 'primary' => [
                     50 => '#fef2f2',
@@ -51,7 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandLogo(asset('storage/Logos/equipocontainer.png'))
             ->brandLogoHeight('8.5rem')
-            
+
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -62,7 +64,7 @@ class AdminPanelProvider extends PanelProvider
                 CartsWidget::class,
                 ActiveUsersWidget::class,
             ])
-            
+
             ->navigationGroups([
                 NavigationGroup::make('Catálogo')
                     ->collapsed(false),
@@ -93,11 +95,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 'panels::topbar.end',
-                fn (): string => view('filament.widgets.currency-selector-inline', [
+                fn(): string => view('filament.widgets.currency-selector-inline', [
                     'currencies' => \App\Models\Currency::active()->ordered()->get(),
                     'currentCurrency' => \App\Helpers\CurrencyHelper::getCurrentCurrency(),
                 ])->render()
-                );
-            
+            );
+
     }
 }

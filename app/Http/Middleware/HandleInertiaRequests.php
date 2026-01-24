@@ -37,7 +37,25 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            //
+
+            // Authentication data - available in all pages via page.props.auth
+            'auth' => [
+                'user' => $request->user(),
+            ],
+
+            // Cart items - available in navbar via page.props.items
+            'items' => function () use ($request) {
+                if ($request->session()->has('cart')) {
+                    return $request->session()->get('cart', []);
+                }
+                return [];
+            },
+
+            // Flash messages - for success/error notifications
+            'flash' => [
+                'message' => fn() => $request->session()->get('message'),
+                'error' => fn() => $request->session()->get('error'),
+            ],
         ];
     }
 }

@@ -6,28 +6,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'type',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -47,39 +47,22 @@ class User extends Authenticatable
         ];
     }
 
-    // Relaciones
-    public function roles()
+    /**
+     * Determine if the user can access the Filament panel
+     */
+    public function canAccessPanel(Panel $panel): bool
     {
-        return $this->belongsToMany(Role::class);
+        // Only users with specific email domains or roles can access admin panel
+        // Adjust this logic based on your needs
+        return str_ends_with($this->email, '@equipocontainer.com')
+            || str_ends_with($this->email, '@admin.com');
     }
 
-    public function addresses()
-    {
-        return $this->hasMany(Address::class);
-    }
-
+    /**
+     * Relationship: User has many orders
+     */
     public function orders()
     {
-        return $this->hasMany(Order::class);
-    }
-
-    public function cart()
-    {
-        return $this->hasOne(Cart::class);
-    }
-
-    public function wishlists()
-    {
-        return $this->hasMany(Wishlist::class);
-    }
-
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
-    }
-
-    public function deliveryManDeliveries()
-    {
-        return $this->hasMany(Delivery::class, 'delivery_man_id');
+        return $this->hasMany(\App\Models\Order::class);
     }
 }
