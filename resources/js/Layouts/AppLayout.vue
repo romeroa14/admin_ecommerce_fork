@@ -23,7 +23,8 @@ const announcements = [
     '📦 Paga al recibir en toda Caracas',
     '🚀 Despacho gratis a todo el país',
     '⭐ Productos de Calidad Premium',
-    '🔒 Compra 100% Segura'
+    '🔒 Compra 100% Segura',
+    '📱 si compras mas de 50$ el envio es gratis'
 ];
 </script>
 
@@ -231,6 +232,7 @@ const announcements = [
 
                 <div class="mt-12 pt-8 border-t border-gray-700 text-center text-sm text-gray-400">
                     <p>&copy; {{ new Date().getFullYear() }} EquipoContainer. Todos los derechos reservados.</p>
+                    <p>Paginas web desarrollada por: <a href="https://www.alfredoromero.io" target="_blank"><span class="text-blue-500">alfredoromero.io</span></a></p>
                 </div>
             </div>
         </footer>

@@ -18,6 +18,14 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    reviews: {
+        type: Array,
+        default: () => [],
+    },
+    reviewStats: {
+        type: Object,
+        default: () => ({ average: 0, total: 0, ratings: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } }),
+    },
 });
 
 const form = useForm({
@@ -40,6 +48,18 @@ const similarOpen = ref(false);
 const carouselContainer = ref<HTMLElement | null>(null);
 const canScrollLeft = ref(false);
 const canScrollRight = ref(false);
+
+// Review form
+const showReviewForm = ref(false);
+const reviewForm = useForm({
+    rating: 5,
+    title: '',
+    comment: '',
+    image: null,
+    youtube_url: '',
+    reviewer_name: '',
+    reviewer_email: '',
+});
 
 const discount = computed(() => {
     if (!props.product.compare_price || props.product.compare_price <= props.product.price) return 0;
@@ -484,6 +504,216 @@ const buyNow = () => {
                         <p class="text-gray-500">Por el momento no tenemos más productos en esta categoría</p>
                     </div>
                 </div>
+
+                <!-- Reviews Section -->
+                <div class="mt-16 border-t border-gray-200 pt-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-8">Reseñas de Clientes</h2>
+                    
+                    <!-- Reviews Summary -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                        <!-- Average Rating -->
+                        <div class="bg-gray-50 rounded-xl p-8 text-center">
+                            <div class="text-5xl font-black text-[#040054] mb-2">{{ reviewStats.average || 0 }}</div>
+                            <div class="flex justify-center mb-3">
+                                <svg v-for="i in 5" :key="i" class="w-6 h-6" :class="i <= Math.round(reviewStats.average) ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current'" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600">Basado en {{ reviewStats.total }} reseñas</p>
+                        </div>
+
+                        <!-- Rating Distribution -->
+                        <div class="lg:col-span-2 space-y-3">
+                            <div v-for="star in [5, 4, 3, 2, 1]" :key="star" class="flex items-center gap-3">
+                                <div class="flex items-center gap-1 w-20">
+                                    <span class="text-sm font-semibold text-gray-700">{{ star }}</span>
+                                    <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                                    <div 
+                                        class="h-full bg-[#040054] rounded-full transition-all"
+                                        :style="{ width: reviewStats.total > 0 ? (reviewStats.ratings[star] / reviewStats.total * 100) + '%' : '0%' }"
+                                    ></div>
+                                </div>
+                                <span class="text-sm text-gray-600 w-8">{{ reviewStats.ratings[star] }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Write Review Button -->
+                    <div class="text-center mb-12">
+                        <button 
+                            @click="showReviewForm = !showReviewForm"
+                            class="bg-[#5A3D2B] text-white px-8 py-4 rounded-lg hover:bg-[#6B4D3B] transition-colors font-semibold text-lg"
+                        >
+                            {{ showReviewForm ? 'Cancelar' : 'Escribir una reseña' }}
+                        </button>
+                    </div>
+
+                    <!-- Review Form -->
+                    <div v-if="showReviewForm" class="bg-gray-50 rounded-2xl p-8 mb-12 border-2 border-gray-200">
+                        <h3 class="text-2xl font-bold mb-6 text-center">Escribe tu reseña</h3>
+                        <form @submit.prevent="reviewForm.post(route('reviews.store', product.slug))" class="max-w-2xl mx-auto space-y-6">
+                            <!-- Rating -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2 text-center">Calificación</label>
+                                <div class="flex justify-center gap-2">
+                                    <button 
+                                        v-for="star in [1, 2, 3, 4, 5]" 
+                                        :key="star"
+                                        type="button"
+                                        @click="reviewForm.rating = star"
+                                        class="transition-transform hover:scale-110"
+                                    >
+                                        <svg class="w-10 h-10" :class="star <= reviewForm.rating ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current'" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Título de la Reseña <span class="text-gray-400">(100)</span></label>
+                                <input 
+                                    v-model="reviewForm.title"
+                                    type="text"
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#040054] focus:ring-2 focus:ring-[#040054]/20 transition"
+                                    placeholder="Da un título a tu reseña"
+                                    maxlength="100"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Comment -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Contenido de la reseña</label>
+                                <textarea 
+                                    v-model="reviewForm.comment"
+                                    rows="5"
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#040054] focus:ring-2 focus:ring-[#040054]/20 transition"
+                                    placeholder="Empieza a escribir aquí..."
+                                ></textarea>
+                            </div>
+
+                            <!-- Image Upload -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Imagen/Video (opcional)</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#040054] transition-colors cursor-pointer">
+                                    <input type="file" @change="reviewForm.image = $event.target.files[0]" accept="image/*" class="hidden" id="review-image">
+                                    <label for="review-image" class="cursor-pointer">
+                                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                        <p class="text-gray-600">Haz clic para subir una imagen</p>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- YouTube URL -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">YouTube URL</label>
+                                <input 
+                                    v-model="reviewForm.youtube_url"
+                                    type="url"
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#040054] focus:ring-2 focus:ring-[#040054]/20 transition"
+                                    placeholder="https://youtube.com/..."
+                                >
+                            </div>
+
+                            <!-- Name & Email -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre <span class="text-xs text-gray-500">(mostrado públicamente como John Smith...)</span></label>
+                                    <input 
+                                        v-model="reviewForm.reviewer_name"
+                                        type="text"
+                                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#040054] focus:ring-2 focus:ring-[#040054]/20 transition"
+                                        placeholder="Nombre"
+                                        required
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección de correo electrónico</label>
+                                    <input 
+                                        v-model="reviewForm.reviewer_email"
+                                        type="email"
+                                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#040054] focus:ring-2 focus:ring-[#040054]/20 transition"
+                                        placeholder="Tu dirección de correo electrónico"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="flex gap-4 justify-center pt-4">
+                                <button 
+                                    type="button"
+                                    @click="showReviewForm = false"
+                                    class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold"
+                                >
+                                    Cancelar reseña
+                                </button>
+                                <button 
+                                    type="submit"
+                                    :disabled="reviewForm.processing"
+                                    class="px-8 py-3 bg-[#5A3D2B] text-white rounded-lg hover:bg-[#6B4D3B] transition font-semibold disabled:opacity-50"
+                                >
+                                    {{ reviewForm.processing ? 'Enviando...' : 'Enviar Reseña' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Reviews List -->
+                    <div v-if="reviews.length > 0" class="space-y-6">
+                        <div v-for="review in reviews" :key="review.id" class="bg-white rounded-xl p-6 border border-gray-200">
+                            <!-- Review Header -->
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="font-bold text-gray-900">{{ review.reviewer_display_name }}</span>
+                                        <span v-if="review.is_verified_purchase" class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">Verificado</span>
+                                    </div>
+                                    <div class="flex gap-1 mb-2">
+                                        <svg v-for="i in 5" :key="i" class="w-5 h-5" :class="i <= review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current'" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <span class="text-sm text-gray-500">{{ new Date(review.created_at).toLocaleDateString() }}</span>
+                            </div>
+
+                            <!-- Review Title -->
+                            <h4 class="text-lg font-bold text-gray-900 mb-2">{{ review.title }}</h4>
+
+                            <!-- Review Content -->
+                            <p class="text-gray-700 mb-4">{{ review.comment }}</p>
+
+                            <!-- Review Image -->
+                            <img v-if="review.image_url" :src="review.image_url" class="w-32 h-32 object-cover rounded-lg mb-4">
+
+                            <!-- YouTube Video -->
+                            <div v-if="review.youtube_embed_url" class="mb-4">
+                                <iframe 
+                                    :src="review.youtube_embed_url" 
+                                    class="w-full aspect-video rounded-lg"
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen
+                                ></iframe>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- No Reviews -->
+                    <div v-else class="text-center py-12 bg-gray-50 rounded-xl">
+                        <p class="text-gray-500">Aún no hay reseñas para este producto. ¡Sé el primero en escribir una!</p>
+                    </div>
+                </div>
+                
             </div>
         </div>
 
