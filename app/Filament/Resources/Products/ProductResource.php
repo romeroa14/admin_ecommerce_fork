@@ -48,6 +48,7 @@ class ProductResource extends Resource
     {
         return [
             RelationManagers\VariantsRelationManager::class,
+            RelationManagers\ReviewsRelationManager::class,
         ];
     }
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Auth\ClientAuthController;
 use Inertia\Inertia;
 use App\Models\Product;
@@ -30,6 +31,11 @@ Route::get('/', function () {
 // Products
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+
+// Reviews
+Route::post('/products/{product:slug}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+Route::post('/reviews/{review}/helpful', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
+Route::post('/reviews/{review}/unhelpful', [ReviewController::class, 'markUnhelpful'])->name('reviews.unhelpful');
 
 // Categories
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');

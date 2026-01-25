@@ -70,16 +70,45 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load(['category', 'images', 'variants.variantGroup', 'reviews', 'tags']);
+        $product->load(['category', 'images', 'variants.variantGroup', 'tags']);
 
         // Check stock logic
         $isInStock = $product->in_stock;
 
-        // Similar products logic could be added here
+        // Get similar products from the same category
+        $similarProducts = Product::active()
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->with(['category', 'images'])
+            ->take(6)
+            ->get();
+
+        // Get approved reviews with user data
+        $reviews = $product->reviews()
+            ->approved()
+            ->with('user')
+            ->latest()
+            ->get();
+
+        // Calculate review statistics
+        $reviewStats = [
+            'average' => round($reviews->avg('rating'), 1),
+            'total' => $reviews->count(),
+            'ratings' => [
+                5 => $reviews->where('rating', 5)->count(),
+                4 => $reviews->where('rating', 4)->count(),
+                3 => $reviews->where('rating', 3)->count(),
+                2 => $reviews->where('rating', 2)->count(),
+                1 => $reviews->where('rating', 1)->count(),
+            ],
+        ];
 
         return Inertia::render('Products/Show', [
             'product' => $product,
             'isInStock' => $isInStock,
+            'similarProducts' => $similarProducts,
+            'reviews' => $reviews,
+            'reviewStats' => $reviewStats,
         ]);
     }
 }
