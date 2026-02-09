@@ -65,4 +65,12 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(\App\Models\Order::class);
     }
+
+    /**
+     * Relationship: User belongs to many roles
+     */
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
 }
