@@ -20,7 +20,7 @@ defineProps({
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div class="space-y-6">
                         <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
-                            Equipos (R) de Calidad para tu Negocio
+                            Equipos (RR) de Calidad para tu Negocio
                         </h1>
                         <p class="text-lg md:text-xl text-gray-200">
                             Encuentra los mejores productos para equipar tu negocio con la mejor relación calidad-precio del mercado.
