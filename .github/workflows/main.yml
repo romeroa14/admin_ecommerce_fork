@@ -28,6 +28,23 @@ jobs:
             DEPLOY_PATH=~/domains/$DOMAIN/public_html
             
             echo "🚀 Starting deployment to $DOMAIN"
+            
+            # PHP Version: Find and use PHP 8.3+
+            echo "🐘 Configuring PHP version..."
+            if [ -x "/opt/alt/php83/usr/bin/php" ]; then
+              export PATH="/opt/alt/php83/usr/bin:$PATH"
+              alias php="/opt/alt/php83/usr/bin/php"
+              alias composer="/opt/alt/php83/usr/bin/composer"
+              echo "✓ Using PHP 8.3"
+            elif [ -x "/opt/alt/php84/usr/bin/php" ]; then
+              export PATH="/opt/alt/php84/usr/bin:$PATH"
+              alias php="/opt/alt/php84/usr/bin/php"
+              alias composer="/opt/alt/php84/usr/bin/composer"
+              echo "✓ Using PHP 8.4"
+            else
+              echo "⚠️  PHP 8.3+ not found, using default PHP $(php -v | head -n1)"
+            fi
+            
             cd $DEPLOY_PATH
             
             # Git: Pull latest changes (with corruption handling)
@@ -51,7 +68,8 @@ jobs:
             
             # Composer: Install PHP dependencies
             echo "📦 Installing Composer dependencies..."
-            composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+            php -v | head -n1
+            /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
             
             # NPM: Install and build assets
             echo "🎨 Building frontend assets..."
