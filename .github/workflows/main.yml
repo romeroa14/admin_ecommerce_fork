@@ -30,10 +30,23 @@ jobs:
             echo "🚀 Starting deployment to $DOMAIN"
             cd $DEPLOY_PATH
             
-            # Git: Pull latest changes
+            # Git: Pull latest changes (with corruption handling)
             echo "📥 Pulling latest changes from Git..."
-            git fetch --all
-            git reset --hard origin/main
+            
+            # Try to reset, if it fails, clean and re-clone
+            if ! git fetch --all 2>/dev/null || ! git reset --hard origin/main 2>/dev/null; then
+              echo "⚠️  Git repository corrupted, re-cloning..."
+              cd ~/domains/$DOMAIN
+              rm -rf public_html/.git
+              cd public_html
+              git init
+              git remote add origin https://github.com/romeroa14/admin_ecommerce_fork.git
+              git fetch --all
+              git reset --hard origin/main
+            fi
+            
+            # Clean any untracked files
+            git clean -fdx --exclude=.env --exclude=storage --exclude=node_modules --exclude=vendor
             git pull origin main
             
             # Composer: Install PHP dependencies
