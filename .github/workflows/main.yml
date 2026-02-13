@@ -21,24 +21,34 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           script: |
-            echo "=== Current directory ==="
-            pwd
+            DOMAIN="blanchedalmond-giraffe-534725.hostingersite.com"
+            DOMAIN_PATH=~/domains/$DOMAIN
+            
+            echo "=== Exploring domain: $DOMAIN ==="
+            echo "Domain path: $DOMAIN_PATH"
             echo ""
-            echo "=== Home directory content ==="
-            ls -la ~
+            
+            echo "=== Domain directory structure ==="
+            ls -la $DOMAIN_PATH
             echo ""
-            echo "=== Looking for common web directories ==="
-            for dir in public_html htdocs www domains; do
-              if [ -d ~/$dir ]; then
-                echo "✓ Found: ~/$dir"
-                ls -la ~/$dir
-              else
-                echo "✗ Not found: ~/$dir"
-              fi
-            done
+            
+            echo "=== Looking for public_html ==="
+            if [ -d "$DOMAIN_PATH/public_html" ]; then
+              echo "✓ Found public_html"
+              ls -la $DOMAIN_PATH/public_html
+            else
+              echo "✗ public_html not found"
+            fi
             echo ""
-            echo "=== Checking if git is available ==="
-            which git && git --version || echo "Git not found"
+            
+            echo "=== Looking for private_html ==="
+            if [ -d "$DOMAIN_PATH/private_html" ]; then
+              echo "✓ Found private_html"
+              ls -la $DOMAIN_PATH/private_html
+            else
+              echo "✗ private_html not found"
+            fi
             echo ""
-            echo "=== Checking if composer is available ==="
-            which composer && composer --version || echo "Composer not found"
+            
+            echo "=== Checking disk space ==="
+            df -h $DOMAIN_PATH
