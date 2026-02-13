@@ -21,34 +21,46 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           script: |
+            set -e
+            
+            # Variables
             DOMAIN="blanchedalmond-giraffe-534725.hostingersite.com"
-            DOMAIN_PATH=~/domains/$DOMAIN
+            DEPLOY_PATH=~/domains/$DOMAIN/public_html
             
-            echo "=== Exploring domain: $DOMAIN ==="
-            echo "Domain path: $DOMAIN_PATH"
-            echo ""
+            echo "🚀 Starting deployment to $DOMAIN"
+            cd $DEPLOY_PATH
             
-            echo "=== Domain directory structure ==="
-            ls -la $DOMAIN_PATH
-            echo ""
+            # Git: Pull latest changes
+            echo "📥 Pulling latest changes from Git..."
+            git fetch --all
+            git reset --hard origin/main
+            git pull origin main
             
-            echo "=== Looking for public_html ==="
-            if [ -d "$DOMAIN_PATH/public_html" ]; then
-              echo "✓ Found public_html"
-              ls -la $DOMAIN_PATH/public_html
-            else
-              echo "✗ public_html not found"
-            fi
-            echo ""
+            # Composer: Install PHP dependencies
+            echo "📦 Installing Composer dependencies..."
+            composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
             
-            echo "=== Looking for private_html ==="
-            if [ -d "$DOMAIN_PATH/private_html" ]; then
-              echo "✓ Found private_html"
-              ls -la $DOMAIN_PATH/private_html
-            else
-              echo "✗ private_html not found"
-            fi
-            echo ""
+            # NPM: Install and build assets
+            echo "🎨 Building frontend assets..."
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm use 20 || nvm install 20
+            npm ci
+            npm run build
             
-            echo "=== Checking disk space ==="
-            df -h $DOMAIN_PATH
+            # Laravel: Run migrations
+            echo "🗄️  Running database migrations..."
+            php artisan migrate --force
+            
+            # Laravel: Clear and cache config
+            echo "🔧 Optimizing Laravel..."
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            
+            # Set correct permissions
+            echo "🔐 Setting permissions..."
+            chmod -R 775 storage bootstrap/cache
+            
+            echo "✅ Deployment completed successfully!"
