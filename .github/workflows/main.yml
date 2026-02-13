@@ -21,24 +21,24 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           script: |
-            set -e
-            cd ~/public_html
-
-            # Make sure this folder is a git repo on the server the first time:
-            # git clone <your_repo_ssh_url> .
-            git fetch --all
-            git reset --hard origin/main
-
-            # PHP deps (skip if you commit vendor/)
-            if [ -f composer.json ]; then
-              composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
-            fi
-
-            # Laravel housekeeping
-            if [ -f artisan ]; then
-              php artisan migrate --force || true
-              php artisan optimize:clear
-              php artisan config:cache || true
-              php artisan route:cache || true
-              php artisan view:cache || true
-            fi
+            echo "=== Current directory ==="
+            pwd
+            echo ""
+            echo "=== Home directory content ==="
+            ls -la ~
+            echo ""
+            echo "=== Looking for common web directories ==="
+            for dir in public_html htdocs www domains; do
+              if [ -d ~/$dir ]; then
+                echo "✓ Found: ~/$dir"
+                ls -la ~/$dir
+              else
+                echo "✗ Not found: ~/$dir"
+              fi
+            done
+            echo ""
+            echo "=== Checking if git is available ==="
+            which git && git --version || echo "Git not found"
+            echo ""
+            echo "=== Checking if composer is available ==="
+            which composer && composer --version || echo "Composer not found"
