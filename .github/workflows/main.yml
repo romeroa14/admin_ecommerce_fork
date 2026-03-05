@@ -100,6 +100,10 @@ jobs:
             php -v | head -n1
             /usr/local/bin/composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
             
+            # Laravel: Create storage symlink
+            echo "🔗 Creating storage symlink..."
+            php artisan storage:link --force || true
+            
             # Laravel: Run migrations
             echo "🗄️  Running database migrations..."
             php artisan migrate --force
