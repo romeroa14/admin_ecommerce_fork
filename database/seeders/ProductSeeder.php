@@ -151,14 +151,29 @@ class ProductSeeder extends Seeder
                 $product->variants()->sync($variantsData);
             }
 
-            // Crear imágenes de ejemplo
-            ProductImage::create([
-                'product_id' => $product->id,
-                'image' => 'products/' . Str::slug($product->name) . '-1.jpg',
-                'alt_text' => $product->name,
-                'order' => 1,
-                'is_primary' => true,
-            ]);
+            // Crear imágenes de ejemplo usando archivos reales si existen
+            $realImages = \Illuminate\Support\Facades\Storage::disk('public')->files('products');
+            
+            if (!empty($realImages)) {
+                // Usar la primera imagen real disponible
+                $imagePath = $realImages[0];
+            } else {
+                // Crear una imagen placeholder real en storage
+                $imagePath = 'products/placeholder-' . $product->id . '.svg';
+                $svgContent = '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><rect width="400" height="400" fill="#f3f4f6"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#9ca3af" font-size="20" font-family="Arial">' . $product->name . '</text></svg>';
+                \Illuminate\Support\Facades\Storage::disk('public')->put($imagePath, $svgContent);
+            }
+            
+            ProductImage::firstOrCreate(
+                ['product_id' => $product->id, 'order' => 1],
+                [
+                    'image' => $imagePath,
+                    'alt_text' => $product->name,
+                    'order' => 1,
+                    'is_primary' => true,
+                ]
+            );
+
 
             // Crear inventario
             Inventory::create([

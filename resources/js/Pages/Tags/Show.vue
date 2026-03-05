@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { getProductImage } from '@/composables/useProductImage';
 
 defineProps({
     tag: Object,
@@ -26,7 +27,7 @@ defineProps({
             >
                 <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200">
                     <img 
-                        :src="product.images?.[0]?.image_url || 'https://via.placeholder.com/400'" 
+                        :src="getProductImage(product)" 
                         :alt="product.name"
                         class="h-full w-full object-cover object-center group-hover:opacity-90 transform group-hover:scale-105 transition duration-500"
                     >

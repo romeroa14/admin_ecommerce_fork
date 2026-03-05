@@ -8,6 +8,25 @@ const route = window.route;
 defineProps({
     products: Object,
 });
+
+// Helper: get image URL from product (handles both Filament array field and ProductImage relation)
+function getProductImage(product: any, fallback = 'https://placehold.co/400x400/f3f4f6/9ca3af?text=Sin+imagen'): string {
+    // Try relation first (ProductImage objects)
+    if (product.images && product.images.length > 0) {
+        const first = product.images[0];
+        if (typeof first === 'string') {
+            // Filament stores as plain path string e.g. "products/abc.png"
+            return '/storage/' + first;
+        }
+        if (first && typeof first === 'object' && first.image_url) {
+            return first.image_url;
+        }
+        if (first && typeof first === 'object' && first.image) {
+            return '/storage/' + first.image;
+        }
+    }
+    return fallback;
+}
 </script>
 
 <template>
@@ -136,7 +155,7 @@ defineProps({
                     >
                         <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 relative">
                             <img 
-                                :src="product.images?.[0]?.image_url || 'https://via.placeholder.com/400'" 
+                                :src="getProductImage(product)" 
                                 :alt="product.name"
                                 class="h-64 w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
                             >
