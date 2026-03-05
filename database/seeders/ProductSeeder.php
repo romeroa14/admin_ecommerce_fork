@@ -19,35 +19,35 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear categorías (usar firstOrCreate para evitar duplicados)
-        $categories = [
-            ['name' => 'Electronics', 'slug' => 'electronics', 'description' => 'Electronic devices and gadgets'],
-            ['name' => 'Clothing', 'slug' => 'clothing', 'description' => 'Fashion and apparel'],
-            ['name' => 'Home & Garden', 'slug' => 'home-garden', 'description' => 'Home improvement and garden supplies'],
-            ['name' => 'Sports', 'slug' => 'sports', 'description' => 'Sports equipment and accessories'],
-        ];
+        // // Crear categorías (usar firstOrCreate para evitar duplicados)
+        // $categories = [
+        //     ['name' => 'Electronics', 'slug' => 'electronics', 'description' => 'Electronic devices and gadgets'],
+        //     ['name' => 'Clothing', 'slug' => 'clothing', 'description' => 'Fashion and apparel'],
+        //     ['name' => 'Home & Garden', 'slug' => 'home-garden', 'description' => 'Home improvement and garden supplies'],
+        //     ['name' => 'Sports', 'slug' => 'sports', 'description' => 'Sports equipment and accessories'],
+        // ];
 
-        foreach ($categories as $categoryData) {
-            Category::firstOrCreate(
-                ['slug' => $categoryData['slug']],
-                $categoryData
-            );
-        }
+        // foreach ($categories as $categoryData) {
+        //     Category::firstOrCreate(
+        //         ['slug' => $categoryData['slug']],
+        //         $categoryData
+        //     );
+        // }
 
-        // Crear marcas (usar firstOrCreate para evitar duplicados)
-        $brands = [
-            ['name' => 'Apple', 'slug' => 'apple', 'description' => 'Technology company'],
-            ['name' => 'Nike', 'slug' => 'nike', 'description' => 'Sports brand'],
-            ['name' => 'Samsung', 'slug' => 'samsung', 'description' => 'Electronics company'],
-            ['name' => 'Adidas', 'slug' => 'adidas', 'description' => 'Sports brand'],
-        ];
+        // // Crear marcas (usar firstOrCreate para evitar duplicados)
+        // $brands = [
+        //     ['name' => 'Apple', 'slug' => 'apple', 'description' => 'Technology company'],
+        //     ['name' => 'Nike', 'slug' => 'nike', 'description' => 'Sports brand'],
+        //     ['name' => 'Samsung', 'slug' => 'samsung', 'description' => 'Electronics company'],
+        //     ['name' => 'Adidas', 'slug' => 'adidas', 'description' => 'Sports brand'],
+        // ];
 
-        foreach ($brands as $brandData) {
-            Brand::firstOrCreate(
-                ['slug' => $brandData['slug']],
-                $brandData
-            );
-        }
+        // foreach ($brands as $brandData) {
+        //     Brand::firstOrCreate(
+        //         ['slug' => $brandData['slug']],
+        //         $brandData
+        //     );
+        // }
 
         // Crear tags (usar firstOrCreate para evitar duplicados)
         $tags = [
@@ -76,8 +76,8 @@ class ProductSeeder extends Seeder
                 'compare_price' => 1099.99,
                 'cost' => 800.00,
                 'discount_percentage' => 10.00,
-                'category_id' => Category::where('slug', 'electronics')->first()->id,
-                'brand_id' => Brand::where('slug', 'apple')->first()->id,
+                // 'category_id' => Category::where('slug', 'electronics')->first()->id,
+                // 'brand_id' => Brand::where('slug', 'apple')->first()->id,
                 'stock' => 50,
                 'low_stock_threshold' => 10,
                 'track_inventory' => true,
@@ -97,8 +97,8 @@ class ProductSeeder extends Seeder
                 'compare_price' => 180.00,
                 'discount_percentage' => 15.00,
                 'cost' => 100.00,
-                'category_id' => Category::where('slug', 'clothing')->first()->id,
-                'brand_id' => Brand::where('slug', 'nike')->first()->id,
+                // 'category_id' => Category::where('slug', 'clothing')->first()->id,
+                // 'brand_id' => Brand::where('slug', 'nike')->first()->id,
                 'stock' => 25,
                 'low_stock_threshold' => 5,
                 'track_inventory' => true,
@@ -118,8 +118,8 @@ class ProductSeeder extends Seeder
                 'compare_price' => 899.99,
                 'cost' => 600.00,
                 'discount_percentage' => 5.00,
-                'category_id' => Category::where('slug', 'electronics')->first()->id,
-                'brand_id' => Brand::where('slug', 'samsung')->first()->id,
+                // 'category_id' => Category::where('slug', 'electronics')->first()->id,
+                // 'brand_id' => Brand::where('slug', 'samsung')->first()->id,
                 'stock' => 30,
                 'low_stock_threshold' => 8,
                 'track_inventory' => true,

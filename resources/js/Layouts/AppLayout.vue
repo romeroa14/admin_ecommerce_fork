@@ -54,6 +54,8 @@ const announcements = [
                             <img src="/storage/Logos/equipocontainer.png" alt="Logo" class="h-16 w-auto">
                         </Link>
                     </div>
+
+                    
                     
                     <!-- Navigation -->
                     <nav class="hidden md:flex space-x-8 items-center">
