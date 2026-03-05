@@ -33,7 +33,7 @@ class CategoryController extends Controller
         // Start query with products from this category
         $query = Product::active()
             ->where('category_id', $category->id)
-            ->with(['category', 'images']);
+            ->with(['category', 'productImages']);
 
         // Filter by stock availability
         if ($request->has('stock')) {

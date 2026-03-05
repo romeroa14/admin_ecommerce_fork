@@ -19,7 +19,7 @@ use App\Models\Product;
 // Home
 Route::get('/', function () {
     $products = Product::active()
-        ->with(['category', 'images'])
+        ->with(['category', 'productImages'])
         ->latest()
         ->paginate(12);
 

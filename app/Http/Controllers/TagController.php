@@ -10,7 +10,7 @@ class TagController extends Controller
 {
     public function show(Tag $tag)
     {
-        $products = $tag->products()->active()->with('images')->paginate(12);
+        $products = $tag->products()->active()->with('productImages')->paginate(12);
 
         return Inertia::render('Tags/Show', [
             'tag' => $tag,

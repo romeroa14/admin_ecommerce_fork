@@ -89,7 +89,7 @@ class Product extends Model
             ->withTimestamps();
     }
 
-    public function images(): HasMany
+    public function productImages(): HasMany
     {
         return $this->hasMany(ProductImage::class);
     }
@@ -132,8 +132,8 @@ class Product extends Model
     // Accessor para obtener la imagen principal
     public function getPrimaryImageAttribute()
     {
-        return $this->images()->where('is_primary', true)->first()
-            ?? $this->images()->ordered()->first();
+        return $this->productImages()->where('is_primary', true)->first()
+            ?? $this->productImages()->ordered()->first();
     }
 
     // Accessor para obtener el precio con descuento
