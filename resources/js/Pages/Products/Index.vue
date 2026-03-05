@@ -335,7 +335,7 @@ const maxPercentage = computed(() => (maxPrice.value / 10000) * 100);
                     >
                         <div class="relative overflow-hidden bg-gray-100">
                             <img 
-                                :src="product.images?.[0] || 'https://via.placeholder.com/400'" 
+                                :src="product.images?.[0]?.image_url || 'https://via.placeholder.com/400'" 
                                 :alt="product.name"
                                 class="h-64 w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
                             >

@@ -34,7 +34,7 @@ const form = useForm({
     variants: {} as Record<string, any>,
 });
 
-const selectedImage = ref(props.product.images?.[0] || 'https://via.placeholder.com/600');
+const selectedImage = ref(props.product.images?.[0]?.image_url || 'https://via.placeholder.com/600');
 const currentQuantity = ref(1);
 const isZoomOpen = ref(false);
 const zoomImageIndex = ref(0);
@@ -162,7 +162,7 @@ const buyNow = () => {
                             
                             <!-- Zoom Button -->
                             <button 
-                                @click="openZoom(product.images.indexOf(selectedImage))"
+                                @click="openZoom(product.images.findIndex((img: any) => img.image_url === selectedImage))"
                                 class="absolute bottom-4 right-4 bg-white hover:bg-gray-50 px-5 py-3 rounded-lg flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all shadow-xl border border-gray-200 font-semibold"
                             >
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,11 +177,11 @@ const buyNow = () => {
                             <button 
                                 v-for="(img, idx) in product.images" 
                                 :key="idx"
-                                @click="selectedImage = img"
+                                @click="selectedImage = img.image_url"
                                 class="aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200"
-                                :class="selectedImage === img ? 'border-[#040054] ring-2 ring-[#040054]/20' : 'border-gray-200 hover:border-gray-300'"
+                                :class="selectedImage === img.image_url ? 'border-[#040054] ring-2 ring-[#040054]/20' : 'border-gray-200 hover:border-gray-300'"
                             >
-                                <img :src="img" class="w-full h-full object-cover">
+                                <img :src="img.image_url" class="w-full h-full object-cover">
                             </button>
                         </div>
                     </div>
@@ -376,7 +376,7 @@ const buyNow = () => {
                                         >
                                             <div class="aspect-square w-full overflow-hidden rounded-lg bg-gray-100 mb-2">
                                                 <img 
-                                                    :src="similar.images?.[0] || 'https://via.placeholder.com/200'" 
+                                                    :src="similar.images?.[0]?.image_url || 'https://via.placeholder.com/200'" 
                                                     :alt="similar.name"
                                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                                 >
@@ -443,7 +443,7 @@ const buyNow = () => {
                                 <!-- Product Image -->
                                 <div class="relative aspect-square w-full overflow-hidden bg-gray-100">
                                     <img 
-                                        :src="similar.images?.[0] || 'https://via.placeholder.com/300'" 
+                                        :src="similar.images?.[0]?.image_url || 'https://via.placeholder.com/300'" 
                                         :alt="similar.name"
                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                     >
@@ -720,7 +720,7 @@ const buyNow = () => {
         <!-- Image Zoom Modal -->
         <ImageZoomModal 
             :is-open="isZoomOpen"
-            :images="product.images || []"
+            :images="product.images?.map((img: any) => img.image_url) || []"
             :product-name="product.name"
             :current-index="zoomImageIndex"
             @close="isZoomOpen = false"
