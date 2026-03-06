@@ -73,7 +73,7 @@ onUnmounted(() => {
         @mouseleave="isPaused = false"
     >
         <!-- Slides Container -->
-        <div class="relative w-full" style="aspect-ratio: 21/9;">
+        <div class="relative w-full" style="aspect-ratio: 16/5; max-height: 420px;">
             <TransitionGroup
                 enter-active-class="transition-all duration-600 ease-out"
                 leave-active-class="transition-all duration-600 ease-out absolute inset-0"
@@ -93,6 +93,7 @@ onUnmounted(() => {
                         :src="getImageUrl(banner.image)"
                         :alt="banner.title"
                         class="w-full h-full object-cover"
+                        @error="(e: Event) => (e.target as HTMLImageElement).style.display = 'none'"
                     >
 
                     <!-- Overlay gradient -->

@@ -7,6 +7,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
 
 class BannerForm
@@ -16,27 +17,58 @@ class BannerForm
         return $schema
             ->components([
                 TextInput::make('title')
-                    ->required(),
+                    ->required()
+                    ->maxLength(255),
                 Textarea::make('description')
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->rows(3),
                 FileUpload::make('image')
                     ->image()
-                    ->required(),
-                FileUpload::make('mobile_image')
-                    ->image(),
-                TextInput::make('link'),
-                TextInput::make('button_text'),
-                TextInput::make('position')
+                    ->disk('public')
+                    ->directory('banners')
+                    ->imageResizeMode('cover')
+                    ->imageCropAspectRatio('16:5')
+                    ->imageResizeTargetWidth('1920')
+                    ->imageResizeTargetHeight('600')
                     ->required()
-                    ->default('home_hero'),
+                    ->columnSpanFull(),
+                FileUpload::make('mobile_image')
+                    ->image()
+                    ->disk('public')
+                    ->directory('banners')
+                    ->imageCropAspectRatio('1:1')
+                    ->columnSpanFull(),
+                // TextInput::make('link')
+                //     ->url()
+                //     ->placeholder('https://...'),
+                TextInput::make('button_text')
+                    ->placeholder('Ver Más')
+                    ->default('Ver Más'),
+                Select::make('position')
+                    ->required()
+                    ->default('home_hero')
+                    ->options([
+                        'home_hero'   => 'Hero Principal (Home)',
+                        'home_middle' => 'Medio (Home)',
+                        'home_bottom' => 'Inferior (Home)',
+                        'sidebar'     => 'Barra lateral',
+                        'category'    => 'Página de Categoría',
+                        'product'     => 'Página de Producto',
+                    ]),
                 TextInput::make('order')
                     ->required()
                     ->numeric()
-                    ->default(0),
-                DateTimePicker::make('starts_at'),
-                DateTimePicker::make('expires_at'),
+                    ->default(0)
+                    ->minValue(0)
+                    ->label('Orden'),
+                DateTimePicker::make('starts_at')
+                    ->label('Fecha de inicio'),
+                DateTimePicker::make('expires_at')
+                    ->label('Fecha de expiración'),
                 Toggle::make('is_active')
-                    ->required(),
+                    ->required()
+                    ->default(true)
+                    ->label('Activo'),
             ]);
     }
 }

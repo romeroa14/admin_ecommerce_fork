@@ -54,7 +54,7 @@ function goToSearch() {
         </section>
 
         <!-- =================== 2. CATEGORIES =================== -->
-        <section v-if="categories && categories.length > 0" class="bg-white border-b border-gray-100">
+        <!-- <section v-if="categories && categories.length > 0" class="bg-white border-b border-gray-100">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
                 <div class="flex items-center gap-6 overflow-x-auto scrollbar-hide py-1">
                     <Link
@@ -72,7 +72,7 @@ function goToSearch() {
                     </Link>
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <!-- =================== 3. SEARCH + PRODUCTS =================== -->
         <section class="bg-gray-50 py-8">
