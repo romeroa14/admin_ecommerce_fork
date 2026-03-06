@@ -17,32 +17,43 @@ class BannersTable
         return $table
             ->columns([
                 TextColumn::make('title')
-                    ->searchable(),
-                ImageColumn::make('image'),
-                ImageColumn::make('mobile_image'),
-                TextColumn::make('link')
-                    ->searchable(),
+                    ->searchable()
+                    ->weight('bold'),
+                ImageColumn::make('image')
+                    ->disk('public')
+                    ->width(160)
+                    ->height(50)
+                    ->label('Imagen principal'),
+                ImageColumn::make('mobile_image')
+                    ->disk('public')
+                    ->width(50)
+                    ->height(50)
+                    ->label('Imagen móvil'),
                 TextColumn::make('button_text')
-                    ->searchable(),
+                    ->label('Botón'),
                 TextColumn::make('position')
-                    ->searchable(),
+                    ->badge()
+                    ->color('info')
+                    ->label('Posición'),
                 TextColumn::make('order')
                     ->numeric()
-                    ->sortable(),
-                TextColumn::make('starts_at')
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('expires_at')
-                    ->dateTime()
-                    ->sortable(),
-                IconColumn::make('is_active')
-                    ->boolean(),
-                TextColumn::make('created_at')
-                    ->dateTime()
                     ->sortable()
+                    ->label('Orden'),
+                TextColumn::make('starts_at')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->label('Inicio')
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
+                TextColumn::make('expires_at')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->label('Vence')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                IconColumn::make('is_active')
+                    ->boolean()
+                    ->label('Activo'),
+                TextColumn::make('created_at')
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
