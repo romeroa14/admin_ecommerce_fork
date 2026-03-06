@@ -68,7 +68,7 @@ onUnmounted(() => {
 <template>
     <div 
         v-if="banners.length > 0"
-        class="banner-carousel relative w-full overflow-hidden rounded-2xl shadow-2xl"
+        class="banner-carousel relative w-full overflow-hidden"
         @mouseenter="isPaused = true"
         @mouseleave="isPaused = false"
     >

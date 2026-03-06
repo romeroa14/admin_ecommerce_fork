@@ -1,36 +1,42 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import BannerCarousel from '@/Components/BannerCarousel.vue';
+import { getProductImage } from '@/composables/useProductImage';
 
 // @ts-ignore
 const route = window.route;
 
-defineProps({
+const props = defineProps({
     products: Object,
     banners: {
-        type: Array,
+        type: Array as () => any[],
+        default: () => [],
+    },
+    categories: {
+        type: Array as () => any[],
         default: () => [],
     },
 });
 
-// Helper: get image URL from product (handles both Filament array field and ProductImage relation)
-function getProductImage(product: any, fallback = 'https://placehold.co/400x400/f3f4f6/9ca3af?text=Sin+imagen'): string {
-    // Try relation first (ProductImage objects)
-    if (product.images && product.images.length > 0) {
-        const first = product.images[0];
-        if (typeof first === 'string') {
-            // Filament stores as plain path string e.g. "products/abc.png"
-            return '/storage/' + first;
-        }
-        if (first && typeof first === 'object' && first.image_url) {
-            return first.image_url;
-        }
-        if (first && typeof first === 'object' && first.image) {
-            return '/storage/' + first.image;
-        }
+// Search
+const searchQuery = ref('');
+const filteredProducts = computed(() => {
+    if (!props.products?.data) return [];
+    if (!searchQuery.value.trim()) return props.products.data;
+    const q = searchQuery.value.toLowerCase().trim();
+    return props.products.data.filter((p: any) =>
+        p.name?.toLowerCase().includes(q) ||
+        p.short_description?.toLowerCase().includes(q) ||
+        p.category?.name?.toLowerCase().includes(q)
+    );
+});
+
+function goToSearch() {
+    if (searchQuery.value.trim()) {
+        router.get('/products', { search: searchQuery.value.trim() });
     }
-    return fallback;
 }
 </script>
 
@@ -38,181 +44,154 @@ function getProductImage(product: any, fallback = 'https://placehold.co/400x400/
     <AppLayout>
         <Head title="Inicio" />
 
-        <!-- Hero Banner -->
-        <section class="relative bg-gradient-to-br from-[#040054] via-[#1a0a7e] to-[#F41D27] text-white min-h-[600px] md:min-h-[700px] flex items-center">
-            <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <div class="space-y-6">
-                        <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
-                            Equipos (RRRRR) de Calidad para tu Negocio
-                        </h1>
-                        <p class="text-lg md:text-xl text-gray-200">
-                            Encuentra los mejores productos para equipar tu negocio con la mejor relación calidad-precio del mercado.
-                        </p>
-                        <div class="flex flex-wrap gap-4">
-                            <Link 
-                                href="/products" 
-                                class="inline-flex items-center px-8 py-4 bg-[#F41D27] text-white font-bold rounded-lg hover:bg-red-600 transition-all transform hover:scale-105 shadow-lg"
-                            >
-                                Ver Catálogo
-                                <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </Link>
-                            <a 
-                                href="#about" 
-                                class="inline-flex items-center px-8 py-4 bg-white text-[#040054] font-bold rounded-lg hover:bg-gray-100 transition-all shadow-lg"
-                            >
-                                Conocer Más
-                            </a>
-                        </div>
-                    </div>
-                    <!-- Logo column: fixed height so it's always big -->
-                    <div class="hidden md:flex items-center justify-center">
-                        <img 
-                            src="/storage/Logos/equipocontainer.png?v=2" 
-                            alt="Equipo Container" 
-                            style="height: 480px; width: auto;"
-                            class="drop-shadow-2xl object-contain"
-                        >
-                    </div>
-                </div>
-            </div>
-            <!-- Wave SVG -->
-            <div class="absolute bottom-0 left-0 right-0">
-                <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
-                </svg>
-            </div>
+        <!-- =================== 1. BANNER CAROUSEL =================== -->
+        <section class="w-full">
+            <BannerCarousel
+                v-if="banners && banners.length > 0"
+                :banners="banners"
+                :autoplay-interval="5000"
+            />
         </section>
 
-        <!-- Banner Carousel -->
-        <section v-if="banners && banners.length > 0" class="py-12 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <BannerCarousel :banners="banners" :autoplay-interval="5000" />
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="py-20 bg-gray-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 class="text-3xl md:text-5xl font-extrabold text-[#040054] mb-4">
-                        ¿Por Qué Elegirnos?
-                    </h2>
-                    <div class="w-24 h-1 bg-[#F41D27] mx-auto mb-6"></div>
-                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Somos tu aliado de confianza en la adquisición de equipos y productos de calidad premium
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Feature 1 -->
-                    <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
-                        <div class="w-16 h-16 bg-[#F41D27] rounded-full flex items-center justify-center mb-6 mx-auto">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-[#040054] text-center mb-3">Calidad Garantizada</h3>
-                        <p class="text-gray-600 text-center">
-                            Todos nuestros productos pasan rigurosos controles de calidad para garantizar tu satisfacción.
-                        </p>
-                    </div>
-
-                    <!-- Feature 2 -->
-                    <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
-                        <div class="w-16 h-16 bg-[#040054] rounded-full flex items-center justify-center mb-6 mx-auto">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-[#040054] text-center mb-3">Mejores Precios</h3>
-                        <p class="text-gray-600 text-center">
-                            Ofrecemos los precios más competitivos del mercado sin comprometer la calidad.
-                        </p>
-                    </div>
-
-                    <!-- Feature 3 -->
-                    <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
-                        <div class="w-16 h-16 bg-[#F41D27] rounded-full flex items-center justify-center mb-6 mx-auto">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-[#040054] text-center mb-3">Entrega Rápida</h3>
-                        <p class="text-gray-600 text-center">
-                            Envíos a todo el país con las mejores empresas de logística. ¡Recibe tu pedido rápidamente!
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Products Section -->
-        <div class="py-20 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-5xl font-extrabold text-[#040054] mb-4">
-                        Nuestros Productos Destacados
-                    </h2>
-                    <div class="w-24 h-1 bg-[#F41D27] mx-auto"></div>
-                </div>
-
-                <div v-if="products && products.data" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <Link 
-                        v-for="product in products.data.slice(0, 8)" 
-                        :key="product.id" 
-                        :href="route('products.show', product.slug)"
-                        class="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
+        <!-- =================== 2. CATEGORIES =================== -->
+        <section v-if="categories && categories.length > 0" class="bg-white border-b border-gray-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                <div class="flex items-center gap-6 overflow-x-auto scrollbar-hide py-1">
+                    <Link
+                        v-for="cat in categories"
+                        :key="cat.id"
+                        :href="`/categories/${cat.slug}`"
+                        class="group flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0"
                     >
-                        <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 relative">
-                            <img 
-                                :src="getProductImage(product)" 
+                        <div class="w-16 h-16 bg-gradient-to-br from-[#040054] to-[#1a0a7e] rounded-2xl flex items-center justify-center text-2xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                            {{ cat.icon || '📦' }}
+                        </div>
+                        <span class="text-xs font-semibold text-gray-700 group-hover:text-[#F41D27] transition text-center leading-tight whitespace-nowrap">
+                            {{ cat.name }}
+                        </span>
+                    </Link>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== 3. SEARCH + PRODUCTS =================== -->
+        <section class="bg-gray-50 py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- Header: Title + Search -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl md:text-2xl font-extrabold text-[#040054]">
+                            Productos
+                        </h2>
+                        <Link
+                            href="/products"
+                            class="text-sm font-semibold text-[#040054]/60 hover:text-[#F41D27] transition group flex items-center gap-1"
+                        >
+                            Ver todos
+                            <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </Link>
+                    </div>
+
+                    <!-- Search Input -->
+                    <form @submit.prevent="goToSearch" class="relative w-full sm:w-80">
+                        <input
+                            v-model="searchQuery"
+                            type="text"
+                            placeholder="Buscar productos..."
+                            class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#040054]/20 focus:border-[#040054] transition shadow-sm"
+                        >
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8" stroke-width="2" />
+                            <path stroke-linecap="round" stroke-width="2" d="M21 21l-4.35-4.35" />
+                        </svg>
+                    </form>
+                </div>
+
+                <!-- Products Grid -->
+                <div v-if="filteredProducts.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                    <Link
+                        v-for="product in filteredProducts"
+                        :key="product.id"
+                        :href="route('products.show', product.slug)"
+                        class="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
+                    >
+                        <!-- Image -->
+                        <div class="relative aspect-square overflow-hidden bg-gray-50">
+                            <img
+                                :src="getProductImage(product)"
                                 :alt="product.name"
-                                class="h-64 w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                loading="lazy"
                             >
-                            <div v-if="product.discount_percentage > 0" class="absolute top-4 right-4 bg-[#F41D27] text-white px-3 py-1 rounded-full font-bold text-sm shadow-lg">
+                            <div
+                                v-if="product.discount_percentage > 0"
+                                class="absolute top-2 left-2 bg-[#F41D27] text-white px-2 py-0.5 rounded-md font-bold text-[11px] shadow"
+                            >
                                 -{{ product.discount_percentage }}%
                             </div>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <!-- Category Badge -->
-                            <div v-if="product.category" class="mb-3">
-                                <Link 
-                                    :href="`/categories/${product.category.slug}`"
-                                    @click.stop
-                                    class="inline-flex items-center text-xs font-medium text-[#040054] bg-blue-50 px-3 py-1 rounded-full hover:bg-blue-100 transition"
-                                >
-                                    <span v-if="product.category.icon" class="mr-1">{{ product.category.icon }}</span>
-                                    {{ product.category.name }}
-                                </Link>
+                            <!-- Hover overlay -->
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-end justify-center pb-3 opacity-0 group-hover:opacity-100">
+                                <span class="bg-white/95 backdrop-blur-sm text-[#040054] text-xs font-bold px-4 py-1.5 rounded-full shadow transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                                    Ver Producto
+                                </span>
                             </div>
-                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-[#F41D27] transition line-clamp-2 mb-2">
+                        </div>
+                        <!-- Content -->
+                        <div class="p-3 flex-1 flex flex-col">
+                            <span v-if="product.category" class="text-[10px] text-gray-400 font-medium uppercase tracking-wider mb-0.5">
+                                {{ product.category.name }}
+                            </span>
+                            <h3 class="text-sm font-semibold text-gray-800 group-hover:text-[#F41D27] transition line-clamp-2 mb-2 flex-1 leading-snug">
                                 {{ product.name }}
                             </h3>
-                            <p class="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">{{ product.short_description }}</p>
-                            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                                <span class="text-2xl font-bold text-[#040054]">€{{ product.price }}</span>
-                                <span v-if="product.stock > 0" class="text-xs font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">En Stock</span>
-                                <span v-else class="text-xs font-semibold text-red-600 bg-red-100 px-3 py-1 rounded-full">Agotado</span>
+                            <div class="flex items-center justify-between">
+                                <span class="text-base md:text-lg font-extrabold text-[#040054]">€{{ product.price }}</span>
+                                <span
+                                    v-if="product.stock > 0"
+                                    class="text-[9px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded"
+                                >En Stock</span>
+                                <span v-else class="text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Agotado</span>
                             </div>
                         </div>
                     </Link>
                 </div>
 
-                <div class="text-center mt-12">
-                    <Link 
-                        href="/products" 
-                        class="inline-flex items-center px-8 py-4 bg-[#040054] text-white font-bold rounded-lg hover:bg-[#060078] transition-all transform hover:scale-105 shadow-lg"
+                <!-- No results -->
+                <div v-else-if="searchQuery.trim()" class="text-center py-16">
+                    <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8" stroke-width="1.5" />
+                        <path stroke-linecap="round" stroke-width="1.5" d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <p class="text-gray-500 text-lg font-medium">No se encontraron productos para "{{ searchQuery }}"</p>
+                    <button @click="searchQuery = ''" class="mt-3 text-sm text-[#F41D27] font-semibold hover:underline">Limpiar búsqueda</button>
+                </div>
+
+                <!-- View All -->
+                <div class="text-center mt-8">
+                    <Link
+                        href="/products"
+                        class="inline-flex items-center px-6 py-3 bg-[#040054] text-white font-bold rounded-xl hover:bg-[#060078] transition-all transform hover:scale-[1.02] shadow-lg text-sm"
                     >
-                        Ver Todos los Productos
-                        <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        Ver Catálogo Completo
+                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
                     </Link>
                 </div>
             </div>
-        </div>
+        </section>
     </AppLayout>
 </template>
+
+<style scoped>
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+</style>

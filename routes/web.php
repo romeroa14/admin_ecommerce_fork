@@ -28,9 +28,12 @@ Route::get('/', function () {
         ->orderBy('order')
         ->get();
 
+    $categories = \App\Models\Category::orderBy('name')->get();
+
     return Inertia::render('Home', [
         'products' => $products,
         'banners' => $banners,
+        'categories' => $categories,
     ]);
 })->name('home');
 
