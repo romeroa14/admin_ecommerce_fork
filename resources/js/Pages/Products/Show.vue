@@ -41,10 +41,8 @@ const currentQuantity = ref(1);
 const isZoomOpen = ref(false);
 const zoomImageIndex = ref(0);
 
-// Accordion states for right sidebar
-const detailsOpen = ref(false);
-const shippingOpen = ref(false);
-const similarOpen = ref(false);
+// Tab state for product info section
+const activeTab = ref('descripcion');
 
 // Carousel
 const carouselContainer = ref<HTMLElement | null>(null);
@@ -300,101 +298,128 @@ const buyNow = () => {
                             </div>
                         </div>
 
-                        <!-- Accordions -->
-                        <div class="space-y-3">
-                            <!-- Details Accordion -->
-                            <div class="border border-gray-200 rounded-lg overflow-hidden">
-                                <button 
-                                    @click="detailsOpen = !detailsOpen"
-                                    class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition"
-                                >
-                                    <span class="font-bold text-gray-900">DETALLES</span>
-                                    <svg class="w-5 h-5 transition-transform" :class="detailsOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                                <div v-show="detailsOpen" class="p-4 bg-white text-sm text-gray-600 leading-relaxed">
-                                    <div v-html="product.description"></div>
-                                </div>
-                            </div>
 
-                            <!-- Shipping Accordion -->
-                            <div class="border border-gray-200 rounded-lg overflow-hidden">
-                                <button 
-                                    @click="shippingOpen = !shippingOpen"
-                                    class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition"
-                                >
-                                    <span class="font-bold text-gray-900">TIEMPOS DE ENVÍO</span>
-                                    <svg class="w-5 h-5 transition-transform" :class="shippingOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                                <div v-show="shippingOpen" class="p-4 bg-white space-y-3">
-                                    <div class="flex items-start space-x-3 text-sm">
-                                        <svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    </div>
+                </div>
+
+                <!-- =================== TABS: Descripción / Envío / Similares =================== -->
+                <div class="mt-12 border-t border-gray-200 pt-8">
+                    <!-- Tab Buttons -->
+                    <div class="border-b border-gray-200">
+                        <nav class="flex gap-8">
+                            <button
+                                @click="activeTab = 'descripcion'"
+                                class="relative pb-4 text-sm font-bold uppercase tracking-wider transition-colors"
+                                :class="activeTab === 'descripcion' ? 'text-[#040054]' : 'text-gray-400 hover:text-gray-600'"
+                            >
+                                Descripción
+                                <span v-if="activeTab === 'descripcion'" class="absolute bottom-0 left-0 right-0 h-[3px] bg-[#040054] rounded-t"></span>
+                            </button>
+                            <button
+                                @click="activeTab = 'envio'"
+                                class="relative pb-4 text-sm font-bold uppercase tracking-wider transition-colors"
+                                :class="activeTab === 'envio' ? 'text-[#040054]' : 'text-gray-400 hover:text-gray-600'"
+                            >
+                                Tiempos de Envío
+                                <span v-if="activeTab === 'envio'" class="absolute bottom-0 left-0 right-0 h-[3px] bg-[#040054] rounded-t"></span>
+                            </button>
+                            <button
+                                @click="activeTab = 'similares'"
+                                class="relative pb-4 text-sm font-bold uppercase tracking-wider transition-colors"
+                                :class="activeTab === 'similares' ? 'text-[#040054]' : 'text-gray-400 hover:text-gray-600'"
+                            >
+                                Productos Similares
+                                <span v-if="activeTab === 'similares'" class="absolute bottom-0 left-0 right-0 h-[3px] bg-[#040054] rounded-t"></span>
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="py-8">
+                        <!-- Descripción -->
+                        <div v-show="activeTab === 'descripcion'">
+                            <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+                                <div v-if="product.short_description" class="mb-6">
+                                    <p class="text-lg text-gray-500 italic">{{ product.short_description }}</p>
+                                </div>
+                                <div v-if="product.description" v-html="product.description"></div>
+                                <p v-else class="text-gray-400">No hay descripción disponible para este producto.</p>
+                            </div>
+                        </div>
+
+                        <!-- Envío -->
+                        <div v-show="activeTab === 'envio'">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <div class="flex items-start gap-4 p-6 bg-green-50 rounded-xl">
+                                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
-                                        <div>
-                                            <p class="font-semibold text-gray-900">Envíos gratis en pedidos de +€100 (Península)</p>
-                                        </div>
                                     </div>
-                                    <div class="flex items-start space-x-3 text-sm">
-                                        <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 mb-1">Envío Gratis</h4>
+                                        <p class="text-sm text-gray-600">En pedidos superiores a €100 para envíos a la Península.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4 p-6 bg-blue-50 rounded-xl">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        <div>
-                                            <p class="font-semibold text-gray-900">Entrega 24/72h (Península) Resto de Europa 3-7 días</p>
-                                        </div>
                                     </div>
-                                    <div class="flex items-start space-x-3 text-sm">
-                                        <svg class="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 mb-1">Entrega Rápida</h4>
+                                        <p class="text-sm text-gray-600">24/72 horas en Península. Resto de Europa: 3-7 días laborables.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4 p-6 bg-purple-50 rounded-xl">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        <div>
-                                            <p class="font-semibold text-gray-900">Envíos gratis en pedidos internacionales de +150€</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 mb-1">Envío Internacional</h4>
+                                        <p class="text-sm text-gray-600">Envíos gratis en pedidos internacionales superiores a €150.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Productos Similares -->
+                        <div v-show="activeTab === 'similares'">
+                            <div v-if="similarProducts.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                <Link
+                                    v-for="similar in similarProducts"
+                                    :key="similar.id"
+                                    :href="route('products.show', similar.slug)"
+                                    class="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col"
+                                >
+                                    <div class="relative aspect-square overflow-hidden bg-gray-50">
+                                        <img
+                                            :src="getProductImage(similar, 'https://placehold.co/300x300/f3f4f6/9ca3af?text=Sin+imagen')"
+                                            :alt="similar.name"
+                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            loading="lazy"
+                                        >
+                                        <div v-if="similar.stock > 0" class="absolute top-2 right-2">
+                                            <span class="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">En Stock</span>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Similar Products Accordion -->
-                            <div class="border border-gray-200 rounded-lg overflow-hidden">
-                                <button 
-                                    @click="similarOpen = !similarOpen"
-                                    class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition"
-                                >
-                                    <span class="font-bold text-gray-900">PAIRS WELL WITH</span>
-                                    <svg class="w-5 h-5 transition-transform" :class="similarOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                                <div v-show="similarOpen" class="p-4 bg-white">
-                                    <div v-if="similarProducts.length > 0" class="grid grid-cols-3 gap-3">
-                                        <Link 
-                                            v-for="similar in similarProducts.slice(0, 3)" 
-                                            :key="similar.id"
-                                            :href="route('products.show', similar.slug)"
-                                            class="group text-center"
-                                        >
-                                            <div class="aspect-square w-full overflow-hidden rounded-lg bg-gray-100 mb-2">
-                                                <img 
-                                                    :src="getProductImage(similar, 'https://placehold.co/200x200/f3f4f6/9ca3af?text=Sin+imagen')" 
-                                                    :alt="similar.name"
-                                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                                >
-                                            </div>
-                                            <h4 class="text-xs font-semibold text-gray-900 line-clamp-2 mb-1">
-                                                {{ similar.name }}
-                                            </h4>
-                                            <p class="text-sm font-bold text-[#040054]">€{{ similar.price }}</p>
-                                            <button class="mt-2 w-full text-xs font-semibold text-[#040054] border border-[#040054] rounded px-2 py-1 hover:bg-[#040054] hover:text-white transition">
-                                                ADD
-                                            </button>
-                                        </Link>
+                                    <div class="p-3 flex-1 flex flex-col">
+                                        <h4 class="text-sm font-semibold text-gray-800 group-hover:text-[#F41D27] transition line-clamp-2 mb-2 flex-1 leading-snug">
+                                            {{ similar.name }}
+                                        </h4>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-base font-extrabold text-[#040054]">€{{ similar.price }}</span>
+                                            <span v-if="similar.compare_price && similar.compare_price > similar.price" class="text-xs text-gray-400 line-through">
+                                                €{{ similar.compare_price }}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <p v-else class="text-sm text-gray-500 text-center py-4">No hay productos similares</p>
-                                </div>
+                                </Link>
                             </div>
+                            <p v-else class="text-center text-gray-400 py-8">No hay productos similares en esta categoría.</p>
                         </div>
                     </div>
                 </div>
