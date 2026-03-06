@@ -66,15 +66,15 @@ const announcements = [
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex items-center justify-between h-[72px] gap-4 md:gap-8">
                         <!-- Logo -->
-                        <div class="flex-shrink-0 flex items-center">
+                        <div class="flex-1 flex items-center">
                             <Link href="/">
                                 <img src="/storage/Logos/equipocontainer.png" alt="Logo" class="h-10 w-auto bg-white rounded p-1">
                             </Link>
                         </div>
                         
                         <!-- Search Bar (Desktop) -->
-                        <div class="flex-1 max-w-xl mx-auto hidden md:block">
-                            <form @submit.prevent="globalSearch" class="relative w-full">
+                        <div class="hidden md:flex flex-[2] justify-center px-4">
+                            <form @submit.prevent="globalSearch" class="relative w-full max-w-2xl">
                                 <input
                                     v-model="searchQuery"
                                     type="text"
@@ -91,7 +91,7 @@ const announcements = [
                         </div>
 
                         <!-- Actions -->
-                        <div class="flex items-center space-x-6 text-sm">
+                        <div class="flex-1 flex items-center justify-end space-x-6 text-sm">
                             <!-- User -->
                             <div class="relative group hidden sm:block h-full">
                                 <Link :href="user ? route('account.dashboard') : route('login')" class="flex items-center gap-2 hover:text-gray-300 transition py-6">
@@ -151,7 +151,7 @@ const announcements = [
             <!-- Bottom White Bar for Categories -->
             <div class="bg-white border-b border-gray-200">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <ul class="flex items-center justify-center gap-6 overflow-x-auto scrollbar-hide py-2.5 text-sm font-bold text-gray-800">
+                    <ul class="flex items-center justify-center gap-8 md:gap-12 overflow-x-auto scrollbar-hide py-3 text-sm font-bold text-gray-800">
                         <li>
                             <Link href="/" class="hover:text-[#F41D27] whitespace-nowrap transition-colors">Inicio</Link>
                         </li>
