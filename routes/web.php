@@ -23,8 +23,14 @@ Route::get('/', function () {
         ->latest()
         ->paginate(12);
 
+    $banners = \App\Models\Banner::valid()
+        ->byPosition('home_hero')
+        ->orderBy('order')
+        ->get();
+
     return Inertia::render('Home', [
         'products' => $products,
+        'banners' => $banners,
     ]);
 })->name('home');
 

@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             CartSeeder::class,
             UpdateCategoryIconsSeeder::class,
             PaymentMethodSeeder::class,
+            BannerSeeder::class,
         ]);
 
         User::factory()->create([

@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import BannerCarousel from '@/Components/BannerCarousel.vue';
 
 // @ts-ignore
 const route = window.route;
 
 defineProps({
     products: Object,
+    banners: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 // Helper: get image URL from product (handles both Filament array field and ProductImage relation)
@@ -34,9 +39,9 @@ function getProductImage(product: any, fallback = 'https://placehold.co/400x400/
         <Head title="Inicio" />
 
         <!-- Hero Banner -->
-        <section class="relative bg-gradient-to-br from-[#040054] via-[#1a0a7e] to-[#F41D27] text-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <section class="relative bg-gradient-to-br from-[#040054] via-[#1a0a7e] to-[#F41D27] text-white min-h-[600px] md:min-h-[700px] flex items-center">
+            <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                     <div class="space-y-6">
                         <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
                             Equipos (RRRRR) de Calidad para tu Negocio
@@ -62,12 +67,13 @@ function getProductImage(product: any, fallback = 'https://placehold.co/400x400/
                             </a>
                         </div>
                     </div>
-                    <div class="relative hidden md:block">
-                        <div class="absolute inset-0 bg-gradient-to-br from-[#F41D27]/20 to-transparent rounded-3xl blur-3xl"></div>
+                    <!-- Logo column: fixed height so it's always big -->
+                    <div class="hidden md:flex items-center justify-center">
                         <img 
-                            src="/storage/Logos/equipocontainer.png" 
-                            alt="Hero" 
-                            class="relative z-10 drop-shadow-2xl"
+                            src="/storage/Logos/equipocontainer.png?v=2" 
+                            alt="Equipo Container" 
+                            style="height: 480px; width: auto;"
+                            class="drop-shadow-2xl object-contain"
                         >
                     </div>
                 </div>
@@ -77,6 +83,13 @@ function getProductImage(product: any, fallback = 'https://placehold.co/400x400/
                 <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
                 </svg>
+            </div>
+        </section>
+
+        <!-- Banner Carousel -->
+        <section v-if="banners && banners.length > 0" class="py-12 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <BannerCarousel :banners="banners" :autoplay-interval="5000" />
             </div>
         </section>
 
