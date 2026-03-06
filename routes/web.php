@@ -56,6 +56,7 @@ Route::get('/tags/{tag:slug}', [\App\Http\Controllers\TagController::class, 'sho
 // Cart (Public - Session based)
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 // Currency

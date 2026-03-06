@@ -249,10 +249,19 @@ const proceedToCheckout = () => {
                     </div>
                 </div>
 
+                <!-- View Full Cart Link -->
+                <Link 
+                    href="/cart"
+                    @click="emit('close')"
+                    class="w-full mt-3 block text-center text-sm font-semibold text-[#040054] border border-[#040054] py-2.5 rounded-xl hover:bg-[#040054] hover:text-white transition"
+                >
+                    Ver Carrito Completo
+                </Link>
+
                 <!-- Continue Shopping Link -->
                 <button 
                     @click="emit('close')"
-                    class="w-full mt-3 text-sm text-[#040054] hover:underline font-medium"
+                    class="w-full mt-2 text-sm text-gray-500 hover:underline font-medium"
                 >
                     ← Continuar Comprando
                 </button>

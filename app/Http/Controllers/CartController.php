@@ -14,11 +14,39 @@ class CartController extends Controller
     public function index()
     {
         $cart = $this->getCart();
+        $enrichedItems = [];
+
+        if ($cart && !empty($cart->items)) {
+            foreach ($cart->items as $item) {
+                $product = Product::with(['category', 'productImages'])->find($item['product_id']);
+                if ($product) {
+                    $image = null;
+                    if ($product->productImages && $product->productImages->count() > 0) {
+                        $image = '/storage/' . $product->productImages->first()->image;
+                    } elseif ($product->image) {
+                        $image = '/storage/' . $product->image;
+                    }
+
+                    $enrichedItems[] = [
+                        'product_id'          => $item['product_id'],
+                        'name'                => $product->name,
+                        'slug'                => $product->slug,
+                        'image'               => $image,
+                        'price'               => $item['price'],
+                        'quantity'            => $item['quantity'],
+                        'discount_percentage' => $item['discount_percentage'] ?? 0,
+                        'variants'            => $item['variants'] ?? [],
+                        'category'            => $product->category?->name,
+                        'stock'               => $product->stock,
+                    ];
+                }
+            }
+        }
 
         return Inertia::render('Cart/Index', [
-            'cart' => $cart,
-            'items' => $cart ? $cart->items : [],
-            'totals' => $cart ? $cart->getTotals() : ['total' => 0],
+            'cart'   => $cart,
+            'items'  => $enrichedItems,
+            'totals' => $cart ? $cart->getTotals() : ['subtotal' => 0, 'discount_amount' => 0, 'tax_amount' => 0, 'total' => 0],
         ]);
     }
 
@@ -26,8 +54,8 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-            'variants' => 'nullable|array',
+            'quantity'   => 'required|integer|min:1',
+            'variants'   => 'nullable|array',
         ]);
 
         $cart = $this->getOrCreateCart();
@@ -40,6 +68,24 @@ class CartController extends Controller
         $cart->addProduct($product->id, $request->quantity, $request->variants ?? []);
 
         return redirect()->back()->with('success', 'Producto agregado al carrito.');
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'index'    => 'required|integer',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $cart = $this->getCart();
+        if ($cart && isset($cart->items[$request->index])) {
+            $items = $cart->items;
+            $items[$request->index]['quantity'] = $request->quantity;
+            $cart->items = $items;
+            $cart->save();
+        }
+
+        return redirect()->back();
     }
 
     public function remove(Request $request)
@@ -91,3 +137,4 @@ class CartController extends Controller
         return $cart;
     }
 }
+

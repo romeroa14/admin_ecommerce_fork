@@ -40,6 +40,7 @@ const selectedImage = ref(allImages[0] || 'https://placehold.co/600x600/f3f4f6/9
 const currentQuantity = ref(1);
 const isZoomOpen = ref(false);
 const zoomImageIndex = ref(0);
+const addedToCart = ref(false);
 
 // Tab state for product info section
 const activeTab = ref('descripcion');
@@ -115,7 +116,10 @@ const addToCart = () => {
     form.post(route('cart.add'), {
         preserveScroll: true,
         onSuccess: () => {
-            // Success
+            addedToCart.value = true;
+            setTimeout(() => {
+                addedToCart.value = false;
+            }, 3000);
         },
     });
 };
@@ -270,10 +274,38 @@ const buyNow = () => {
                             <button 
                                 @click="addToCart" 
                                 :disabled="!isInStock || form.processing"
-                                class="w-full bg-white border-2 border-[#040054] text-[#040054] font-bold py-4 rounded-xl hover:bg-[#040054] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="w-full font-bold py-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                :class="addedToCart 
+                                    ? 'bg-green-500 text-white border-2 border-green-500' 
+                                    : 'bg-white border-2 border-[#040054] text-[#040054] hover:bg-[#040054] hover:text-white'"
                             >
-                                Agregar al Carrito
+                                <template v-if="addedToCart">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    ¡Agregado al Carrito!
+                                </template>
+                                <template v-else-if="form.processing">
+                                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                    Agregando...
+                                </template>
+                                <template v-else>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                    Agregar al Carrito
+                                </template>
                             </button>
+
+                            <!-- View Cart Link (appears after adding) -->
+                            <Transition
+                                enter-active-class="transition-all duration-300"
+                                enter-from-class="opacity-0 -translate-y-2"
+                                enter-to-class="opacity-100 translate-y-0"
+                                leave-active-class="transition-all duration-200"
+                                leave-from-class="opacity-100"
+                                leave-to-class="opacity-0"
+                            >
+                                <Link v-if="addedToCart" href="/cart" class="block w-full text-center text-sm font-semibold text-[#040054] hover:underline py-2">
+                                    Ver carrito →
+                                </Link>
+                            </Transition>
                         </div>
 
                         <!-- Trust Badges -->
