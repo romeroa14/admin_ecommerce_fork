@@ -1,10 +1,25 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { Link, usePage, router } from '@inertiajs/vue3';
+import { computed, ref, onMounted } from 'vue';
 import CartSidebar from '@/Components/CartSidebar.vue';
 
 // @ts-ignore
 const route = window.route;
+
+const searchQuery = ref('');
+
+onMounted(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    searchQuery.value = urlParams.get('search') || '';
+});
+
+function globalSearch() {
+    if (searchQuery.value.trim()) {
+        router.get('/products', { search: searchQuery.value.trim() });
+    } else {
+        router.get('/products');
+    }
+}
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
@@ -30,8 +45,8 @@ const announcements = [
 
 <template>
     <div class="min-h-screen bg-white text-gray-900">
-        <!-- Infinite Ticker / Announcement Bar -->
-        <div class="bg-gradient-to-r from-[#F41D27] to-[#040054] text-white py-2 overflow-hidden">
+        <!-- Infinite Ticker / Announcement Bar (Hidden as requested) -->
+        <div v-if="false" class="bg-gradient-to-r from-[#F41D27] to-[#040054] text-white py-2 overflow-hidden">
             <div class="ticker-wrapper">
                 <div class="ticker-content">
                     <span v-for="(announcement, idx) in announcements" :key="`a-${idx}`" class="ticker-item">
@@ -45,119 +60,107 @@ const announcements = [
         </div>
 
         <!-- Main Header -->
-        <header class="bg-white shadow-md sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-20">
-                    <!-- Logo -->
-                    <div class="flex items-center">
-                        <Link href="/" class="flex items-center">
-                            <img src="/storage/Logos/equipocontainer.png" alt="Logo" class="h-16 w-auto">
-                        </Link>
-                    </div>
-
-                    
-                    
-                    <!-- Navigation -->
-                    <nav class="hidden md:flex space-x-8 items-center">
-                        <Link href="/" class="text-gray-700 hover:text-[#F41D27] font-medium transition-colors">
-                            Inicio
-                        </Link>
-                        
-                        <!-- Categories Dropdown -->
-                        <div class="relative group">
-                            <button class="flex items-center space-x-1 text-gray-700 hover:text-[#F41D27] font-medium transition-colors">
-                                <span>Categorías</span>
-                                <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            
-                            <!-- Dropdown Menu -->
-                            <div class="absolute left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                                <Link 
-                                    v-for="category in categories" 
-                                    :key="category.id"
-                                    :href="`/categories/${category.slug}`"
-                                    class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#F41D27] transition"
-                                >
-                                    <span v-if="category.icon" class="mr-3 text-lg">{{ category.icon }}</span>
-                                    <span class="font-medium">{{ category.name }}</span>
-                                </Link>
-                                
-                                <hr class="my-2 border-gray-200">
-                                
-                                <Link href="/categories" class="flex items-center px-4 py-3 text-sm text-[#040054] font-semibold hover:bg-gray-50">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                    Ver todas las categorías
-                                </Link>
-                            </div>
-                        </div>
-                        
-                        <a href="#contacto" class="text-gray-700 hover:text-[#F41D27] font-medium transition-colors">
-                            Contacto
-                        </a>
-                    </nav>
-
-                    <!-- Actions -->
-                    <div class="flex items-center space-x-4">
-                        <!-- User Account -->
-                        <div v-if="user" class="hidden md:flex items-center space-x-2 relative group">
-                            <Link :href="route('account.dashboard')" class="flex items-center space-x-2 text-gray-700 hover:text-[#F41D27] transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                                <span class="text-sm font-medium">{{ user.name }}</span>
+        <header class="w-full shadow-sm sticky top-0 z-50">
+            <!-- Top Bar -->
+            <div class="bg-[#040054] text-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between h-[72px] gap-4 md:gap-8">
+                        <!-- Logo -->
+                        <div class="flex-shrink-0 flex items-center">
+                            <Link href="/">
+                                <img src="/storage/Logos/equipocontainer.png" alt="Logo" class="h-10 w-auto bg-white rounded p-1">
                             </Link>
-                            <!-- Dropdown Menu -->
-                            <div class="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                                <Link :href="route('account.dashboard')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Mi Cuenta
-                                </Link>
-                                <Link href="/mis-pedidos" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Mis Pedidos
-                                </Link>
-                                <hr class="my-2 border-gray-200">
-                                <Link :href="route('logout')" method="post" as="button" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                    Cerrar Sesión
-                                </Link>
-                            </div>
                         </div>
-                        <Link v-else :href="route('login')" class="hidden md:flex items-center space-x-1 text-gray-700 hover:text-[#F41D27] transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            <span class="text-sm font-medium">Acceso</span>
-                        </Link>
+                        
+                        <!-- Search Bar (Desktop) -->
+                        <div class="flex-1 max-w-xl mx-auto hidden md:block">
+                            <form @submit.prevent="globalSearch" class="relative w-full">
+                                <input
+                                    v-model="searchQuery"
+                                    type="text"
+                                    placeholder="Buscar..."
+                                    class="w-full pl-4 pr-10 py-2.5 bg-white text-gray-900 rounded-sm border-none focus:ring-0 text-sm"
+                                >
+                                <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="11" cy="11" r="8" stroke-width="2" />
+                                        <path stroke-linecap="round" stroke-width="2" d="M21 21l-4.35-4.35" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
 
-                        <!-- Search Icon -->
-                        <button class="hidden md:block p-2 text-gray-600 hover:text-[#F41D27] transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </button>
+                        <!-- Actions -->
+                        <div class="flex items-center space-x-6 text-sm">
+                            <!-- User -->
+                            <div class="relative group hidden sm:block h-full">
+                                <Link :href="user ? route('account.dashboard') : route('login')" class="flex items-center gap-2 hover:text-gray-300 transition py-6">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    <span class="font-medium hidden lg:block">{{ user ? 'Mi cuenta' : 'Acceso' }}</span>
+                                </Link>
+                                <!-- Dropdown if logged in -->
+                                <div v-if="user" class="absolute right-0 top-full -mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-100 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                                    <Link :href="route('account.dashboard')" class="block px-4 py-2 text-gray-700 hover:bg-gray-50">Mi Cuenta</Link>
+                                    <Link href="/mis-pedidos" class="block px-4 py-2 text-gray-700 hover:bg-gray-50">Mis Pedidos</Link>
+                                    <Link :href="route('logout')" method="post" as="button" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50">Cerrar Sesión</Link>
+                                </div>
+                            </div>
 
-                        <!-- Cart Button -->
-                        <button 
-                            @click="isCartOpen = true"
-                            class="relative p-2 text-gray-600 hover:text-[#F41D27] transition-colors"
-                        >
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                            <span v-if="itemsCount > 0" class="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-[#F41D27] rounded-full animate-pulse">
-                                {{ itemsCount }}
-                            </span>
-                        </button>
+                            <!-- Favoritos -->
+                            <Link href="/favoritos" class="flex items-center gap-2 hover:text-gray-300 transition hidden sm:flex">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                <span class="font-medium hidden lg:block">Favoritos</span>
+                            </Link>
 
-                        <!-- Mobile Menu Button -->
-                        <button class="md:hidden p-2 text-gray-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
+                            <!-- Cart -->
+                            <button @click="isCartOpen = true" class="relative flex items-center gap-2 hover:text-gray-300 transition">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span v-if="itemsCount > 0" class="absolute -top-1.5 -right-2 w-5 h-5 flex items-center justify-center bg-[#F41D27] text-white text-[10px] font-bold rounded-full">
+                                    {{ itemsCount }}
+                                </span>
+                            </button>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="bg-[#040054] p-3 md:hidden border-t border-[#040054]">
+                <form @submit.prevent="globalSearch" class="relative w-full">
+                    <input
+                        v-model="searchQuery"
+                        type="text"
+                        placeholder="Buscar..."
+                        class="w-full pl-4 pr-10 py-2 bg-white text-gray-900 rounded-sm border-none focus:ring-0 text-sm"
+                    >
+                    <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8" stroke-width="2" />
+                            <path stroke-linecap="round" stroke-width="2" d="M21 21l-4.35-4.35" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Bottom White Bar for Categories -->
+            <div class="bg-white border-b border-gray-200">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <ul class="flex items-center justify-center gap-6 overflow-x-auto scrollbar-hide py-2.5 text-sm font-bold text-gray-800">
+                        <li>
+                            <Link href="/" class="hover:text-[#F41D27] whitespace-nowrap transition-colors">Inicio</Link>
+                        </li>
+                        <li v-for="cat in categories" :key="cat.id">
+                            <Link :href="`/categories/${cat.slug}`" class="hover:text-[#F41D27] whitespace-nowrap transition-colors">
+                                {{ cat.name }}
+                            </Link>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </header>

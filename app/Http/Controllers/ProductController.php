@@ -13,6 +13,12 @@ class ProductController extends Controller
     {
         $query = Product::active()->with(['category', 'productImages']);
 
+        // Filter by text search (LIKE)
+        if ($request->has('search') && $request->search) {
+            $searchTerm = '%' . $request->search . '%';
+            $query->where('name', 'ilike', $searchTerm);
+        }
+
         // Filter by stock availability
         if ($request->has('stock')) {
             if ($request->stock === 'available') {

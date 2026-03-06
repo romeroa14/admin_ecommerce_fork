@@ -21,23 +21,10 @@ const props = defineProps({
 });
 
 // Search
-const searchQuery = ref('');
+// (Buscador movido a AppLayout.vue para ser global)
 const filteredProducts = computed(() => {
-    if (!props.products?.data) return [];
-    if (!searchQuery.value.trim()) return props.products.data;
-    const q = searchQuery.value.toLowerCase().trim();
-    return props.products.data.filter((p: any) =>
-        p.name?.toLowerCase().includes(q) ||
-        p.short_description?.toLowerCase().includes(q) ||
-        p.category?.name?.toLowerCase().includes(q)
-    );
+    return props.products?.data || [];
 });
-
-function goToSearch() {
-    if (searchQuery.value.trim()) {
-        router.get('/products', { search: searchQuery.value.trim() });
-    }
-}
 </script>
 
 <template>
@@ -78,7 +65,7 @@ function goToSearch() {
         <section class="bg-gray-50 py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                <!-- Header: Title + Search -->
+                <!-- Header: Title -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                     <div class="flex items-center gap-3">
                         <h2 class="text-xl md:text-2xl font-extrabold text-[#040054]">
@@ -94,20 +81,6 @@ function goToSearch() {
                             </svg>
                         </Link>
                     </div>
-
-                    <!-- Search Input -->
-                    <form @submit.prevent="goToSearch" class="relative w-full sm:w-80">
-                        <input
-                            v-model="searchQuery"
-                            type="text"
-                            placeholder="Buscar productos..."
-                            class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#040054]/20 focus:border-[#040054] transition shadow-sm"
-                        >
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <circle cx="11" cy="11" r="8" stroke-width="2" />
-                            <path stroke-linecap="round" stroke-width="2" d="M21 21l-4.35-4.35" />
-                        </svg>
-                    </form>
                 </div>
 
                 <!-- Products Grid -->
@@ -160,13 +133,8 @@ function goToSearch() {
                 </div>
 
                 <!-- No results -->
-                <div v-else-if="searchQuery.trim()" class="text-center py-16">
-                    <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="8" stroke-width="1.5" />
-                        <path stroke-linecap="round" stroke-width="1.5" d="M21 21l-4.35-4.35" />
-                    </svg>
-                    <p class="text-gray-500 text-lg font-medium">No se encontraron productos para "{{ searchQuery }}"</p>
-                    <button @click="searchQuery = ''" class="mt-3 text-sm text-[#F41D27] font-semibold hover:underline">Limpiar búsqueda</button>
+                <div v-else class="text-center py-16">
+                    <p class="text-gray-500 text-lg font-medium">No hay productos disponibles por el momento.</p>
                 </div>
 
                 <!-- View All -->
