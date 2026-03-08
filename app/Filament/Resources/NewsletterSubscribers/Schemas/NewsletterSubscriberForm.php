@@ -16,9 +16,12 @@ class NewsletterSubscriberForm
                     ->label('Email address')
                     ->email()
                     ->required(),
-                TextInput::make('first_name'),
-                TextInput::make('last_name'),
+                TextInput::make('first_name')
+                    ->label('Nombre'),
+                TextInput::make('last_name')
+                    ->label('Apellido'),
                 TextInput::make('status')
+                    ->label('Estado')
                     ->required()
                     ->default('pending'),
                 DateTimePicker::make('subscribed_at'),

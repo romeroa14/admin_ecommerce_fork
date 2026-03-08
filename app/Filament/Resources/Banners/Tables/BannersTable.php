@@ -17,6 +17,7 @@ class BannersTable
         return $table
             ->columns([
                 TextColumn::make('title')
+                    ->label('Título')
                     ->searchable()
                     ->weight('bold'),
                 ImageColumn::make('image')
@@ -53,6 +54,7 @@ class BannersTable
                     ->boolean()
                     ->label('Activo'),
                 TextColumn::make('created_at')
+                    ->label('Creado El')
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

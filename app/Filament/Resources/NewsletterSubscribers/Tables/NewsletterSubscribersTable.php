@@ -18,10 +18,13 @@ class NewsletterSubscribersTable
                     ->label('Email address')
                     ->searchable(),
                 TextColumn::make('first_name')
+                    ->label('Nombre')
                     ->searchable(),
                 TextColumn::make('last_name')
+                    ->label('Apellido')
                     ->searchable(),
                 TextColumn::make('status')
+                    ->label('Estado')
                     ->searchable(),
                 TextColumn::make('subscribed_at')
                     ->dateTime()
@@ -32,10 +35,12 @@ class NewsletterSubscribersTable
                 TextColumn::make('source')
                     ->searchable(),
                 TextColumn::make('created_at')
+                    ->label('Creado El')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Actualizado El')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

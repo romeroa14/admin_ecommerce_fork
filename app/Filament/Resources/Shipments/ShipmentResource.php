@@ -24,7 +24,7 @@ class ShipmentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'tracking_number';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Envios';
+    protected static UnitEnum|string|null $navigationGroup = 'Envíos';
 
     protected static ?string $navigationLabel = 'Tracking de Envíos';
 

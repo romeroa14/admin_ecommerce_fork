@@ -100,6 +100,7 @@ class CartForm
                             ->label('Items del Carrito')
                             ->schema([
                                 \Filament\Forms\Components\Hidden::make('product_id')
+                                    ->label('Producto')
                                     ->dehydrated(),
 
                                 \Filament\Forms\Components\TextInput::make('product_name')

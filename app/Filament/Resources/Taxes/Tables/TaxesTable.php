@@ -16,28 +16,38 @@ class TaxesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
                 TextColumn::make('country')
+                    ->label('País')
                     ->searchable(),
                 TextColumn::make('state')
+                    ->label('Estado/Provincia')
                     ->searchable(),
                 TextColumn::make('zip_code')
+                    ->label('Código Postal')
                     ->searchable(),
                 TextColumn::make('rate')
+                    ->label('Tasa (%)')
                     ->numeric()
                     ->sortable(),
                 IconColumn::make('is_compound')
+                    ->label('Compuesto')
                     ->boolean(),
                 TextColumn::make('priority')
+                    ->label('Prioridad')
                     ->numeric()
                     ->sortable(),
                 IconColumn::make('is_active')
+                    ->label('Activo')
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label('Creado El')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Actualizado El')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

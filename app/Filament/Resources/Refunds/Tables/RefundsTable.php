@@ -19,22 +19,29 @@ class RefundsTable
                 TextColumn::make('payment.id')
                     ->searchable(),
                 TextColumn::make('refund_number')
+                    ->label('Nro. Reembolso')
                     ->searchable(),
                 TextColumn::make('amount')
+                    ->label('Monto')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('type')
+                    ->label('Tipo')
                     ->searchable(),
                 TextColumn::make('status')
+                    ->label('Estado')
                     ->searchable(),
                 TextColumn::make('processed_at')
+                    ->label('Procesada el')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label('Creado El')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Actualizado El')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

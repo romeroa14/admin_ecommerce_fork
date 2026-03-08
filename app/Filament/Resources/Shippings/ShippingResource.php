@@ -23,7 +23,7 @@ class ShippingResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Envios';
+    protected static string|UnitEnum|null $navigationGroup = 'Envíos';
 
     protected static ?string $navigationLabel = 'Métodos de Envío';
 

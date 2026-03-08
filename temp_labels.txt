@@ -1,0 +1,908 @@
+]633;E;for f in app/Filament/Resources/*/*/*Form.php\x3b do echo "--- $f ---"\x3b grep "make(" "$f" -A 1\x3b done > temp_labels.txt;cc3b4b16-1014-4df8-869c-9b979cee5fff]633;C--- app/Filament/Resources/Addresses/Schemas/AddressForm.php ---
+                Section::make('Información del Usuario')
+                    ->schema([
+                        Select::make('user_id')
+                            ->label('Usuario')
+--
+                        Select::make('type')
+                            ->label('Tipo de Dirección')
+--
+                Section::make('Información Personal')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('first_name')
+                                    ->label('Nombre')
+--
+                                TextInput::make('last_name')
+                                    ->label('Apellido')
+--
+                        TextInput::make('company')
+                            ->label('Empresa')
+--
+                        TextInput::make('phone')
+                            ->label('Teléfono')
+--
+                Section::make('Dirección')
+                    ->schema([
+                        TextInput::make('address_line_1')
+                            ->label('Dirección Línea 1')
+--
+                        TextInput::make('address_line_2')
+                            ->label('Dirección Línea 2')
+--
+                        Grid::make(3)
+                            ->schema([
+                                TextInput::make('city')
+                                    ->label('Ciudad')
+--
+                                TextInput::make('state')
+                                    ->label('Estado/Provincia'),
+--
+                                TextInput::make('postal_code')
+                                    ->label('Código Postal')
+--
+                        TextInput::make('country')
+                            ->label('País')
+--
+                Section::make('Configuración')
+                    ->schema([
+                        Toggle::make('is_default')
+                            ->label('Dirección por Defecto')
+--- app/Filament/Resources/Analytics/Schemas/AnalyticsForm.php ---
+--- app/Filament/Resources/Banners/Schemas/BannerForm.php ---
+                TextInput::make('title')
+                    ->required()
+--
+                Textarea::make('description')
+                    ->columnSpanFull()
+--
+                FileUpload::make('image')
+                    ->image()
+--
+                FileUpload::make('mobile_image')
+                    ->image()
+--
+                TextInput::make('button_text')
+                    ->placeholder('Ver Más')
+--
+                Select::make('position')
+                    ->required()
+--
+                TextInput::make('order')
+                    ->required()
+--
+                DateTimePicker::make('starts_at')
+                    ->label('Fecha de inicio'),
+                DateTimePicker::make('expires_at')
+                    ->label('Fecha de expiración'),
+--
+                Toggle::make('is_active')
+                    ->required()
+--- app/Filament/Resources/Brands/Schemas/BrandForm.php ---
+                TextInput::make('name')
+                    ->required(),
+                TextInput::make('slug')
+                    ->required(),
+                Textarea::make('description')
+                    ->columnSpanFull(),
+                TextInput::make('logo'),
+                TextInput::make('website')
+                    ->url(),
+                Toggle::make('is_active')
+                    ->required(),
+--- app/Filament/Resources/Carts/Schemas/CartForm.php ---
+                \Filament\Schemas\Components\Section::make('Información del Carrito')
+                    ->schema([
+                        \Filament\Forms\Components\Select::make('user_id')
+                            ->label('Usuario')
+--
+                        \Filament\Forms\Components\TextInput::make('session_id')
+                            ->label('Session ID')
+--
+                        \Filament\Forms\Components\Select::make('coupon_id')
+                            ->label('Cupón')
+--
+                        \Filament\Forms\Components\DateTimePicker::make('expires_at')
+                            ->label('Expira')
+--
+                                \Filament\Forms\Components\Placeholder::make('Resumen del Carrito')
+                                    ->label('Resumen del Carrito')
+--
+                \Filament\Schemas\Components\Section::make('Items del Carrito')
+                    ->schema([
+                        \Filament\Forms\Components\Repeater::make('items')
+                            ->label('Items del Carrito')
+--
+                                \Filament\Forms\Components\Hidden::make('product_id')
+                                    ->dehydrated(),
+--
+                                \Filament\Forms\Components\TextInput::make('product_name')
+                                    ->label('Producto')
+--
+                                \Filament\Forms\Components\TextInput::make('quantity')
+                                    ->label('Cantidad')
+--
+                                \Filament\Forms\Components\TextInput::make('price')
+                                    ->label('Precio')
+--
+                                \Filament\Forms\Components\TextInput::make('discount_percentage')
+                                    ->label('Descuento (%)')
+--
+                                \Filament\Forms\Components\Hidden::make('variants')
+                                    ->dehydrated(),
+--
+                                \Filament\Forms\Components\TextInput::make('variants_display')
+                                    ->label('Variantes')
+--- app/Filament/Resources/Categories/Schemas/CategoryForm.php ---
+                TextInput::make('name')
+                    ->required(),
+                TextInput::make('slug')
+                    ->required(),
+                Textarea::make('description')
+                    ->columnSpanFull(),
+                FileUpload::make('image')
+                    ->image(),
+                Select::make('parent_id')
+                    ->relationship('parent', 'name'),
+                Toggle::make('is_active')
+                    ->required(),
+                TextInput::make('order')
+                    ->required()
+--- app/Filament/Resources/Coupons/Schemas/CouponForm.php ---
+                Section::make('Información del Cupón')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('code')
+                                    ->label('Código')
+--
+                                TextInput::make('name')
+                                    ->label('Nombre')
+--
+                        Textarea::make('description')
+                            ->label('Descripción')
+--
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('type')
+                                    ->label('Tipo de Descuento')
+--
+                                TextInput::make('amount')
+                                    ->label('Valor del Descuento')
+--
+                Section::make('Configuración Avanzada')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('min_purchase_amount')
+                                    ->label('Compra Mínima')
+--
+                                TextInput::make('max_discount_amount')
+                                    ->label('Descuento Máximo')
+--
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('usage_limit')
+                                    ->label('Límite de Uso Total')
+--
+                                TextInput::make('usage_limit_per_user')
+                                    ->label('Límite por Usuario')
+--
+                        Toggle::make('free_shipping')
+                            ->label('Envío Gratis')
+--
+                        Toggle::make('is_active')
+                            ->label('Activo')
+--
+                Section::make('Restricciones de Productos')
+                    ->schema([
+                        TextInput::make('product_ids')
+                            ->label('IDs de Productos Específicos')
+--
+                        TextInput::make('category_ids')
+                            ->label('IDs de Categorías Específicas')
+--
+                        TextInput::make('excluded_product_ids')
+                            ->label('Productos Excluidos')
+--
+                        TextInput::make('excluded_category_ids')
+                            ->label('Categorías Excluidas')
+--
+                Section::make('Fechas de Validez')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                DateTimePicker::make('starts_at')
+                                    ->label('Fecha de Inicio')
+--
+                                DateTimePicker::make('expires_at')
+                                    ->label('Fecha de Expiración')
+--- app/Filament/Resources/Currencies/Schemas/CurrencyForm.php ---
+                Section::make('Información de la Moneda')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label('Nombre de la Moneda')
+--
+                                TextInput::make('code')
+                                    ->label('Código ISO')
+--
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('symbol')
+                                    ->label('Símbolo')
+--
+                                Select::make('symbol_position')
+                                    ->label('Posición del Símbolo')
+--
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('decimal_places')
+                                    ->label('Decimales')
+--
+                                TextInput::make('sort_order')
+                                    ->label('Orden de Visualización')
+--
+                Section::make('Configuración de Tasa de Cambio')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('exchange_rate')
+                                    ->label('Tasa de Cambio')
+--
+                                Toggle::make('is_default')
+                                    ->label('Moneda por Defecto')
+--
+                        Toggle::make('is_active')
+                            ->label('Activa')
+--
+                Section::make('Información Adicional')
+                    ->schema([
+                        Textarea::make('description')
+                            ->label('Descripción')
+--- app/Filament/Resources/Deliveries/Schemas/DeliveryForm.php ---
+                Section::make('Detalles del Envío')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('zone')
+                                    ->label('Zona')
+--
+                                TextInput::make('destination')
+                                    ->label('Destino')
+--
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('amount')
+                                    ->label('Monto')
+--
+                                Select::make('status')
+                                    ->label('Estado')
+--
+                Section::make('Asignación')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('delivery_man_id')
+                                    ->label('Repartidor')
+--
+                                Select::make('person_id')
+                                    ->label('Cliente')
+--
+                        Toggle::make('is_active')
+                            ->label('Activo')
+--- app/Filament/Resources/Invoices/Schemas/InvoiceForm.php ---
+                Section::make('Información de la Factura')
+                    ->schema([
+                        Select::make('order_id')
+                            ->label('Pedido Asociado')
+--
+                        TextInput::make('invoice_number')
+                            ->label('Número de Factura')
+--
+                        DatePicker::make('invoice_date')
+                            ->label('Fecha de Factura')
+--
+                        DatePicker::make('due_date')
+                            ->label('Fecha de Vencimiento')
+--
+                Section::make('Totales de la Factura')
+                    ->schema([
+                        TextInput::make('subtotal')
+                            ->label('Subtotal')
+--
+                        TextInput::make('tax_amount')
+                            ->label('Impuestos')
+--
+                        TextInput::make('discount_amount')
+                            ->label('Descuento')
+--
+                        TextInput::make('total_amount')
+                            ->label('Total')
+--
+                Section::make('Estado y Dirección')
+                    ->schema([
+                        Select::make('status')
+                            ->label('Estado de la Factura')
+--
+                        Textarea::make('billing_address')
+                            ->label('Dirección de Facturación')
+--
+                        Textarea::make('notes')
+                            ->label('Notas')
+--
+                TextInput::make('pdf_path')
+                    ->label('Ruta del PDF')
+--- app/Filament/Resources/Logs/Schemas/LogsForm.php ---
+--- app/Filament/Resources/NewsletterSubscribers/Schemas/NewsletterSubscriberForm.php ---
+                TextInput::make('email')
+                    ->label('Email address')
+--
+                TextInput::make('first_name'),
+                TextInput::make('last_name'),
+                TextInput::make('status')
+                    ->required()
+--
+                DateTimePicker::make('subscribed_at'),
+                DateTimePicker::make('unsubscribed_at'),
+                TextInput::make('source'),
+            ]);
+--- app/Filament/Resources/Orders/Schemas/OrderForm.php ---
+                Section::make('Información del Pedido')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('order_number')
+                                    ->label('Número de Pedido')
+--
+                                Select::make('user_id')
+                                    ->label('Cliente')
+--
+                        Select::make('cart_id')
+                            ->label('Carrito del Cliente')
+--
+                        Select::make('status')
+                            ->label('Estado del Pedido')
+--
+                Section::make('Direcciones')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('shipping_address_id')
+                                    ->label('Dirección de Envío')
+--
+                                        \Filament\Forms\Components\TextInput::make('first_name')
+                                            ->label('Nombre')
+--
+                                        \Filament\Forms\Components\TextInput::make('last_name')
+                                            ->label('Apellido')
+--
+                                        \Filament\Forms\Components\TextInput::make('address_line_1')
+                                            ->label('Dirección')
+--
+                                        \Filament\Forms\Components\TextInput::make('city')
+                                            ->label('Ciudad')
+--
+                                        \Filament\Forms\Components\TextInput::make('postal_code')
+                                            ->label('Código Postal')
+--
+                                        \Filament\Forms\Components\TextInput::make('country')
+                                            ->label('País')
+--
+                                Select::make('billing_address_id')
+                                    ->label('Dirección de Facturación')
+--
+                                        \Filament\Forms\Components\TextInput::make('first_name')
+                                            ->label('Nombre')
+--
+                                        \Filament\Forms\Components\TextInput::make('last_name')
+                                            ->label('Apellido')
+--
+                                        \Filament\Forms\Components\TextInput::make('address_line_1')
+                                            ->label('Dirección')
+--
+                                        \Filament\Forms\Components\TextInput::make('city')
+                                            ->label('Ciudad')
+--
+                                        \Filament\Forms\Components\TextInput::make('postal_code')
+                                            ->label('Código Postal')
+--
+                                        \Filament\Forms\Components\TextInput::make('country')
+                                            ->label('País')
+--
+                Section::make('Información de Pago')
+                    ->schema([
+                        Select::make('coupon_id')
+                            ->label('Cupón de Descuento')
+--
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('shipping_id')
+                                    ->label('Método de Envío')
+--
+                                TextInput::make('shipping_amount')
+                                    ->label('Costo de Envío')
+--
+                Section::make('Totales del Pedido')
+                    ->schema([
+--
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('subtotal')
+                                    ->label('Subtotal')
+--
+                                TextInput::make('discount_amount')
+                                    ->label('Descuento')
+--
+                        TextInput::make('tax_amount')
+                            ->label('Impuestos')
+--
+                        TextInput::make('total_amount')
+                            ->label('Total Final')
+--
+                        Placeholder::make('total_calculation')
+                            ->label('Cálculo del Total Final')
+--
+                Section::make('Notas')
+                    ->schema([
+                        Textarea::make('customer_notes')
+                            ->label('Notas del Cliente')
+--
+                        Textarea::make('admin_notes')
+                            ->label('Notas Administrativas')
+--
+                \Filament\Forms\Components\Hidden::make('auto_create_invoice')
+                    ->default(false),
+--
+                Section::make('Fechas Importantes')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                DateTimePicker::make('confirmed_at')
+                                    ->label('Fecha de Confirmación'),
+--
+                                DateTimePicker::make('shipped_at')
+                                    ->label('Fecha de Envío'),
+--
+                        Grid::make(2)
+                            ->schema([
+                                DateTimePicker::make('delivered_at')
+                                    ->label('Fecha de Entrega'),
+--
+                                DateTimePicker::make('cancelled_at')
+                                    ->label('Fecha de Cancelación'),
+--- app/Filament/Resources/PaymentMethods/Schemas/PaymentMethodForm.php ---
+                Section::make('Información del Método de Pago')
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Nombre')
+--
+                        TextInput::make('code')
+                            ->label('Código')
+--
+                        Textarea::make('description')
+                            ->label('Descripción')
+--
+                        TextInput::make('sort_order')
+                            ->label('Orden')
+--
+                        Toggle::make('is_active')
+                            ->label('Activo')
+--
+                Section::make('Apariencia')
+                    ->schema([
+                        TextInput::make('icon')
+                            ->label('Icono')
+--
+                        ColorPicker::make('color')
+                            ->label('Color')
+--
+                Section::make('Configuración del Gateway')
+                    ->schema([
+                        Toggle::make('requires_gateway')
+                            ->label('Requiere Gateway')
+--
+                        KeyValue::make('gateway_config')
+                            ->label('Configuración del Gateway')
+--- app/Filament/Resources/Payments/Schemas/PaymentForm.php ---
+                Section::make('Información del Pago')
+                    ->schema([
+                        Select::make('order_id')
+                            ->label('Pedido Asociado')
+--
+                        TextInput::make('transaction_id')
+                            ->label('ID de Transacción')
+--
+                        Select::make('payment_method_id')
+                            ->label('Método de Pago')
+--
+                        TextInput::make('amount')
+                            ->label('Monto')
+--
+                        TextInput::make('currency')
+                            ->label('Moneda')
+--
+                Section::make('Estado del Pago')
+                    ->schema([
+                        Select::make('status')
+                            ->label('Estado')
+--
+                        DatePicker::make('payment_date')
+                            ->label('Fecha de Pago')
+--
+                        TextInput::make('gateway_response')
+                            ->label('Respuesta del Gateway')
+--
+                        Textarea::make('notes')
+                            ->label('Notas')
+--
+                \Filament\Forms\Components\Hidden::make('auto_create_invoice')
+                    ->default(false),
+--
+                Section::make('Información de Reembolso')
+                    ->schema([
+                        TextInput::make('refund_amount')
+                            ->label('Monto de Reembolso')
+--
+                        DatePicker::make('refund_date')
+                            ->label('Fecha de Reembolso'),
+--
+                        TextInput::make('refund_reason')
+                            ->label('Motivo del Reembolso')
+--- app/Filament/Resources/People/Schemas/PersonForm.php ---
+                TextInput::make('first_name')
+                    ->required(),
+                TextInput::make('last_name')
+                    ->required(),
+                TextInput::make('email')
+                    ->label('Email address')
+--
+                TextInput::make('phone')
+                    ->tel(),
+                TextInput::make('identification'),
+                Toggle::make('is_active')
+                    ->required(),
+--- app/Filament/Resources/Products/Schemas/ProductForm.php ---
+                Section::make('Información Básica del Producto')
+                    ->schema([
+--
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label('Nombre del Producto')
+--
+                                TextInput::make('slug')
+                                    ->label('Slug')
+--
+                        Grid::make(3)
+                            ->schema([
+                                TextInput::make('sku')
+                                    ->label('SKU')
+--
+                                TextInput::make('price')
+                                    ->label('Precio')
+--
+                                TextInput::make('compare_price')
+                                    ->label('Precio de Comparación')
+--
+                                TextInput::make('discount_percentage')
+                                    ->label('Descuento (%)')
+--
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('cost')
+                                    ->label('Precio de Costo')
+--
+                                TextInput::make('low_stock_threshold')
+                                    ->label('Umbral de Stock Bajo')
+--
+                        Textarea::make('short_description')
+                            ->label('Descripción Corta')
+--
+                        Textarea::make('description')
+                            ->label('Descripción Completa')
+--
+                Section::make('Categorización y Organización')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('category_id')
+                                    ->label('Categoría')
+--
+                                        TextInput::make('name')
+                                            ->required(),
+                                        TextInput::make('slug')
+                                            ->required()
+--
+                                        Textarea::make('description'),
+                                        Toggle::make('is_active')
+                                            ->default(true),
+--
+                        TagsInput::make('tags')
+                            ->label('Etiquetas')
+--
+                Section::make('Configuración de Inventario')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('stock')
+                                    ->label('Cantidad en Stock')
+--
+                                Toggle::make('track_inventory')
+                                    ->label('Rastrear Inventario')
+--
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('status')
+                                    ->label('Estado')
+--
+                                Toggle::make('is_featured')
+                                    ->label('Producto Destacado')
+--
+                                Toggle::make('is_on_demand')
+                                    ->label('Contrapedido')
+--
+                Section::make('Imágenes del Producto')
+                    ->schema([
+                        FileUpload::make('images')
+                            ->label('Imágenes del Producto')
+--
+                Section::make('SEO y Metadatos')
+                    ->schema([
+                        TextInput::make('meta_title')
+                            ->label('Título Meta')
+--
+                        Textarea::make('meta_description')
+                            ->label('Descripción Meta')
+--
+                        TagsInput::make('meta_keywords')
+                            ->label('Palabras Clave Meta')
+--- app/Filament/Resources/Refunds/Schemas/RefundForm.php ---
+                Select::make('order_id')
+                    ->relationship('order', 'id')
+--
+                Select::make('payment_id')
+                    ->relationship('payment', 'id'),
+                TextInput::make('refund_number')
+                    ->required(),
+                TextInput::make('amount')
+                    ->required()
+--
+                TextInput::make('type')
+                    ->required()
+--
+                TextInput::make('status')
+                    ->required()
+--
+                Textarea::make('reason')
+                    ->columnSpanFull(),
+                Textarea::make('admin_notes')
+                    ->columnSpanFull(),
+                DateTimePicker::make('processed_at'),
+            ]);
+--- app/Filament/Resources/Reviews/Schemas/ReviewForm.php ---
+                \Filament\Forms\Components\Select::make('product_id')
+                    ->label('Producto')
+--
+                \Filament\Forms\Components\Select::make('user_id')
+                    ->label('Usuario')
+--
+                \Filament\Forms\Components\Select::make('order_id')
+                    ->label('Pedido')
+--
+                \Filament\Forms\Components\Select::make('rating')
+                    ->label('Calificación')
+--
+                TextInput::make('title')
+                    ->label('Título')
+--
+                Textarea::make('comment')
+                    ->label('Comentario')
+--
+                \Filament\Forms\Components\FileUpload::make('images')
+                    ->label('Imágenes')
+--
+                \Filament\Forms\Components\Select::make('status')
+                    ->label('Estado')
+--
+                Toggle::make('is_verified_purchase')
+                    ->label('Compra Verificada')
+--
+                TextInput::make('helpful_count')
+                    ->label('Útil')
+--
+                TextInput::make('unhelpful_count')
+                    ->label('No Útil')
+--
+                DateTimePicker::make('approved_at')
+                    ->label('Fecha de Aprobación')
+--- app/Filament/Resources/Roles/Schemas/RoleForm.php ---
+                TextInput::make('name')
+                    ->required(),
+                TextInput::make('slug')
+                    ->required(),
+                Textarea::make('description')
+                    ->columnSpanFull(),
+                Toggle::make('is_active')
+                    ->required(),
+--- app/Filament/Resources/Settings/Schemas/SettingForm.php ---
+                TextInput::make('key')
+                    ->label('Clave')
+--
+                Textarea::make('value')
+                    ->label('Valor')
+--
+                TextInput::make('type')
+                    ->label('Tipo')
+--
+                TextInput::make('group')
+                    ->label('Grupo')
+--
+                Textarea::make('description')
+                    ->label('Descripción')
+--
+                Toggle::make('is_public')
+                    ->label('Público')
+--- app/Filament/Resources/Shipments/Schemas/ShipmentForm.php ---
+                Select::make('order_id')
+                    ->relationship('order', 'id')
+--
+                TextInput::make('tracking_number'),
+                TextInput::make('carrier'),
+                TextInput::make('service_level'),
+                TextInput::make('status')
+                    ->required()
+--
+                TextInput::make('shipping_cost')
+                    ->required()
+--
+                Textarea::make('shipping_address')
+                    ->columnSpanFull(),
+                Textarea::make('notes')
+                    ->columnSpanFull(),
+                DateTimePicker::make('shipped_at'),
+                DateTimePicker::make('delivered_at'),
+                DateTimePicker::make('estimated_delivery'),
+            ]);
+--- app/Filament/Resources/Shippings/Schemas/ShippingForm.php ---
+                Section::make('Información del Método de Envío')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label('Nombre del Método')
+--
+                                TextInput::make('code')
+                                    ->label('Código')
+--
+                        Textarea::make('description')
+                            ->label('Descripción')
+--
+                Section::make('Configuración de Precios')
+                    ->schema([
+                        Grid::make(3)
+                            ->schema([
+                                TextInput::make('base_price')
+                                    ->label('Precio Base')
+--
+                                TextInput::make('price_per_kg')
+                                    ->label('Precio por Kg')
+--
+                                TextInput::make('free_shipping_threshold')
+                                    ->label('Umbral Envío Gratis')
+--
+                Section::make('Configuración de Entrega')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('estimated_days_min')
+                                    ->label('Días Mínimos')
+--
+                                TextInput::make('estimated_days_max')
+                                    ->label('Días Máximos')
+--
+                Section::make('Zonas de Envío')
+                    ->schema([
+                        Repeater::make('zones')
+                            ->label('Zonas Disponibles')
+--
+                                TextInput::make('zone')
+                                    ->label('Zona')
+--
+                Section::make('Límites de Peso')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('weight_limits.max')
+                                    ->label('Peso Máximo (kg)')
+--
+                                TextInput::make('weight_limits.min')
+                                    ->label('Peso Mínimo (kg)')
+--
+                Section::make('Configuración del Sistema')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Activo')
+--
+                                TextInput::make('sort_order')
+                                    ->label('Orden de Visualización')
+--- app/Filament/Resources/Tags/Schemas/TagForm.php ---
+                TextInput::make('name')
+                    ->label('Nombre de la Etiqueta')
+--
+                TextInput::make('slug')
+                    ->label('Slug (URL)')
+--
+                Select::make('type')
+                    ->label('Tipo de Etiqueta')
+--
+                TextInput::make('color')
+                    ->label('Color (Hex)')
+--
+                Toggle::make('is_active')
+                    ->label('Activa')
+--- app/Filament/Resources/Taxes/Schemas/TaxForm.php ---
+                TextInput::make('name')
+                    ->required(),
+                TextInput::make('country')
+                    ->required(),
+                TextInput::make('state'),
+                TextInput::make('zip_code'),
+                TextInput::make('rate')
+                    ->required()
+--
+                Toggle::make('is_compound')
+                    ->required(),
+                TextInput::make('priority')
+                    ->required()
+--
+                Toggle::make('is_active')
+                    ->required(),
+--- app/Filament/Resources/Users/Schemas/UserForm.php ---
+                TextInput::make('name')
+                    ->label('Nombre')
+--
+                TextInput::make('email')
+                    ->label('Correo Electrónico')
+--
+                Select::make('type')
+                    ->label('Tipo de Usuario')
+--
+                TextInput::make('password')
+                    ->label('Contraseña')
+--- app/Filament/Resources/VariantGroups/Schemas/VariantGroupForm.php ---
+                TextInput::make('name')
+                    ->label('Nombre')
+--
+                TextInput::make('slug')
+                    ->label('Slug')
+--
+                Textarea::make('description')
+                    ->label('Descripción')
+--
+                Select::make('status')
+                    ->label('Estado')
+--
+                TextInput::make('sort_order')
+                    ->label('Orden')
+--- app/Filament/Resources/Variants/Schemas/VariantForm.php ---
+                Section::make('Información de la Variante')
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Nombre de la Variante')
+--
+                        Select::make('variant_group_id')
+                            ->label('Grupo de Variante')
+--
+                        Textarea::make('description')
+                            ->label('Descripción')
+--
+                        Select::make('status')
+                            ->label('Estado')
+--
+                        TextInput::make('sort_order')
+                            ->label('Orden')

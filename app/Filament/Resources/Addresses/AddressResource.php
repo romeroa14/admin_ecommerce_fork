@@ -19,7 +19,7 @@ class AddressResource extends Resource
 {
     protected static ?string $model = Address::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-map-pin';
 
     protected static ?string $recordTitleAttribute = 'address_line_1';
 

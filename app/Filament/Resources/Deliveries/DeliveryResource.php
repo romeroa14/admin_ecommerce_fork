@@ -20,9 +20,14 @@ class DeliveryResource extends Resource
 {
     protected static ?string $model = Delivery::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-truck';
 
-    protected static ?string $recordTitleAttribute = 'Delivery';
+    protected static ?string $recordTitleAttribute = 'Envíos';
+
+    protected static \UnitEnum|string|null $navigationGroup = 'Ventas';
+    protected static ?string $navigationLabel = 'Envíos';
+    protected static ?string $modelLabel = 'Envío';
+    protected static ?string $pluralModelLabel = 'Envíos';
 
     public static function form(Schema $schema): Schema
     {

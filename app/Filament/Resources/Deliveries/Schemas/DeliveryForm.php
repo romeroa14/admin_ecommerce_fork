@@ -15,7 +15,7 @@ class DeliveryForm
     {
         return $schema
             ->components([
-                Section::make('Detalles del Delivery')
+                Section::make('Detalles del Envío')
                     ->schema([
                         Grid::make(2)
                             ->schema([

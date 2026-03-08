@@ -20,9 +20,14 @@ class PersonResource extends Resource
 {
     protected static ?string $model = Person::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $recordTitleAttribute = 'Person';
+    protected static ?string $recordTitleAttribute = 'name';
+
+    protected static \UnitEnum|string|null $navigationGroup = 'Usuarios';
+    protected static ?string $navigationLabel = 'Personas / Clientes';
+    protected static ?string $modelLabel = 'Persona';
+    protected static ?string $pluralModelLabel = 'Personas';
 
     public static function form(Schema $schema): Schema
     {

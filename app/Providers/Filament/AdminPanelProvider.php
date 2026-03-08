@@ -70,7 +70,7 @@ class AdminPanelProvider extends PanelProvider
                     ->collapsed(false),
                 NavigationGroup::make('Ventas')
                     ->collapsed(false),
-                NavigationGroup::make('Envios')
+                NavigationGroup::make('Envíos')
                     ->collapsed(false),
                 NavigationGroup::make('Marketing')
                     ->collapsed(true),

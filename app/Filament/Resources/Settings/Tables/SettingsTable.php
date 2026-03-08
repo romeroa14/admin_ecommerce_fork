@@ -16,18 +16,24 @@ class SettingsTable
         return $table
             ->columns([
                 TextColumn::make('key')
+                    ->label('Clave')
                     ->searchable(),
                 TextColumn::make('type')
+                    ->label('Tipo')
                     ->searchable(),
                 TextColumn::make('group')
+                    ->label('Grupo')
                     ->searchable(),
                 IconColumn::make('is_public')
+                    ->label('Es Público')
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label('Creado El')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Actualizado El')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

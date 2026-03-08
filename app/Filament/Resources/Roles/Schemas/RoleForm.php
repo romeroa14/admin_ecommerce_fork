@@ -14,12 +14,16 @@ class RoleForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label('Nombre')
                     ->required(),
                 TextInput::make('slug')
+                    ->label('Slug')
                     ->required(),
                 Textarea::make('description')
+                    ->label('Descripción')
                     ->columnSpanFull(),
                 Toggle::make('is_active')
+                    ->label('Activo')
                     ->required(),
             ]);
     }
