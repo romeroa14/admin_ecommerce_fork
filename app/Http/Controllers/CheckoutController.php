@@ -10,88 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
-    public function index()
-    {
-        $cart = $this->getCart();
-        if (!$cart || $cart->isEmpty()) {
-            return redirect()->route('cart.index');
-        }
-
-        return Inertia::render('Checkout/Index', [
-            'cart' => $cart,
-            'items' => $cart->items,
-            'totals' => $cart->getTotals(),
-        ]);
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email' . (auth()->check() ? '' : '|unique:users,email'),
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:20',
-            'phone' => 'required|string|max:20',
-        ]);
-
-        $cart = $this->getCart();
-        if (!$cart || $cart->isEmpty()) {
-            return redirect()->route('cart.index');
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $user = auth()->user();
-
-            // If guest, create user or just use data (depending on logic, here assume we might create a user or just pass null)
-            // But Order needs user_id? Let's assume nullable or we create a user.
-            // The requirement says "no es necesario hacer login".
-            // So if checking for guest, we might create a user or leave it null.
-            // Let's create an address first.
-
-            $address = Address::create([
-                'user_id' => $user ? $user->id : null,
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'address_line_1' => $request->address,
-                'city' => $request->city,
-                'zip_code' => $request->postal_code,
-                'phone' => $request->phone,
-                'country' => 'Venezuela' // Default or form field
-            ]);
-
-            // Create Order
-            $order = Order::createFromCart($cart, [
-                'shipping_address_id' => $address->id,
-                'billing_address_id' => $address->id,
-                'status' => 'pending',
-                'user_id' => $user ? $user->id : null,
-                // We might need to handle 'email' in order if user_id is null, but Order model uses user_id. 
-                // We'll trust Order model handles null user_id or we should have created a guest user.
-            ]);
-
-            // Clear cart
-            $cart->items = [];
-            $cart->save();
-
-            DB::commit();
-
-            return redirect()->route('checkout.success', $order->id); // We need a success page
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors(['error' => 'Error procesando el pedido: ' . $e->getMessage()]);
-        }
-    }
-
     private function getCart()
     {
         $sessionId = Session::getId();
@@ -106,5 +28,183 @@ class CheckoutController extends Controller
         }
 
         return $query->first();
+    }
+
+    public function init()
+    {
+        $cart = $this->getCart();
+        if (!$cart || $cart->isEmpty()) {
+            return redirect()->route('cart.index');
+        }
+
+        if (auth()->check()) {
+            return redirect()->route('checkout.address');
+        }
+
+        // If guest, send to login but indicate intent to checkout
+        return redirect()->route('login', ['checkout' => 1]);
+    }
+
+    public function address()
+    {
+        $cart = $this->getCart();
+        if (!$cart || $cart->isEmpty()) {
+            return redirect()->route('cart.index');
+        }
+
+        $sessionData = Session::get('checkout_data', []);
+        
+        return Inertia::render('Checkout/Address', [
+            'cart' => $cart,
+            'items' => $this->enrichItemsWithProducts($cart->items),
+            'totals' => $cart->getTotals(),
+            'defaultAddress' => $sessionData['address'] ?? (auth()->user() ? auth()->user()->toArray() : [])
+        ]);
+    }
+
+    private function enrichItemsWithProducts($items)
+    {
+        if (empty($items)) return [];
+        
+        $productIds = array_column($items, 'product_id');
+        $products = \App\Models\Product::whereIn('id', $productIds)->get()->keyBy('id');
+        
+        foreach ($items as &$item) {
+            $product = $products->get($item['product_id']);
+            $item['product'] = $product ? $product->toArray() : null;
+        }
+        
+        \Illuminate\Support\Facades\Log::info('Checkout Items Enriched:', ['items' => $items]);
+        
+        return $items;
+    }
+
+    public function storeAddress(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:20',
+            'phone' => 'required|string|max:20',
+        ]);
+
+        $sessionData = Session::get('checkout_data', []);
+        $sessionData['address'] = $request->except('_token');
+        Session::put('checkout_data', $sessionData);
+
+        return redirect()->route('checkout.shipping');
+    }
+
+    public function shipping()
+    {
+        $cart = $this->getCart();
+        if (!$cart || $cart->isEmpty()) {
+            return redirect()->route('cart.index');
+        }
+
+        $sessionData = Session::get('checkout_data', []);
+        if (empty($sessionData['address'])) {
+            return redirect()->route('checkout.address');
+        }
+
+        return Inertia::render('Checkout/Shipping', [
+            'cart' => $cart,
+            'items' => $this->enrichItemsWithProducts($cart->items),
+            'totals' => $cart->getTotals(),
+            'shipping' => $sessionData['shipping'] ?? []
+        ]);
+    }
+
+    public function storeShipping(Request $request)
+    {
+        $request->validate([
+            'shipping_method' => 'required|string',
+        ]);
+
+        $sessionData = Session::get('checkout_data', []);
+        $sessionData['shipping'] = $request->except('_token');
+        Session::put('checkout_data', $sessionData);
+
+        return redirect()->route('checkout.payment');
+    }
+
+    public function payment()
+    {
+        $cart = $this->getCart();
+        if (!$cart || $cart->isEmpty()) {
+            return redirect()->route('cart.index');
+        }
+
+        $sessionData = Session::get('checkout_data', []);
+        if (empty($sessionData['shipping'])) {
+            return redirect()->route('checkout.shipping');
+        }
+
+        return Inertia::render('Checkout/Payment', [
+            'cart' => $cart,
+            'items' => $this->enrichItemsWithProducts($cart->items),
+            'totals' => $cart->getTotals(),
+            'sessionData' => $sessionData
+        ]);
+    }
+
+    public function storePayment(Request $request)
+    {
+        $cart = $this->getCart();
+        if (!$cart || $cart->isEmpty()) {
+            return redirect()->route('cart.index');
+        }
+
+        $sessionData = Session::get('checkout_data', []);
+        
+        if (empty($sessionData['address']) || empty($sessionData['shipping'])) {
+            return redirect()->route('checkout.address');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $user = auth()->user();
+            $addressData = $sessionData['address'];
+            
+            // Create user logic for guests if needed, or leave user_id as null
+            
+            $address = Address::create([
+                'user_id' => $user ? $user->id : null,
+                'first_name' => $addressData['first_name'],
+                'last_name' => $addressData['last_name'],
+                'email' => $addressData['email'],
+                'address_line_1' => $addressData['address'],
+                'city' => $addressData['city'],
+                'postal_code' => $addressData['postal_code'],
+                'phone' => $addressData['phone'],
+                'country' => 'Venezuela'
+            ]);
+
+            $order = Order::createFromCart($cart, [
+                'shipping_address_id' => $address->id,
+                'billing_address_id' => $address->id,
+                'status' => 'pending',
+                'user_id' => $user ? $user->id : null,
+                'shipping_method' => $sessionData['shipping']['shipping_method'] ?? 'default',
+            ]);
+
+            // Clear cart & session
+            $cart->items = [];
+            $cart->save();
+            Session::forget('checkout_data');
+
+            DB::commit();
+
+            return redirect()->route('checkout.success', $order->id);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error processing checkout: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Error al procesar el pago. Por favor, inténtelo de nuevo.']);
+        }
     }
 }

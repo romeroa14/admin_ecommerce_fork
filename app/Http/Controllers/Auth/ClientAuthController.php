@@ -16,9 +16,11 @@ class ClientAuthController extends Controller
     /**
      * Display the login page
      */
-    public function showLogin()
+    public function showLogin(Request $request)
     {
-        return Inertia::render('Auth/Login');
+        return Inertia::render('Auth/Login', [
+            'checkout' => $request->query('checkout')
+        ]);
     }
 
     /**

@@ -130,7 +130,7 @@ const buyNow = () => {
     form.quantity = currentQuantity.value;
     form.post(route('cart.add'), {
         onSuccess: () => {
-            window.location.href = route('checkout.index');
+            window.location.href = route('checkout.init');
         }
     });
 };

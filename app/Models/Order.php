@@ -421,6 +421,8 @@ class Order extends Model
             'shipping_id' => $additionalData['shipping_id'] ?? null,
             'status' => 'pending',
             'payment_status' => 'pending',
+            'subtotal' => 0,
+            'total_amount' => 0,
         ], $additionalData));
 
         // Calcular totales automáticamente (incluye envío si está seleccionado)
@@ -445,16 +447,20 @@ class Order extends Model
             $product = \App\Models\Product::find($item['product_id']);
             if (!$product) continue;
 
-            $itemSubtotal = ($item['price'] - ($item['price'] * $item['discount_percentage'] / 100)) * $item['quantity'];
+            $discountAmount = ($item['price'] * ($item['discount_percentage'] ?? 0) / 100);
+            $itemSubtotal = ($item['price'] - $discountAmount) * $item['quantity'];
 
             $this->items()->create([
                 'product_id' => $item['product_id'],
                 'cart_id' => $this->cart_id,
                 'quantity' => $item['quantity'],
-                'price' => $item['price'],
-                'discount_percentage' => $item['discount_percentage'],
+                'unit_price' => $item['price'],
+                'discount_amount' => $discountAmount,
                 'subtotal' => $itemSubtotal,
-                'variants' => $item['variants'] ?? [],
+                'total' => $itemSubtotal, // Assuming no tax for now or handle later
+                'product_name' => $product->name,
+                'product_sku' => $product->sku,
+                'product_attributes' => $item['variants'] ?? [],
             ]);
         }
     }

@@ -49,7 +49,7 @@ const updateQuantity = (item: any, delta: number) => {
 
 const proceedToCheckout = () => {
     emit('close');
-    router.visit(route('checkout.index'));
+    router.visit(route('checkout.init'));
 };
 </script>
 

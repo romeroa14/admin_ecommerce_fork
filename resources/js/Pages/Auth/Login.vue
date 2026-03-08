@@ -5,6 +5,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 // @ts-ignore
 const route = window.route;
 
+const props = defineProps<{
+    checkout?: string | null;
+}>();
+
 // Define the form with initial values
 const form = useForm({
     email: '',
@@ -118,6 +122,16 @@ const submit = () => {
 
                     <!-- Divider -->
                     <div class="mt-6">
+                        <!-- Continuar como invitado -->
+                        <div v-if="props.checkout" class="mb-6">
+                            <Link
+                                href="/checkout/address"
+                                class="w-full flex justify-center items-center px-6 py-3 border-2 border-dashed border-gray-300 text-base font-bold rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#040054] transition shadow-sm"
+                            >
+                                Continuar como Invitado y Finalizar Compra
+                            </Link>
+                        </div>
+
                         <div class="relative">
                             <div class="absolute inset-0 flex items-center">
                                 <div class="w-full border-t border-gray-300"></div>

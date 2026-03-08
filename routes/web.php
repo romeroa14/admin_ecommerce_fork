@@ -107,16 +107,25 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Account/Dashboard');
     })->name('account.dashboard');
 
-    // Checkout (Requires authentication)
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::get('/checkout/success/{order}', function ($order) {
-        return Inertia::render('Checkout/Success', ['orderId' => $order]);
-    })->name('checkout.success');
-
     // Orders
     Route::get('/mis-pedidos', function () {
         $orders = auth()->user()->orders()->with('items')->latest()->paginate(10);
         return Inertia::render('Account/Orders', ['orders' => $orders]);
     })->name('account.orders');
 });
+
+// Checkout Routes (Guest & Auth)
+Route::get('/checkout/init', [CheckoutController::class, 'init'])->name('checkout.init');
+Route::get('/checkout/address', [CheckoutController::class, 'address'])->name('checkout.address');
+Route::post('/checkout/address', [CheckoutController::class, 'storeAddress'])->name('checkout.address.store');
+Route::get('/checkout/shipping', [CheckoutController::class, 'shipping'])->name('checkout.shipping');
+Route::post('/checkout/shipping', [CheckoutController::class, 'storeShipping'])->name('checkout.shipping.store');
+Route::get('/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
+Route::post('/checkout/payment', [CheckoutController::class, 'storePayment'])->name('checkout.payment.store');
+Route::get('/checkout/success/{order}', function ($order) {
+    $orderInstance = \App\Models\Order::with(['items.product', 'shippingAddress'])->findOrFail($order);
+    return Inertia::render('Checkout/Success', [
+        'orderId' => $order,
+        'orderData' => $orderInstance
+    ]);
+})->name('checkout.success');

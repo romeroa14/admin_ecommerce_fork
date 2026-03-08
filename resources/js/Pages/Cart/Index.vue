@@ -175,7 +175,7 @@ const applyCoupon = () => {
 
                             <!-- Checkout Button -->
                             <Link
-                                :href="route('checkout.index')"
+                                :href="route('checkout.init')"
                                 class="w-full flex justify-center py-3 px-4 border border-transparent rounded-sm shadow-sm text-base font-bold text-white bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 transition"
                             >
                                 Realizar pedido
