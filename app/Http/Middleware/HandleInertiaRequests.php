@@ -55,10 +55,48 @@ class HandleInertiaRequests extends Middleware
 
             // Cart items - available in navbar via page.props.items
             'items' => function () use ($request) {
-                if ($request->session()->has('cart')) {
-                    return $request->session()->get('cart', []);
+                $cart = null;
+                $user = $request->user();
+                $sessionId = $request->session()->getId();
+
+                if ($user) {
+                    $cart = \App\Models\Cart::where('user_id', $user->id)->first();
+                } else {
+                    $cart = \App\Models\Cart::where('session_id', $sessionId)->first();
                 }
-                return [];
+
+                if (!$cart || empty($cart->items)) {
+                    return [];
+                }
+
+                // Enrich items with product details (name, image, slug)
+                $enriched = [];
+                foreach ($cart->items as $item) {
+                    $product = \App\Models\Product::with('productImages')->find($item['product_id']);
+                    if ($product) {
+                        $image = null;
+                        // 1. Check product_images table
+                        if ($product->productImages && $product->productImages->count() > 0) {
+                            $image = '/storage/' . $product->productImages->first()->image;
+                        }
+                        // 2. Check images JSON column on product
+                        elseif (!empty($product->images) && is_array($product->images)) {
+                            $image = '/storage/' . $product->images[0];
+                        }
+
+                        $enriched[] = [
+                            'id'       => $product->id,
+                            'name'     => $product->name,
+                            'slug'     => $product->slug,
+                            'image'    => $image,
+                            'price'    => $item['price'],
+                            'quantity' => $item['quantity'],
+                            'variants' => $item['variants'] ?? [],
+                        ];
+                    }
+                }
+
+                return $enriched;
             },
 
             // Flash messages - for success/error notifications

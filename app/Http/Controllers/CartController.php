@@ -21,10 +21,13 @@ class CartController extends Controller
                 $product = Product::with(['category', 'productImages'])->find($item['product_id']);
                 if ($product) {
                     $image = null;
+                    // 1. Check product_images table
                     if ($product->productImages && $product->productImages->count() > 0) {
                         $image = '/storage/' . $product->productImages->first()->image;
-                    } elseif ($product->image) {
-                        $image = '/storage/' . $product->image;
+                    }
+                    // 2. Check images JSON column on product
+                    elseif (!empty($product->images) && is_array($product->images)) {
+                        $image = '/storage/' . $product->images[0];
                     }
 
                     $enrichedItems[] = [

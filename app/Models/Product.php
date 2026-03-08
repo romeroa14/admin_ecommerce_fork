@@ -163,11 +163,13 @@ class Product extends Model
     // Accessor para obtener el stock total
     public function getTotalStockAttribute()
     {
+        // Si tiene variantes, sumar el stock de las variantes
         if ($this->variants()->exists()) {
             return $this->variants()->sum('stock');
         }
 
-        return $this->inventories()->sum('quantity');
+        // Si no tiene variantes, usar directamente el campo stock del producto
+        return $this->stock ?? 0;
     }
 
     // Accessor para verificar si está en stock

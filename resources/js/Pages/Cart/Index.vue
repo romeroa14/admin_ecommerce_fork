@@ -46,182 +46,165 @@ const applyCoupon = () => {
     <AppLayout>
         <Head title="Carrito de Compras" />
 
-        <div class="bg-white min-h-screen">
-            <div class="max-w-lg mx-auto px-4 py-8">
+        <div class="bg-white min-h-screen py-8">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <h1 class="text-3xl font-extrabold text-gray-900 mb-8">Carrito</h1>
 
-                <!-- Back link -->
-                <div class="flex justify-end mb-6">
-                    <Link href="/" class="text-sm text-gray-500 hover:text-[#040054] transition flex items-center gap-1">
-                        Volver al carrito
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Link>
-                </div>
-
-                <!-- If cart has items -->
                 <template v-if="items && items.length > 0">
-                    <!-- Header -->
-                    <div class="flex items-center justify-between mb-6">
-                        <h1 class="text-2xl font-extrabold text-gray-900">Resumen</h1>
-                        <span class="text-sm text-gray-500">{{ itemCount }} artículo{{ itemCount !== 1 ? 's' : '' }}</span>
-                    </div>
+                    <div class="flex flex-col lg:flex-row gap-8 items-start">
+                        
+                        <!-- Left Column: Items List -->
+                        <div class="flex-1 w-full bg-white">
+                            <div class="divide-y divide-gray-200 border-t border-gray-200">
+                                <div
+                                    v-for="(item, idx) in items"
+                                    :key="idx"
+                                    class="py-6 flex gap-6"
+                                >
+                                    <!-- Product Image -->
+                                    <div class="w-24 h-24 flex-shrink-0 border border-gray-200 rounded p-1">
+                                        <img
+                                            v-if="item.image"
+                                            :src="item.image"
+                                            :alt="item.name"
+                                            class="w-full h-full object-contain"
+                                        >
+                                        <div v-else class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-400 text-xs text-center">
+                                            Sin imagen
+                                        </div>
+                                    </div>
 
-                    <!-- Items List -->
-                    <div class="divide-y divide-gray-100">
-                        <div
-                            v-for="(item, idx) in items"
-                            :key="idx"
-                            class="flex items-center gap-4 py-4"
-                        >
-                            <!-- Product Image with Quantity Badge -->
-                            <div class="relative flex-shrink-0">
-                                <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                                    <img
-                                        v-if="item.image"
-                                        :src="item.image"
-                                        :alt="item.name"
-                                        class="w-full h-full object-cover"
-                                    >
-                                    <div v-else class="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                                        Sin imagen
+                                    <!-- Product Details -->
+                                    <div class="flex-1 flex justify-between items-center">
+                                        <div class="flex flex-col">
+                                            <Link :href="route('products.show', item.slug)" class="text-base font-bold text-gray-900 hover:underline">
+                                                {{ item.name }}
+                                            </Link>
+                                            
+                                            <!-- Variant Tags -->
+                                            <div v-if="item.variants && Object.keys(item.variants).length > 0" class="flex flex-wrap gap-2 mt-1 mb-2">
+                                                <span
+                                                    v-for="(val, key) in item.variants"
+                                                    :key="key"
+                                                    class="text-xs text-gray-600 border border-gray-300 px-2 py-0.5 rounded-sm"
+                                                >
+                                                    {{ val }}
+                                                </span>
+                                            </div>
+                                            
+                                            <div v-else class="h-2"></div> <!-- Spacer if no variants -->
+
+                                            <!-- Actions -->
+                                            <div class="flex items-center gap-4 mt-2">
+                                                <!-- Quantity Controls -->
+                                                <div class="flex items-center border border-gray-300 rounded-sm overflow-hidden h-8">
+                                                    <button
+                                                        @click="updateQuantity(idx, item.quantity - 1)"
+                                                        :disabled="item.quantity <= 1"
+                                                        class="w-8 h-full flex items-center justify-center text-gray-600 hover:bg-gray-100 transition disabled:opacity-50"
+                                                    >
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M20 12H4" /></svg>
+                                                    </button>
+                                                    <span class="w-8 text-center text-sm font-semibold text-gray-900 Select-none">{{ item.quantity }}</span>
+                                                    <button
+                                                        @click="updateQuantity(idx, item.quantity + 1)"
+                                                        class="w-8 h-full flex items-center justify-center text-gray-600 hover:bg-gray-100 transition"
+                                                    >
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                                    </button>
+                                                </div>
+
+                                                <!-- Remove -->
+                                                <button
+                                                    @click="removeItem(idx)"
+                                                    class="text-sm font-medium text-[#D18F3B] hover:text-yellow-700 transition"
+                                                >
+                                                    Quitar
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Price -->
+                                        <div class="text-right self-end mb-2">
+                                            <span class="text-lg font-bold text-gray-900">US$ {{ (item.price * item.quantity).toFixed(2) }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <!-- Quantity Badge -->
-                                <span class="absolute -top-1.5 -left-1.5 w-5 h-5 bg-[#F41D27] text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow">
-                                    {{ item.quantity }}
-                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Summary -->
+                        <div class="w-full lg:w-96 bg-gray-50 p-6 shadow-sm border border-gray-100 sticky top-24">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold text-gray-900">Resumen</h2>
+                                <span class="text-sm text-gray-500">{{ itemCount }} artículo{{ itemCount !== 1 ? 's' : '' }}</span>
                             </div>
 
-                            <!-- Product Info -->
-                            <div class="flex-1 min-w-0">
-                                <Link :href="route('products.show', item.slug)" class="text-sm font-semibold text-gray-900 hover:text-[#040054] transition line-clamp-1">
-                                    {{ item.name }}
-                                </Link>
-                                <!-- Variant Tags -->
-                                <div v-if="item.variants && Object.keys(item.variants).length > 0" class="flex flex-wrap gap-1 mt-1">
-                                    <span
-                                        v-for="(val, key) in item.variants"
-                                        :key="key"
-                                        class="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200"
-                                    >
-                                        {{ val }}
-                                    </span>
+                            <!-- Apply Coupon -->
+                            <div class="mb-6">
+                                <button class="text-sm font-medium text-yellow-500 hover:text-yellow-600 flex items-center gap-1">
+                                    Aplicar cupón
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                </button>
+                                <!-- Optional: expand field for coupon -->
+                            </div>
+
+                            <!-- Totals -->
+                            <div class="space-y-4 text-sm text-gray-900 border-b border-gray-200 pb-4 mb-4">
+                                <div class="flex justify-between">
+                                    <span class="font-medium">Subtotal</span>
+                                    <span class="font-bold">US$ {{ Number(totals.subtotal).toFixed(2) }}</span>
                                 </div>
-                                <!-- Quantity Controls -->
-                                <div class="flex items-center gap-2 mt-1.5">
-                                    <button
-                                        @click="updateQuantity(idx, item.quantity - 1)"
-                                        :disabled="item.quantity <= 1"
-                                        class="w-6 h-6 flex items-center justify-center rounded border border-gray-300 text-gray-500 hover:bg-gray-100 transition disabled:opacity-30"
-                                    >
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M20 12H4" /></svg>
-                                    </button>
-                                    <span class="text-xs font-semibold text-gray-700 w-4 text-center">{{ item.quantity }}</span>
-                                    <button
-                                        @click="updateQuantity(idx, item.quantity + 1)"
-                                        class="w-6 h-6 flex items-center justify-center rounded border border-gray-300 text-gray-500 hover:bg-gray-100 transition"
-                                    >
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                                    </button>
-                                    <button
-                                        @click="removeItem(idx)"
-                                        class="ml-1 text-gray-400 hover:text-red-500 transition"
-                                        title="Eliminar"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                    </button>
+                                <div v-if="totals.discount_amount > 0" class="flex justify-between text-green-600">
+                                    <span class="font-medium">Descuento</span>
+                                    <span class="font-bold">-US$ {{ Number(totals.discount_amount).toFixed(2) }}</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-medium">Envío</span>
+                                    <span class="text-gray-500">Calculado en checkout</span>
                                 </div>
                             </div>
 
-                            <!-- Price -->
-                            <div class="text-right flex-shrink-0">
-                                <span class="text-sm font-bold text-gray-900">€{{ (item.price * item.quantity).toFixed(2) }}</span>
-                                <p v-if="item.quantity > 1" class="text-[10px] text-gray-400">€{{ Number(item.price).toFixed(2) }} c/u</p>
+                            <div class="flex justify-between items-center mb-6">
+                                <span class="text-lg font-bold text-gray-900">Total</span>
+                                <div class="text-right">
+                                    <span class="text-xl font-bold text-gray-900">US$ {{ Number(totals.total).toFixed(2) }}</span>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Spacer -->
-                    <div class="my-8"></div>
-
-                    <!-- Footer: Coupon + Totals -->
-                    <div class="border-t border-gray-200 pt-6 space-y-4">
-                        <!-- Coupon -->
-                        <div class="flex gap-2">
-                            <input
-                                v-model="couponCode"
-                                type="text"
-                                placeholder="¿Tienes un cupón? Introdúcelo aquí"
-                                class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-[#040054] focus:border-[#040054] transition"
+                            <!-- Checkout Button -->
+                            <Link
+                                :href="route('checkout.index')"
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-sm shadow-sm text-base font-bold text-white bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 transition"
                             >
-                            <button
-                                @click="applyCoupon"
-                                class="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded hover:bg-gray-800 transition"
-                            >
-                                Aplicar
-                            </button>
-                        </div>
-
-                        <!-- Subtotal -->
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-600">Subtotal</span>
-                            <span class="font-semibold text-gray-900">€{{ Number(totals.subtotal).toFixed(2) }}</span>
-                        </div>
-
-                        <!-- Discount -->
-                        <div v-if="totals.discount_amount > 0" class="flex items-center justify-between text-sm">
-                            <span class="text-gray-600">Descuento</span>
-                            <span class="font-semibold text-green-600">-€{{ Number(totals.discount_amount).toFixed(2) }}</span>
-                        </div>
-
-                        <!-- Shipping -->
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-600">Envío</span>
-                            <span class="font-medium text-gray-500">Calculado en checkout</span>
-                        </div>
-
-                        <!-- Total -->
-                        <div class="flex items-center justify-between pt-3 border-t border-gray-300">
-                            <span class="text-base font-extrabold text-gray-900">Total</span>
-                            <div class="text-right">
-                                <span class="text-xl font-black text-gray-900">€{{ Number(totals.total).toFixed(2) }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Checkout Button -->
-                        <Link
-                            :href="route('checkout.index')"
-                            class="block w-full text-center bg-[#040054] text-white font-bold py-3.5 rounded-lg hover:bg-[#060078] transition shadow-md mt-2"
-                        >
-                            Proceder al Pago
-                        </Link>
-
-                        <!-- Continue Shopping -->
-                        <div class="text-center">
-                            <Link href="/" class="text-sm text-gray-500 hover:text-[#040054] transition">
-                                ← Continuar comprando
+                                Realizar pedido
                             </Link>
+
+                            <!-- Secure Payment Badge -->
+                            <div class="mt-6 flex items-center justify-center gap-2 text-gray-500 text-sm">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                Pago seguro
+                            </div>
                         </div>
+
                     </div>
                 </template>
 
                 <!-- Empty Cart -->
                 <template v-else>
-                    <div class="text-center py-20">
-                        <svg class="w-24 h-24 mx-auto text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <div class="bg-gray-50 border border-gray-200 p-12 text-center rounded">
+                        <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
-                        <h2 class="text-xl font-bold text-gray-900 mb-2">Tu carrito está vacío</h2>
-                        <p class="text-gray-500 mb-8">Agrega productos para comenzar tu compra</p>
-                        <Link href="/" class="inline-flex items-center px-6 py-3 bg-[#040054] text-white font-bold rounded-lg hover:bg-[#060078] transition shadow-md">
-                            Ir a Comprar
-                            <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                            </svg>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Tu carrito está vacío</h2>
+                        <p class="text-gray-500 mb-8">Parece que aún no has agregado nada a tu carrito.</p>
+                        <Link href="/" class="inline-flex justify-center py-3 px-8 border border-transparent rounded-sm shadow-sm text-base font-bold text-white bg-yellow-500 hover:bg-yellow-600 transition">
+                            Volver a la tienda
                         </Link>
                     </div>
                 </template>
+
             </div>
         </div>
     </AppLayout>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage, router } from '@inertiajs/vue3';
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import CartSidebar from '@/Components/CartSidebar.vue';
 
 // @ts-ignore
@@ -27,11 +27,18 @@ const user = computed(() => page.props.auth?.user);
 const categories = computed(() => page.props.categories || []);
 const itemsCount = computed(() => {
     // @ts-ignore
-    return page.props.items ? page.props.items.length : 0;
+    const items = page.props.items || [];
+    if (!Array.isArray(items) || items.length === 0) return 0;
+    return items.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
 });
 
 // Cart sidebar state
 const isCartOpen = ref(false);
+
+// Listen for global event to open cart sidebar (e.g. from Show.vue after adding to cart)
+const openCartFromEvent = () => { isCartOpen.value = true; };
+onMounted(() => window.addEventListener('open-cart-sidebar', openCartFromEvent));
+onUnmounted(() => window.removeEventListener('open-cart-sidebar', openCartFromEvent));
 
 const announcements = [
     '💎 Descuentos Únicos',

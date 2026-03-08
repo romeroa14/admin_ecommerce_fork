@@ -153,7 +153,7 @@ const proceedToCheckout = () => {
                         <!-- Product Image -->
                         <div class="flex-shrink-0 w-20 h-20 bg-white rounded-lg overflow-hidden border border-gray-200">
                             <img 
-                                :src="item.image || 'https://via.placeholder.com/80'" 
+                                :src="item.image || 'https://placehold.co/80x80/f3f4f6/9ca3af?text=Sin+img'" 
                                 :alt="item.name"
                                 class="w-full h-full object-cover"
                             >

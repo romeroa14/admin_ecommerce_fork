@@ -117,6 +117,8 @@ const addToCart = () => {
         preserveScroll: true,
         onSuccess: () => {
             addedToCart.value = true;
+            // Open the cart sidebar
+            window.dispatchEvent(new Event('open-cart-sidebar'));
             setTimeout(() => {
                 addedToCart.value = false;
             }, 3000);
