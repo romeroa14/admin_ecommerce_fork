@@ -104,6 +104,28 @@ class HandleInertiaRequests extends Middleware
                 'message' => fn() => $request->session()->get('message'),
                 'error' => fn() => $request->session()->get('error'),
             ],
+
+            // Currencies - available in navbar dropdown
+            'currencies' => function () {
+                $currencies = \App\Models\Currency::active()->ordered()->get(['id', 'name', 'code', 'symbol', 'exchange_rate']);
+                // Forzar la serialización del mutator
+                return $currencies->map(function ($currency) {
+                    $arr = $currency->toArray();
+                    $arr['exchange_rate'] = $currency->exchange_rate;
+                    return $arr;
+                })->toArray();
+            },
+            
+            // Current currency selected
+            'currentCurrency' => function () {
+                $currency = \App\Helpers\CurrencyHelper::getCurrentCurrency();
+                if ($currency) {
+                    $arr = $currency->only(['id', 'name', 'code', 'symbol', 'exchange_rate']);
+                    $arr['exchange_rate'] = $currency->exchange_rate;
+                    return $arr;
+                }
+                return null;
+            },
         ];
     }
 }

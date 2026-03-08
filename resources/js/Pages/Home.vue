@@ -121,7 +121,7 @@ const filteredProducts = computed(() => {
                                 {{ product.name }}
                             </h3>
                             <div class="flex items-center justify-between">
-                                <span class="text-base md:text-lg font-extrabold text-[#040054]">€{{ product.price }}</span>
+                                <span class="text-base md:text-lg font-extrabold text-[#040054]">{{ $formatCurrency(product.price) }}</span>
                                 <span
                                     v-if="product.stock > 0"
                                     class="text-[9px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded"

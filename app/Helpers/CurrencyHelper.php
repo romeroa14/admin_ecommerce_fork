@@ -25,7 +25,10 @@ class CurrencyHelper
             return '$' . number_format($amount, 2);
         }
 
-        $formatted = number_format($amount, $currency->decimal_places);
+        // Convertir el monto base del sistema (ej: almacenado en USD) a la moneda seleccionada
+        $convertedAmount = $amount * ($currency->exchange_rate ?? 1);
+
+        $formatted = number_format($convertedAmount, $currency->decimal_places);
         
         if ($currency->symbol_position === 'before') {
             return $currency->symbol . $formatted;

@@ -215,13 +215,13 @@ const buyNow = () => {
                         <!-- Price -->
                         <div class="mb-6">
                             <div class="flex items-baseline mb-2">
-                                <span class="text-5xl font-black text-gray-900">€{{ product.price }}</span>
+                                <span class="text-5xl font-black text-gray-900">{{ $formatCurrency(product.price) }}</span>
                                 <span v-if="product.compare_price > product.price" class="ml-3 text-2xl text-gray-400 line-through">
-                                    €{{ product.compare_price }}
+                                    {{ $formatCurrency(product.compare_price) }}
                                 </span>
                             </div>
                             <p v-if="discount > 0" class="text-[#F41D27] font-bold text-base">
-                                ¡Ahorras €{{ (product.compare_price - product.price).toFixed(2) }} hoy!
+                                ¡Ahorras {{ $formatCurrency((product.compare_price - product.price)) }} hoy!
                             </p>
                         </div>
 
@@ -392,7 +392,7 @@ const buyNow = () => {
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-gray-900 mb-1">Envío Gratis</h4>
-                                        <p class="text-sm text-gray-600">En pedidos superiores a €100 para envíos a la Península.</p>
+                                        <p class="text-sm text-gray-600">En pedidos superiores a {{ $formatCurrency(100) }} para envíos a la Península.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-4 p-6 bg-blue-50 rounded-xl">
@@ -414,7 +414,7 @@ const buyNow = () => {
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-gray-900 mb-1">Envío Internacional</h4>
-                                        <p class="text-sm text-gray-600">Envíos gratis en pedidos internacionales superiores a €150.</p>
+                                        <p class="text-sm text-gray-600">Envíos gratis en pedidos internacionales superiores a {{ $formatCurrency(150) }}.</p>
                                     </div>
                                 </div>
                             </div>
@@ -445,9 +445,9 @@ const buyNow = () => {
                                             {{ similar.name }}
                                         </h4>
                                         <div class="flex items-center justify-between">
-                                            <span class="text-base font-extrabold text-[#040054]">€{{ similar.price }}</span>
+                                            <span class="text-base font-extrabold text-[#040054]">{{ $formatCurrency(similar.price) }}</span>
                                             <span v-if="similar.compare_price && similar.compare_price > similar.price" class="text-xs text-gray-400 line-through">
-                                                €{{ similar.compare_price }}
+                                                {{ $formatCurrency(similar.compare_price) }}
                                             </span>
                                         </div>
                                     </div>
@@ -534,9 +534,9 @@ const buyNow = () => {
                                     </h4>
                                     <div class="flex items-center justify-between mb-3">
                                         <div class="flex flex-col">
-                                            <span class="text-2xl font-black text-[#040054]">€{{ similar.price }}</span>
+                                            <span class="text-2xl font-black text-[#040054]">{{ $formatCurrency(similar.price) }}</span>
                                             <span v-if="similar.compare_price && similar.compare_price > similar.price" class="text-sm text-gray-400 line-through">
-                                                €{{ similar.compare_price }}
+                                                {{ $formatCurrency(similar.compare_price) }}
                                             </span>
                                         </div>
                                         <div class="flex text-yellow-400">

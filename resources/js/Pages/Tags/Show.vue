@@ -38,7 +38,7 @@ defineProps({
                     </h3>
                     <p class="mt-1 text-sm text-gray-500 line-clamp-2">{{ product.short_description }}</p>
                     <div class="mt-auto pt-4 flex items-center justify-between">
-                        <span class="text-xl font-bold text-gray-900">€{{ product.price }}</span>
+                        <span class="text-xl font-bold text-gray-900">{{ $formatCurrency(product.price) }}</span>
                     </div>
                 </div>
             </Link>

@@ -76,6 +76,17 @@ class Currency extends Model
         return $baseAmount * $targetCurrency->exchange_rate;
     }
 
+    public function getExchangeRateAttribute($value)
+    {
+        if (strtoupper($this->code) === 'VES') {
+            $apiRate = \App\Services\ExchangeRateService::getOfficialRate();
+            if ($apiRate) {
+                return $apiRate;
+            }
+        }
+        return $value;
+    }
+
     public function getFormattedExchangeRateAttribute()
     {
         return '1 ' . $this->code . ' = ' . number_format($this->exchange_rate, 4) . ' USD';

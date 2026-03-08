@@ -107,7 +107,7 @@ const proceedToCheckout = () => {
             <div v-if="total < 100" class="px-6 py-3 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-blue-900 font-medium">
-                        ¡Gasta €{{ (100 - total).toFixed(2) }} más para envío gratis!
+                        ¡Gasta {{ $formatCurrency((100 - total)) }} más para envío gratis!
                     </span>
                 </div>
                 <div class="mt-2 bg-white rounded-full h-2 overflow-hidden">
@@ -164,7 +164,7 @@ const proceedToCheckout = () => {
                             <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 mb-1">
                                 {{ item.name }}
                             </h4>
-                            <p class="text-sm text-gray-500 mb-2">€{{ item.price }}</p>
+                            <p class="text-sm text-gray-500 mb-2">{{ $formatCurrency(item.price) }}</p>
                             
                             <!-- Quantity Controls -->
                             <div class="flex items-center space-x-2">
@@ -199,7 +199,7 @@ const proceedToCheckout = () => {
                                 </svg>
                             </button>
                             <span class="text-base font-bold text-gray-900">
-                                €{{ (item.price * item.quantity).toFixed(2) }}
+                                {{ $formatCurrency((item.price * item.quantity)) }}
                             </span>
                         </div>
                     </div>
@@ -211,7 +211,7 @@ const proceedToCheckout = () => {
                 <!-- Subtotal -->
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-gray-600">Subtotal</span>
-                    <span class="text-lg font-semibold text-gray-900">€{{ subtotal.toFixed(2) }}</span>
+                    <span class="text-lg font-semibold text-gray-900">{{ $formatCurrency(subtotal) }}</span>
                 </div>
 
                 <!-- Shipping -->
@@ -225,7 +225,7 @@ const proceedToCheckout = () => {
                 <!-- Total -->
                 <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-300">
                     <span class="text-lg font-bold text-gray-900">TOTAL</span>
-                    <span class="text-2xl font-black text-[#040054]">€{{ total.toFixed(2) }}</span>
+                    <span class="text-2xl font-black text-[#040054]">{{ $formatCurrency(total) }}</span>
                 </div>
 
                 <!-- Checkout Button -->

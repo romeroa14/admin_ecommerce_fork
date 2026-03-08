@@ -48,7 +48,7 @@ class CurrenciesTable
 
                 TextColumn::make('exchange_rate')
                     ->label('Tasa de Cambio')
-                    ->formatStateUsing(fn ($state) => '1 ' . $state . ' USD')
+                    ->formatStateUsing(fn ($state, $record) => '1 USD = ' . number_format($state, 2) . ' ' . $record->code)
                     ->sortable()
                     ->alignEnd(),
 

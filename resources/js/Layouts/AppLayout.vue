@@ -35,6 +35,24 @@ const itemsCount = computed(() => {
 // Cart sidebar state
 const isCartOpen = ref(false);
 
+interface Currency {
+    id: number;
+    name: string;
+    code: string;
+    symbol: string;
+    exchange_rate: number;
+}
+
+const currencies = computed<Currency[]>(() => (page.props.currencies as Currency[]) || []);
+const currentCurrency = computed<Currency | null>(() => (page.props.currentCurrency as Currency) || null);
+
+function changeCurrency(currencyId: number) {
+    router.post('/currency/update', { currency_id: currencyId }, {
+        preserveScroll: true,
+        preserveState: false
+    });
+}
+
 // Listen for global event to open cart sidebar (e.g. from Show.vue after adding to cart)
 const openCartFromEvent = () => { isCartOpen.value = true; };
 onMounted(() => window.addEventListener('open-cart-sidebar', openCartFromEvent));
@@ -75,7 +93,7 @@ const announcements = [
                         <!-- Logo -->
                         <div class="flex-1 flex items-center">
                             <Link href="/">
-                                <img src="/storage/Logos/equipocontainer.png" alt="Logo" class="h-10 w-auto bg-white rounded p-1">
+                                <img src="/storage/Logos/econtainer.png" alt="Logo" class="h-14 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-200">
                             </Link>
                         </div>
                         
@@ -99,6 +117,31 @@ const announcements = [
 
                         <!-- Actions -->
                         <div class="flex-1 flex items-center justify-end space-x-6 text-sm">
+
+                            <!-- Currency Selector -->
+                            <div class="relative group h-full flex items-center" v-if="currencies && currencies.length > 0">
+                                <button class="flex items-center gap-1 hover:text-gray-300 transition py-6 font-medium">
+                                    <span>{{ currentCurrency?.symbol || '$' }}</span>
+                                    <span class="hidden sm:inline">{{ currentCurrency?.code || 'USD' }}</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <!-- Dropdown -->
+                                <div class="absolute right-0 top-full -mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-100 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all text-gray-800">
+                                    <button 
+                                        v-for="curr in (currencies as any[])" 
+                                        :key="curr.id"
+                                        @click="changeCurrency(curr.id)"
+                                        class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center justify-between"
+                                        :class="{'bg-gray-50 text-[#F41D27]': currentCurrency?.id === curr.id}"
+                                    >
+                                        <span>{{ curr.name }}</span>
+                                        <span class="font-bold border bg-gray-100 rounded px-1 text-xs">{{ curr.symbol }}</span>
+                                    </button>
+                                </div>
+                            </div>
+
                             <!-- User -->
                             <div class="relative group hidden sm:block h-full">
                                 <Link :href="user ? route('account.dashboard') : route('login')" class="flex items-center gap-2 hover:text-gray-300 transition py-6">

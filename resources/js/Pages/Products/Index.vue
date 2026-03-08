@@ -356,9 +356,9 @@ const maxPercentage = computed(() => (maxPrice.value / 10000) * 100);
                             <p class="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">{{ product.short_description }}</p>
                             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                                 <div>
-                                    <span class="text-xl font-bold text-[#040054]">€{{ product.price }}</span>
+                                    <span class="text-xl font-bold text-[#040054]">{{ $formatCurrency(product.price) }}</span>
                                     <span v-if="product.compare_price > product.price" class="block text-xs text-gray-400 line-through">
-                                        €{{ product.compare_price }}
+                                        {{ $formatCurrency(product.compare_price) }}
                                     </span>
                                 </div>
                                 <span v-if="product.stock > 0" class="text-xs font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">

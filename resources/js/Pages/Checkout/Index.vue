@@ -76,7 +76,7 @@ const submit = () => {
 
                     <div class="sm:col-span-2 mt-4">
                         <button type="submit" :disabled="form.processing" class="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Confirmar Pedido - €{{ totals.total }}
+                            Confirmar Pedido - {{ $formatCurrency(totals.total) }}
                         </button>
                     </div>
                 </form>
@@ -92,7 +92,7 @@ const submit = () => {
                                 <div>
                                     <div class="flex justify-between text-base font-medium text-gray-900">
                                         <h3>Producto #{{ item.product_id }}</h3>
-                                        <p class="ml-4">€{{ item.price }}</p>
+                                        <p class="ml-4">{{ $formatCurrency(item.price) }}</p>
                                     </div>
                                 </div>
                                 <div class="flex-1 flex items-end justify-between text-sm">
@@ -104,7 +104,7 @@ const submit = () => {
                     <dl class="border-t border-gray-200 pt-4 space-y-2">
                         <div class="flex items-center justify-between">
                             <dt class="text-sm text-gray-600">Total</dt>
-                            <dd class="text-sm font-medium text-gray-900">€{{ totals.total }}</dd>
+                            <dd class="text-sm font-medium text-gray-900">{{ $formatCurrency(totals.total) }}</dd>
                         </div>
                     </dl>
                 </div>

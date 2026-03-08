@@ -31,6 +31,17 @@ class CurrencyForm
                                     ->required()
                                     ->maxLength(3)
                                     ->unique(ignoreRecord: true)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, callable $set) {
+                                        if (strtoupper($state) === 'VES') {
+                                            $set('name', 'Bolívares (VES)');
+                                            $set('symbol', 'Bs');
+                                            $rate = \App\Services\ExchangeRateService::getOfficialRate();
+                                            if ($rate) {
+                                                $set('exchange_rate', $rate);
+                                            }
+                                        }
+                                    })
                                     ->helperText('Código ISO 4217 (USD, EUR, VES)')
                                     ->rules(['regex:/^[A-Z]{3}$/']),
                             ]),
@@ -83,7 +94,39 @@ class CurrencyForm
                                     ->required()
                                     ->step(0.0001)
                                     ->default(1.0000)
-                                    ->helperText('Tasa de cambio respecto al USD (1.0000 = 1 USD)'),
+                                    ->helperText(function (\Filament\Forms\Get $get) {
+                                        $rate = \App\Services\ExchangeRateService::getOfficialRate() ?? 'actual';
+                                        if (strtoupper($get('code')) === 'VES') {
+                                            return "La tasa en VES es $rate y se actualiza sola automáticamente en tiempo real con DolarAPI. No necesitas hacer fetch.";
+                                        }
+                                        return "Equivalencia 1 USD = X (La de VES es manejada por API de $rate)";
+                                    })
+                                    ->suffixActions([
+                                        \Filament\Actions\Action::make('fetchBcv')
+                                            ->icon('heroicon-o-banknotes')
+                                            ->tooltip('Extraer BCV actual')
+                                            ->action(function (\Filament\Forms\Set $set, \Filament\Forms\Get $get) {
+                                                if(strtoupper($get('code')) === 'VES') {
+                                                    $rate = \App\Services\ExchangeRateService::getOfficialRate();
+                                                    if ($rate) {
+                                                        $set('exchange_rate', $rate);
+                                                        \Filament\Notifications\Notification::make()->success()->title('BCV Aplicado')->send();
+                                                    }
+                                                }
+                                            }),
+                                        \Filament\Actions\Action::make('fetchParalelo')
+                                            ->icon('heroicon-o-currency-dollar')
+                                            ->tooltip('Extraer Paralelo')
+                                            ->action(function (\Filament\Forms\Set $set, \Filament\Forms\Get $get) {
+                                                if(strtoupper($get('code')) === 'VES') {
+                                                    $rate = \App\Services\ExchangeRateService::getParallelRate();
+                                                    if ($rate) {
+                                                        $set('exchange_rate', $rate);
+                                                        \Filament\Notifications\Notification::make()->success()->title('Paralelo Aplicado')->send();
+                                                    }
+                                                }
+                                            })
+                                    ]),
 
                                 Toggle::make('is_default')
                                     ->label('Moneda por Defecto')

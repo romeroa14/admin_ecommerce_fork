@@ -127,7 +127,7 @@ const applyCoupon = () => {
 
                                         <!-- Price -->
                                         <div class="text-right self-end mb-2">
-                                            <span class="text-lg font-bold text-gray-900">US$ {{ (item.price * item.quantity).toFixed(2) }}</span>
+                                            <span class="text-lg font-bold text-gray-900">{{ $formatCurrency((item.price * item.quantity)) }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -154,11 +154,11 @@ const applyCoupon = () => {
                             <div class="space-y-4 text-sm text-gray-900 border-b border-gray-200 pb-4 mb-4">
                                 <div class="flex justify-between">
                                     <span class="font-medium">Subtotal</span>
-                                    <span class="font-bold">US$ {{ Number(totals.subtotal).toFixed(2) }}</span>
+                                    <span class="font-bold">{{ $formatCurrency(Number(totals.subtotal)) }}</span>
                                 </div>
                                 <div v-if="totals.discount_amount > 0" class="flex justify-between text-green-600">
                                     <span class="font-medium">Descuento</span>
-                                    <span class="font-bold">-US$ {{ Number(totals.discount_amount).toFixed(2) }}</span>
+                                    <span class="font-bold">-{{ $formatCurrency(Number(totals.discount_amount)) }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="font-medium">Envío</span>
@@ -169,7 +169,7 @@ const applyCoupon = () => {
                             <div class="flex justify-between items-center mb-6">
                                 <span class="text-lg font-bold text-gray-900">Total</span>
                                 <div class="text-right">
-                                    <span class="text-xl font-bold text-gray-900">US$ {{ Number(totals.total).toFixed(2) }}</span>
+                                    <span class="text-xl font-bold text-gray-900">{{ $formatCurrency(Number(totals.total)) }}</span>
                                 </div>
                             </div>
 
