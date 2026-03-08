@@ -183,7 +183,12 @@ class ProductForm
                     ->schema([
                         FileUpload::make('images')
                             ->label('Imágenes del Producto')
+                            ->image()
                             ->multiple()
+                            ->reorderable()
+                            ->appendFiles()
+                            ->panelLayout('grid')
+                            ->imageEditor()
                             ->maxFiles(10)
                             ->directory('products')
                             ->disk('public')

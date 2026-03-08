@@ -44,7 +44,9 @@ class CategoriesTable
                     ->sortable()
                     ->alignCenter()
                     ->badge()
-                    ->color('primary'),
+                    ->color('primary')
+                    ->summarize(\Filament\Tables\Columns\Summarizers\Sum::make()
+                        ->label('Total')),
 
                 TextColumn::make('created_at')
                     ->label('Creado')
