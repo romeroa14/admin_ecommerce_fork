@@ -391,8 +391,8 @@ const buyNow = () => {
                                         </svg>
                                     </div>
                                     <div>
-                                        <h4 class="font-bold text-gray-900 mb-1">Envío Gratis</h4>
-                                        <p class="text-sm text-gray-600">En pedidos superiores a {{ $formatCurrency(100) }} para envíos a la Península.</p>
+                                        <h4 class="font-bold text-gray-900 mb-1">Envío Gratis, Nivel Nacional</h4>
+                                        <p class="text-sm text-gray-600">En pedidos superiores a {{ $formatCurrency(25) }} para envíos a toda venezuela por MRW ( Que pese menos de 1kg en total ).</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-4 p-6 bg-blue-50 rounded-xl">
@@ -402,8 +402,8 @@ const buyNow = () => {
                                         </svg>
                                     </div>
                                     <div>
-                                        <h4 class="font-bold text-gray-900 mb-1">Entrega Rápida</h4>
-                                        <p class="text-sm text-gray-600">24/72 horas en Península. Resto de Europa: 3-7 días laborables.</p>
+                                        <h4 class="font-bold text-gray-900 mb-1">Paga Al recibir</h4>
+                                        <p class="text-sm text-gray-600">Valido solo en Caracas.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-4 p-6 bg-purple-50 rounded-xl">
@@ -413,8 +413,8 @@ const buyNow = () => {
                                         </svg>
                                     </div>
                                     <div>
-                                        <h4 class="font-bold text-gray-900 mb-1">Envío Internacional</h4>
-                                        <p class="text-sm text-gray-600">Envíos gratis en pedidos internacionales superiores a {{ $formatCurrency(150) }}.</p>
+                                        <h4 class="font-bold text-gray-900 mb-1">Retiro en Tienda</h4>
+                                        <p class="text-sm text-gray-600">Disponible para pickup y retiro en Caracas La Candelaria C.C. Galerias Avila. ¡Sin costo adicional!</p>
                                     </div>
                                 </div>
                             </div>

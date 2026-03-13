@@ -47,7 +47,7 @@ class Product extends Model
     protected $rules = [
         'name' => 'required|string|max:255',
         'slug' => 'required|string|max:255',
-        'sku' => 'required|string|max:255',
+        'sku' => 'nullable|string|max:255',
         'description' => 'required|string',
         'short_description' => 'required|string',
         'price' => 'required|numeric',

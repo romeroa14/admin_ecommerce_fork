@@ -51,12 +51,11 @@ class ProductForm
                             ->schema([
                                 TextInput::make('sku')
                                     ->label('SKU')
-                                    ->required()
                                     ->unique(ignoreRecord: true)
                                     ->rules(['alpha_dash']),
 
                                 TextInput::make('price')
-                                    ->label('Precio')
+                                    ->label('Precio de Venta')
                                     ->required()
                                     ->numeric()
                                     ->prefix(fn() => CurrencyHelper::getCurrentCurrencySymbol())
