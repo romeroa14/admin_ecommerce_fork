@@ -53,7 +53,7 @@ jobs:
             set -e
             
             # Variables
-            DOMAIN="blanchedalmond-giraffe-534725.hostingersite.com"
+            DOMAIN="equipocontainer.com"
             DEPLOY_PATH=~/domains/$DOMAIN/public_html
             
             echo "🚀 Starting deployment to $DOMAIN"

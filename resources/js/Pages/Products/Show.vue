@@ -414,7 +414,7 @@ const buyNow = () => {
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-gray-900 mb-1">Retiro en Tienda</h4>
-                                        <p class="text-sm text-gray-600">Disponible para pickup y retiro en Caracas La Candelaria C.C. Galerias Avila. ¡Sin costo adicional!</p>
+                                        <p class="text-sm text-gray-600">Disponible para pickup y retiro en Caracas La Candelaria C.C. Galerias Avila Local A-14. ¡Sin costo adicional!</p>
                                     </div>
                                 </div>
                             </div>
