@@ -79,12 +79,12 @@ class BannerForm
                     ->default('home_hero')
                     ->label('Posición')
                     ->options([
-                        'home_hero'   => 'Hero Principal (Home)',
-                        'home_middle' => 'Medio (Home)',
-                        'home_bottom' => 'Inferior (Home)',
-                        'sidebar'     => 'Barra lateral',
-                        'category'    => 'Página de Categoría',
-                        'product'     => 'Página de Producto',
+                        'home_hero'   => '🖼️  Hero Principal (Carrusel grande - inicio)',
+                        'home_middle' => '📣  Banner Grande Central (inicio)',
+                        'home_bottom' => '⬆️  Banner pequeño (encima del footer)',
+                        'sidebar'     => '↔️  Barra lateral',
+                        'category'    => '🗂️  Página de Categoría',
+                        'product'     => '🛒  Página de Producto',
                     ]),
 
                 TextInput::make('order')

@@ -18,24 +18,48 @@ use App\Models\Product;
 
 // Home
 Route::get('/', function () {
-    $products = Product::active()
+    $bannerHero = \App\Models\Banner::valid()->byPosition('home_hero')->orderBy('order')->get();
+    $bannerMiddle = \App\Models\Banner::valid()->byPosition('home_middle')->orderBy('order')->first();
+    $bannerBottom = \App\Models\Banner::valid()->byPosition('home_bottom')->orderBy('order')->first();
+
+    $saleProducts = Product::active()
         ->with(['category', 'productImages'])
-        ->latest()
-        ->paginate(12);
+        ->where('discount_percentage', '>', 0)
+        ->orderByDesc('discount_percentage')
+        ->limit(4)->get();
 
-    $banners = \App\Models\Banner::valid()
-        ->byPosition('home_hero')
-        ->orderBy('order')
-        ->get();
+    $newProducts = Product::active()
+        ->with(['category', 'productImages'])
+        ->latest()->limit(4)->get();
 
-    $categories = \App\Models\Category::orderBy('name')->get();
+    $bestSellers = Product::active()
+        ->with(['category', 'productImages'])
+        ->orderByDesc('stock')
+        ->limit(4)->get();
+
+    $categories = \App\Models\Category::active()
+        ->ordered()
+        ->with(['products' => function ($q) {
+            $q->active()->with('productImages')->limit(1);
+        }])
+        ->get()
+        ->map(function ($cat) {
+            $firstProduct = $cat->products->first();
+            $cat->preview_product = $firstProduct;
+            return $cat;
+        });
 
     return Inertia::render('Home', [
-        'products' => $products,
-        'banners' => $banners,
-        'categories' => $categories,
+        'bannerHero'   => $bannerHero,
+        'bannerMiddle' => $bannerMiddle,
+        'bannerBottom' => $bannerBottom,
+        'saleProducts' => $saleProducts,
+        'newProducts'  => $newProducts,
+        'bestSellers'  => $bestSellers,
+        'categories'   => $categories,
     ]);
 })->name('home');
+
 
 // Products
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');

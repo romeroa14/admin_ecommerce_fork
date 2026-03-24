@@ -201,7 +201,7 @@ const announcements = [
             <!-- Bottom White Bar for Categories -->
             <div class="bg-white border-b border-gray-200">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <ul class="flex items-center justify-center gap-8 md:gap-12 overflow-x-auto scrollbar-hide py-3 text-sm font-bold text-gray-800">
+                    <ul class="flex items-center justify-center flex-wrap gap-x-6 gap-y-1 py-2.5 text-sm font-bold text-gray-800">
                         <li>
                             <Link href="/" class="hover:text-[#F41D27] whitespace-nowrap transition-colors">Inicio</Link>
                         </li>
