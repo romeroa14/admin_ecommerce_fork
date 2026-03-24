@@ -11,6 +11,7 @@ const route = window.route;
 const props = defineProps({
     bannerHero:   { type: Array as () => any[], default: () => [] },
     bannerMiddle: { type: Object as () => any,  default: null },
+    bannerMiddle2:{ type: Object as () => any,  default: null },
     bannerBottom: { type: Object as () => any,  default: null },
     saleProducts: { type: Array as () => any[], default: () => [] },
     newProducts:  { type: Array as () => any[], default: () => [] },
@@ -223,6 +224,20 @@ function getCategoryImage(cat: any): string | null {
                     </Link>
                 </div>
             </div>
+        </section>
+
+        <!-- ═══════════════ 5.5 BANNER MEDIANO CENTRAL ═══════════════ -->
+        <section v-if="bannerMiddle2" class="w-full">
+            <a :href="bannerMiddle2.link || '#'" class="block w-full overflow-hidden relative">
+                <img :src="getBannerUrl(bannerMiddle2)" :alt="bannerMiddle2.title" class="w-full object-cover max-h-[440px]">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent flex items-center">
+                    <div class="max-w-7xl mx-auto px-8 w-full">
+                        <h2 class="text-3xl md:text-5xl font-black text-white mb-4 leading-tight drop-shadow-xl">{{ bannerMiddle2.title }}</h2>
+                        <p v-if="bannerMiddle2.description" class="text-white/85 mb-6 max-w-lg text-base">{{ bannerMiddle2.description }}</p>
+                        <a v-if="bannerMiddle2.button_text" :href="bannerMiddle2.link || '#'" class="inline-block bg-[#F41D27] text-white font-extrabold px-8 py-3 rounded-xl shadow-xl hover:bg-[#cc1520] transition text-sm uppercase tracking-wide">{{ bannerMiddle2.button_text }}</a>
+                    </div>
+                </div>
+            </a>
         </section>
 
         <!-- ═══════════════ 6. MÁS VENDIDOS ═══════════════ -->

@@ -20,6 +20,7 @@ use App\Models\Product;
 Route::get('/', function () {
     $bannerHero = \App\Models\Banner::valid()->byPosition('home_hero')->orderBy('order')->get();
     $bannerMiddle = \App\Models\Banner::valid()->byPosition('home_middle')->orderBy('order')->first();
+    $bannerMiddle2 = \App\Models\Banner::valid()->byPosition('home_middle_2')->orderBy('order')->first();
     $bannerBottom = \App\Models\Banner::valid()->byPosition('home_bottom')->orderBy('order')->first();
 
     $saleProducts = Product::active()
@@ -52,6 +53,7 @@ Route::get('/', function () {
     return Inertia::render('Home', [
         'bannerHero'   => $bannerHero,
         'bannerMiddle' => $bannerMiddle,
+        'bannerMiddle2' => $bannerMiddle2,
         'bannerBottom' => $bannerBottom,
         'saleProducts' => $saleProducts,
         'newProducts'  => $newProducts,
