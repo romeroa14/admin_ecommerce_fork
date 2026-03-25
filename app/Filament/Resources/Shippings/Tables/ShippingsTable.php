@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Shippings\Tables;
 
+use App\Helpers\CurrencyHelper;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Actions\EditAction;
@@ -30,19 +31,19 @@ class ShippingsTable
 
                 TextColumn::make('base_price')
                     ->label('Precio Base')
-                    ->money('EUR')
+                    ->money(fn() => CurrencyHelper::getCurrentCurrencyCode() ?? 'USD')
                     ->sortable()
                     ->alignEnd(),
 
                 TextColumn::make('price_per_kg')
                     ->label('Precio/Kg')
-                    ->money('EUR')
+                    ->money(fn() => CurrencyHelper::getCurrentCurrencyCode() ?? 'USD')
                     ->sortable()
                     ->alignEnd(),
 
                 TextColumn::make('free_shipping_threshold')
                     ->label('Envío Gratis')
-                    ->money('EUR')
+                    ->money(fn() => CurrencyHelper::getCurrentCurrencyCode() ?? 'USD')
                     ->sortable()
                     ->alignEnd()
                     ->placeholder('No aplica'),

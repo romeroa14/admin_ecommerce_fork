@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { Head, useForm, Link } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { getProductImage } from '@/composables/useProductImage';
+import CheckoutLayout from '@/Layouts/CheckoutLayout.vue';
 
 const props = defineProps({
     cart: Object,
-    items: Array as () => any[],
+    items: {
+        type: Array as () => any[],
+        default: () => []
+    },
     totals: {
         type: Object as () => any,
         default: () => ({ total: 0 })
@@ -29,39 +31,42 @@ const form = useForm({
     phone: props.defaultAddress.phone || '',
 });
 
-
 const submit = () => {
     form.post(route('checkout.address.store'));
 };
 </script>
 
 <template>
-    <AppLayout>
+    <CheckoutLayout
+        formId="address-form"
+        :items="items"
+        :totals="totals"
+        buttonText="Continuar a Envíos"
+        :buttonLoading="form.processing"
+    >
         <Head title="Dirección de Envío" />
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 bg-white min-h-screen">
-            <!-- Navigation steps -->
-            <nav class="mb-8" aria-label="Progress">
-                <ol role="list" class="flex space-x-8 justify-center mb-10">
-                    <li class="flex items-center">
-                        <span class="text-[#F41D27] font-bold text-lg">1. Dirección</span>
-                        <svg class="h-5 w-5 ml-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" /></svg>
+        <template #navigation>
+            <nav class="mb-12" aria-label="Progress">
+                <ol role="list" class="flex space-x-4 md:space-x-8 text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-400">
+                    <li class="flex items-center text-gray-900 border-b-2 border-gray-900 pb-1">
+                        <span>1. Dirección</span>
+                        <svg class="h-4 w-4 ml-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" /></svg>
                     </li>
                     <li class="flex items-center">
-                        <span class="text-gray-400 font-bold text-lg">2. Envío</span>
-                        <svg class="h-5 w-5 ml-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" /></svg>
+                        <span>2. Envío</span>
+                        <svg class="h-4 w-4 ml-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" /></svg>
                     </li>
                     <li class="flex items-center">
-                        <span class="text-gray-400 font-bold text-lg">3. Pago</span>
+                        <span>3. Pago</span>
                     </li>
                 </ol>
             </nav>
+        </template>
 
-            <div class="lg:grid lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16">
-                <div class="lg:col-span-7">
-                    <h2 class="text-2xl font-bold text-[#040054] mb-8">Información de Envío</h2>
+        <h2 class="text-2xl font-black text-gray-900 mb-8 tracking-tight">Información de contacto y envío</h2>
 
-                    <form @submit.prevent="submit" class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+        <form id="address-form" @submit.prevent="submit" class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
                         <div class="sm:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                             <input v-model="form.email" type="email" autocomplete="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#F41D27] focus:ring-[#F41D27] py-3 px-4 border text-sm" placeholder="tu@email.com">
@@ -104,51 +109,6 @@ const submit = () => {
                             <div v-if="form.errors.phone" class="text-red-600 text-xs mt-1">{{ form.errors.phone }}</div>
                         </div>
 
-                        <div class="sm:col-span-2 mt-6 flex justify-end">
-                            <button type="submit" :disabled="form.processing" class="w-full sm:w-auto bg-[#F41D27] hover:bg-red-700 border border-transparent rounded-lg shadow-md py-4 px-8 text-lg font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F41D27] transition">
-                                Continuar a Envíos
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Order Preview -->
-                <div class="mt-10 lg:mt-0 lg:col-span-5 bg-gray-50 border border-gray-200 rounded-xl p-6 lg:p-8 h-fit">
-                    <h2 class="text-xl font-bold text-[#040054] mb-6">Resumen del Pedido</h2>
-                    <ul role="list" class="divide-y divide-gray-200">
-                        <li v-for="(item, idx) in items" :key="idx" class="flex py-4">
-                            <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white">
-                                <img :src="item.product ? getProductImage(item.product) : '/storage/placeholder.png'" class="h-full w-full object-cover object-center">
-                            </div>
-                            <div class="ml-4 flex flex-1 flex-col justify-center">
-                                <div class="flex justify-between text-sm font-bold text-gray-900">
-                                    <h3 class="line-clamp-2 pr-2">{{ item.product?.name || `Producto #${item.product_id}` }}</h3>
-                                    <p class="ml-4 whitespace-nowrap">{{ $formatCurrency(item.price) }}</p>
-                                </div>
-                                <p class="text-gray-500 text-sm mt-1">Cant: {{ item.quantity }}</p>
-                            </div>
-                        </li>
-                    </ul>
-                    <dl class="border-t border-gray-200 pt-6 mt-6 space-y-4">
-                        <div class="flex items-center justify-between text-sm">
-                            <dt class="text-gray-600">Subtotal</dt>
-                            <dd class="font-bold text-gray-900">{{ $formatCurrency(totals.subtotal) }}</dd>
-                        </div>
-                        <div v-if="totals.discount_amount > 0" class="flex items-center justify-between text-sm">
-                            <dt class="text-gray-600 flex items-center gap-1">
-                                Descuentos
-                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                            </dt>
-                            <dd class="font-bold text-green-600">-{{ $formatCurrency(totals.discount_amount) }}</dd>
-                        </div>
-                        <div class="border-t border-gray-200 pt-4 flex items-center justify-between font-bold text-lg mt-4">
-                            <dt class="text-[#040054]">Total Estimado</dt>
-                            <dd class="text-[#F41D27]">{{ $formatCurrency(totals.total) }}</dd>
-                        </div>
-                        <p class="text-xs text-gray-500 text-center mt-4">Los costos de envío se calcularán en el siguiente paso.</p>
-                    </dl>
-                </div>
-            </div>
-        </div>
-    </AppLayout>
+        </form>
+    </CheckoutLayout>
 </template>

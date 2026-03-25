@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Shippings\Schemas;
 
+use App\Helpers\CurrencyHelper;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
@@ -50,7 +51,7 @@ class ShippingForm
                                 TextInput::make('base_price')
                                     ->label('Precio Base')
                                     ->numeric()
-                                    ->prefix('€')
+                                    ->prefix(fn() => CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
                                     ->required()
                                     ->helperText('Precio mínimo de envío'),
@@ -58,7 +59,7 @@ class ShippingForm
                                 TextInput::make('price_per_kg')
                                     ->label('Precio por Kg')
                                     ->numeric()
-                                    ->prefix('€')
+                                    ->prefix(fn() => CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
                                     ->default(0)
                                     ->helperText('Costo adicional por kilogramo'),
@@ -66,7 +67,7 @@ class ShippingForm
                                 TextInput::make('free_shipping_threshold')
                                     ->label('Umbral Envío Gratis')
                                     ->numeric()
-                                    ->prefix('€')
+                                    ->prefix(fn() => CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
                                     ->helperText('Pedidos superiores a este monto tienen envío gratis'),
                             ]),
@@ -102,7 +103,7 @@ class ShippingForm
                                 TextInput::make('zone')
                                     ->label('Zona')
                                     ->required()
-                                    ->placeholder('Ej: España, Europa, Mundial'),
+                                    ->placeholder('Ej: Caracas, Miranda, Nacional'),
                             ])
                             ->defaultItems(1)
                             ->collapsible()

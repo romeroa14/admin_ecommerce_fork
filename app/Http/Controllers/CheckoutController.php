@@ -130,7 +130,14 @@ class CheckoutController extends Controller
         ]);
 
         $sessionData = Session::get('checkout_data', []);
+        
+        $shipping = \App\Models\Shipping::where('code', $request->shipping_method)->first();
+        
         $sessionData['shipping'] = $request->except('_token');
+        if ($shipping) {
+            $sessionData['shipping']['shipping_id'] = $shipping->id;
+        }
+        
         Session::put('checkout_data', $sessionData);
 
         return redirect()->route('checkout.payment');
@@ -153,12 +160,17 @@ class CheckoutController extends Controller
             'items' => $this->enrichItemsWithProducts($cart->items),
             'totals' => $cart->getTotals(),
             'sessionData' => $sessionData,
-            'shippingMethods' => \App\Models\Shipping::active()->ordered()->get()
+            'shippingMethods' => \App\Models\Shipping::active()->ordered()->get(),
+            'paymentMethods' => \App\Models\PaymentMethod::active()->ordered()->get()
         ]);
     }
 
     public function storePayment(Request $request)
     {
+        $request->validate([
+            'payment_method' => 'required|string',
+        ]);
+
         $cart = $this->getCart();
         if (!$cart || $cart->isEmpty()) {
             return redirect()->route('cart.index');
@@ -195,8 +207,21 @@ class CheckoutController extends Controller
                 'billing_address_id' => $address->id,
                 'status' => 'pending',
                 'user_id' => $user ? $user->id : null,
-                'shipping_method' => $sessionData['shipping']['shipping_method'] ?? 'default',
+                'shipping_id' => $sessionData['shipping']['shipping_id'] ?? null,
             ]);
+
+            $paymentMethodCode = $request->payment_method ?? 'whatsapp';
+            $pm = \App\Models\PaymentMethod::where('code', $paymentMethodCode)->first();
+
+            $payment = \App\Models\Payment::create([
+                'order_id' => $order->id,
+                'payment_method_id' => $pm ? $pm->id : null,
+                'payment_method' => $paymentMethodCode,
+                'amount' => $order->total_amount,
+                'status' => 'pending'
+            ]);
+
+            $order->update(['payment_id' => $payment->id]);
 
             // Clear cart & session
             $cart->items = [];

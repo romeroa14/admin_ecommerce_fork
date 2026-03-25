@@ -18,28 +18,40 @@ const whatsappUrl = computed(() => {
     const order = props.orderData;
     const address = order.shipping_address;
     const items = order.items || [];
-    
+    const shipping = order.shipping;
+    const payment = order.payments?.length > 0 ? order.payments[0] : null;
+
     let message = `🚀 *NUEVO PEDIDO EN EQUIPO CONTAINER*\n`;
     message += `------------------------------------------\n`;
-    message += `*Pedido:* #${props.orderId}\n`;
+    message += `*Pedido:* #${order.order_number}\n`;
     message += `*Cliente:* ${address.first_name} ${address.last_name}\n`;
     message += `*Email:* ${address.email}\n`;
     message += `*Teléfono:* ${address.phone}\n`;
     message += `*Dirección:* ${address.address_line_1}, ${address.city}\n`;
-    message += `*Método:* ${order.shipping_method === 'express' ? 'Retiro en Tienda' : 'Envío a Domicilio'}\n`;
+    message += `*Método de Envío:* ${shipping ? shipping.name : 'Por definir'}\n`;
+    message += `*Método de Pago:* ${payment?.payment_method_model?.name || payment?.payment_method || 'WhatsApp'}\n`;
     message += `------------------------------------------\n`;
     message += `*PRODUCTOS:*\n`;
     
     items.forEach((item: any) => {
-        message += `• ${item.product?.name} (x${item.quantity}) - ${item.price}\n`;
+        message += `• ${item.product?.name} (x${item.quantity}) - $ ${Number(item.total).toFixed(2)}\n`;
     });
     
     message += `------------------------------------------\n`;
-    message += `*TOTAL A PAGAR:* ${order.total}\n`;
+    message += `*Subtotal:* $ ${Number(order.subtotal).toFixed(2)}\n`;
+    if (order.discount_amount > 0) {
+        message += `*Descuentos:* -$ ${Number(order.discount_amount).toFixed(2)}\n`;
+    }
+    if (Number(order.shipping_amount) > 0) {
+        message += `*Cargo de envío:* $ ${Number(order.shipping_amount).toFixed(2)}\n`;
+    } else {
+        message += `*Cargo de envío:* Gratis\n`;
+    }
+    message += `*TOTAL A PAGAR:* $ ${Number(order.total_amount).toFixed(2)}\n`;
     message += `------------------------------------------\n`;
-    message += `_Por favor, envíeme los datos bancarios para completar el pago._`;
+    message += `_Por favor, confírmenme el pedido y bríndenme los datos para realizar el pago._`;
 
-    const phoneNumber = '584123816330'; // Sin el + para la URL de API
+    const phoneNumber = '584123816330'; // Cambiar si es necesario
     return `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
 });
 

@@ -149,7 +149,7 @@ Route::post('/checkout/shipping', [CheckoutController::class, 'storeShipping'])-
 Route::get('/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
 Route::post('/checkout/payment', [CheckoutController::class, 'storePayment'])->name('checkout.payment.store');
 Route::get('/checkout/success/{order}', function ($order) {
-    $orderInstance = \App\Models\Order::with(['items.product', 'shippingAddress'])->findOrFail($order);
+    $orderInstance = \App\Models\Order::with(['items.product', 'shippingAddress', 'shipping', 'payments.paymentMethod'])->findOrFail($order);
     return Inertia::render('Checkout/Success', [
         'orderId' => $order,
         'orderData' => $orderInstance
