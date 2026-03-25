@@ -114,7 +114,12 @@ class CheckoutController extends Controller
             'cart' => $cart,
             'items' => $this->enrichItemsWithProducts($cart->items),
             'totals' => $cart->getTotals(),
-            'shipping' => $sessionData['shipping'] ?? []
+            'shipping' => $sessionData['shipping'] ?? [],
+            'shippingMethods' => \App\Models\Shipping::active()->ordered()->get()->map(function($sm) {
+                return array_merge($sm->toArray(), [
+                    'estimated_delivery' => $sm->getEstimatedDeliveryDays()
+                ]);
+            })
         ]);
     }
 
@@ -147,7 +152,8 @@ class CheckoutController extends Controller
             'cart' => $cart,
             'items' => $this->enrichItemsWithProducts($cart->items),
             'totals' => $cart->getTotals(),
-            'sessionData' => $sessionData
+            'sessionData' => $sessionData,
+            'shippingMethods' => \App\Models\Shipping::active()->ordered()->get()
         ]);
     }
 

@@ -91,12 +91,11 @@ class Cart extends Model
             $itemDiscount = ($price * $discountPercentage) / 100;
             $totalDiscount += $itemDiscount * $quantity;
             
-            $itemSubtotal = ($price - $itemDiscount) * $quantity;
-            $subtotal += $itemSubtotal;
+            $subtotal += $price * $quantity;
         }
         
-        $taxAmount = $subtotal * 0.21; // IVA 21%
-        $total = $subtotal + $taxAmount;
+        $taxAmount = 0; // Impuestos removidos temporalmente (o calculados por separado)
+        $total = $subtotal - $totalDiscount + $taxAmount;
         
         return [
             'subtotal' => round($subtotal, 2),

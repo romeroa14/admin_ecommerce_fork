@@ -357,14 +357,14 @@ const buyNow = () => {
                                 Tiempos de Envío
                                 <span v-if="activeTab === 'envio'" class="absolute bottom-0 left-0 right-0 h-[3px] bg-[#040054] rounded-t"></span>
                             </button>
-                            <button
+                            <!-- <button
                                 @click="activeTab = 'similares'"
                                 class="relative pb-4 text-sm font-bold uppercase tracking-wider transition-colors"
                                 :class="activeTab === 'similares' ? 'text-[#040054]' : 'text-gray-400 hover:text-gray-600'"
                             >
                                 Productos Similares
                                 <span v-if="activeTab === 'similares'" class="absolute bottom-0 left-0 right-0 h-[3px] bg-[#040054] rounded-t"></span>
-                            </button>
+                            </button> -->
                         </nav>
                     </div>
 

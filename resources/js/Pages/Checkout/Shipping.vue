@@ -9,13 +9,21 @@ const props = defineProps({
         type: Object as () => any,
         default: () => ({ total: 0 })
     },
+    shipping: {
+        type: Object as () => any,
+        default: () => ({})
+    },
+    shippingMethods: {
+        type: Array as () => any[],
+        default: () => []
+    },
 });
 
 // @ts-ignore
 const route = window.route;
 
 const form = useForm({
-    shipping_method: 'standard', // default
+    shipping_method: props.shipping?.shipping_method || (props.shippingMethods.length > 0 ? props.shippingMethods[0].code : ''),
 });
 
 const submit = () => {
@@ -52,42 +60,40 @@ const submit = () => {
 
                     <form @submit.prevent="submit">
                         <div class="space-y-4">
-                            <!-- Standard Shipping -->
-                            <label class="relative flex cursor-pointer rounded-lg border bg-white p-5 shadow-sm focus:outline-none"
-                                :class="{'border-[#F41D27] ring-1 ring-[#F41D27]': form.shipping_method === 'standard', 'border-gray-300': form.shipping_method !== 'standard'}"
+                            <!-- Dynamic Shipping Methods -->
+                            <label 
+                                v-for="method in shippingMethods" 
+                                :key="method.id"
+                                class="relative flex cursor-pointer rounded-lg border bg-white p-5 shadow-sm focus:outline-none transition-all duration-200"
+                                :class="{'border-[#F41D27] ring-1 ring-[#F41D27] bg-red-50/10': form.shipping_method === method.code, 'border-gray-200 hover:border-gray-300': form.shipping_method !== method.code}"
                             >
-                                <input type="radio" v-model="form.shipping_method" value="standard" class="sr-only">
+                                <input type="radio" v-model="form.shipping_method" :value="method.code" class="sr-only">
                                 <span class="flex flex-1">
                                     <span class="flex flex-col">
-                                        <span class="block text-sm font-bold text-gray-900">Envío Standard</span>
-                                        <span class="mt-1 flex items-center text-sm text-gray-500">2 - 4 días hábiles dependiendo la zona</span>
+                                        <span class="block text-sm font-bold text-gray-900">{{ method.name }}</span>
+                                        <span class="mt-1 flex items-center text-sm text-gray-500">
+                                            {{ method.description || `Tiempo estimado: ${method.estimated_delivery}` }}
+                                        </span>
                                     </span>
                                 </span>
-                                <circle cx="12" cy="12" r="12" fill="#fff" class="text-white h-5 w-5" />
-                                <span v-if="form.shipping_method === 'standard'" class="text-[#F41D27]">
-                                    <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                    </svg>
-                                </span>
+                                <!-- Delivery Cost Status -->
+                                <div class="flex items-center gap-4">
+                                    <span v-if="method.base_price > 0" class="text-sm font-bold text-gray-900">{{ $formatCurrency(method.base_price) }}</span>
+                                    <span v-else class="text-sm font-extrabold text-[#1CA862]">Gratis</span>
+                                    
+                                    <!-- Selected Checkmark -->
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors"
+                                        :class="form.shipping_method === method.code ? 'border-[#F41D27] bg-[#F41D27]' : 'border-gray-300'">
+                                        <svg v-if="form.shipping_method === method.code" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </label>
-
-                            <!-- Express Shipping (Example) -->
-                            <label class="relative flex cursor-pointer rounded-lg border bg-white p-5 shadow-sm focus:outline-none"
-                                :class="{'border-[#F41D27] ring-1 ring-[#F41D27]': form.shipping_method === 'express', 'border-gray-300': form.shipping_method !== 'express'}"
-                            >
-                                <input type="radio" v-model="form.shipping_method" value="express" class="sr-only">
-                                <span class="flex flex-1">
-                                    <span class="flex flex-col">
-                                        <span class="block text-sm font-bold text-gray-900">Retiro en Tienda</span>
-                                        <span class="mt-1 flex items-center text-sm text-gray-500">Visita nuestras sedes para retirar tu paquete sin costo.</span>
-                                    </span>
-                                </span>
-                                <span v-if="form.shipping_method === 'express'" class="text-[#F41D27]">
-                                    <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                    </svg>
-                                </span>
-                            </label>
+                            
+                            <div v-if="shippingMethods.length === 0" class="p-4 text-center text-gray-500 border border-gray-200 rounded-lg">
+                                No hay métodos de envío disponibles.
+                            </div>
                         </div>
                         
                         <div class="mt-8 flex justify-between items-center">
@@ -108,15 +114,31 @@ const submit = () => {
                     <dl class="space-y-4">
                         <div class="flex items-center justify-between text-sm">
                             <dt class="text-gray-600">Subtotal</dt>
-                            <dd class="font-bold text-gray-900">{{ $formatCurrency(totals.total) }}</dd>
+                            <dd class="font-bold text-gray-900">{{ $formatCurrency(totals.subtotal) }}</dd>
+                        </div>
+                        <div v-if="totals.discount_amount > 0" class="flex items-center justify-between text-sm">
+                            <dt class="text-gray-600 flex items-center gap-1">
+                                Descuentos
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                            </dt>
+                            <dd class="font-bold text-green-600">-{{ $formatCurrency(totals.discount_amount) }}</dd>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <dt class="text-gray-600">Cargo de envío</dt>
-                            <dd class="font-bold text-gray-900">{{ form.shipping_method === 'standard' ? 'Por Calcular' : 'Gratis' }}</dd>
+                            <dd class="font-bold text-gray-900">
+                                <template v-if="shippingMethods.find(m => m.code === form.shipping_method)?.base_price > 0">
+                                    {{ $formatCurrency(shippingMethods.find(m => m.code === form.shipping_method)?.base_price) }}
+                                </template>
+                                <template v-else>
+                                    <span class="text-[#1CA862]">Gratis</span>
+                                </template>
+                            </dd>
                         </div>
                         <div class="border-t border-gray-200 pt-4 flex items-center justify-between font-bold text-lg mt-4">
                             <dt class="text-[#040054]">Total a Pagar</dt>
-                            <dd class="text-[#F41D27]">{{ $formatCurrency(totals.total) }}</dd>
+                            <dd class="text-[#F41D27]">
+                                {{ $formatCurrency(totals.total + Number(shippingMethods.find(m => m.code === form.shipping_method)?.base_price || 0)) }}
+                            </dd>
                         </div>
                     </dl>
                 </div>

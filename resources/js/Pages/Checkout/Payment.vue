@@ -11,6 +11,10 @@ const props = defineProps({
         default: () => ({ total: 0 })
     },
     sessionData: Object as () => any,
+    shippingMethods: {
+        type: Array as () => any[],
+        default: () => []
+    },
 });
 
 // @ts-ignore
@@ -76,7 +80,7 @@ const submit = () => {
                             <p><strong class="font-semibold text-gray-900">Email:</strong> {{ sessionData?.address?.email }}</p>
                             <p><strong class="font-semibold text-gray-900">Teléfono:</strong> {{ sessionData?.address?.phone }}</p>
                             <p><strong class="font-semibold text-gray-900">Dirección a enviar:</strong> {{ sessionData?.address?.address }}, {{ sessionData?.address?.city }} ({{ sessionData?.address?.postal_code }})</p>
-                            <p><strong class="font-semibold text-gray-900">Tipo de entrega:</strong> {{ sessionData?.shipping?.shipping_method === 'express' ? 'Retiro en Tienda' : 'Envío Standard' }}</p>
+                            <p><strong class="font-semibold text-gray-900">Tipo de entrega:</strong> {{ shippingMethods.find(m => m.code === sessionData?.shipping?.shipping_method)?.name || sessionData?.shipping?.shipping_method }}</p>
                         </div>
                     </div>
 
@@ -100,7 +104,7 @@ const submit = () => {
                     <ul role="list" class="divide-y divide-gray-200">
                         <li v-for="(item, idx) in items" :key="idx" class="flex py-4">
                             <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white">
-                                <img :src="getProductImage(item.product)" class="h-full w-full object-cover object-center">
+                                <img :src="item.product ? getProductImage(item.product) : '/storage/placeholder.png'" class="h-full w-full object-cover object-center">
                             </div>
                             <div class="ml-4 flex flex-1 flex-col justify-center">
                                 <div class="flex justify-between text-sm font-bold text-gray-900">
@@ -114,15 +118,31 @@ const submit = () => {
                     <dl class="border-t border-gray-200 pt-6 mt-6 space-y-4">
                         <div class="flex items-center justify-between text-sm">
                             <dt class="text-gray-600">Subtotal</dt>
-                            <dd class="font-bold text-gray-900">{{ $formatCurrency(totals.total) }}</dd>
+                            <dd class="font-bold text-gray-900">{{ $formatCurrency(totals.subtotal) }}</dd>
+                        </div>
+                        <div v-if="totals.discount_amount > 0" class="flex items-center justify-between text-sm">
+                            <dt class="text-gray-600 flex items-center gap-1">
+                                Descuentos
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                            </dt>
+                            <dd class="font-bold text-green-600">-{{ $formatCurrency(totals.discount_amount) }}</dd>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <dt class="text-gray-600">Cargo de envío</dt>
-                            <dd class="font-bold text-gray-900">{{ sessionData?.shipping?.shipping_method === 'express' ? 'Gratis' : 'Por Calcular' }}</dd>
+                            <dd class="font-bold text-gray-900">
+                                <template v-if="shippingMethods.find(m => m.code === sessionData?.shipping?.shipping_method)?.base_price > 0">
+                                    {{ $formatCurrency(shippingMethods.find(m => m.code === sessionData?.shipping?.shipping_method)?.base_price) }}
+                                </template>
+                                <template v-else>
+                                    <span class="text-[#1CA862]">Gratis</span>
+                                </template>
+                            </dd>
                         </div>
                         <div class="border-t border-gray-200 pt-4 flex items-center justify-between font-bold text-xl mt-4">
                             <dt class="text-[#040054]">Total a Pagar</dt>
-                            <dd class="text-[#F41D27]">{{ $formatCurrency(totals.total) }}</dd>
+                            <dd class="text-[#F41D27]">
+                                {{ $formatCurrency(totals.total + Number(shippingMethods.find(m => m.code === sessionData?.shipping?.shipping_method)?.base_price || 0)) }}
+                            </dd>
                         </div>
                     </dl>
                 </div>
