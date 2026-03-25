@@ -22,9 +22,15 @@ class OrderObserver
 
     private function createPayment(Order $order): void
     {
+        // Evitar duplicados si ya existe un pago asociado
+        if (Payment::where('order_id', $order->id)->exists()) {
+            return;
+        }
         // Buscar método de pago por defecto o el primero activo
         $defaultPaymentMethod = PaymentMethod::active()
-            ->where('code', 'credit_card') // Método por defecto
+            ->where('code', 'whatsapp') // Cambiado a whatsapp como defecto principal
+            ->first() ?? PaymentMethod::active()
+            ->where('code', 'credit_card')
             ->first() ?? PaymentMethod::active()->first();
 
         if (!$defaultPaymentMethod) {
@@ -43,7 +49,7 @@ class OrderObserver
             'payment_method_id' => $defaultPaymentMethod->id,
             'transaction_id' => Payment::generateTransactionId(),
             'amount' => $order->total_amount,
-            'currency' => 'EUR', // Por defecto, se puede hacer dinámico
+            'currency' => 'USD', // Cambiado a USD como moneda base del sistema
             'status' => 'pending',
             'payment_date' => now(),
             'notes' => "Pago creado automáticamente para el pedido #{$order->order_number}",

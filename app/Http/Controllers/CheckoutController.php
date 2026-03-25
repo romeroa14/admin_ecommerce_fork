@@ -202,13 +202,15 @@ class CheckoutController extends Controller
                 'country' => 'Venezuela'
             ]);
 
-            $order = Order::createFromCart($cart, [
-                'shipping_address_id' => $address->id,
-                'billing_address_id' => $address->id,
-                'status' => 'pending',
-                'user_id' => $user ? $user->id : null,
-                'shipping_id' => $sessionData['shipping']['shipping_id'] ?? null,
-            ]);
+            $order = Order::withoutEvents(function () use ($cart, $address, $user, $sessionData) {
+                return Order::createFromCart($cart, [
+                    'shipping_address_id' => $address->id,
+                    'billing_address_id' => $address->id,
+                    'status' => 'pending',
+                    'user_id' => $user ? $user->id : null,
+                    'shipping_id' => $sessionData['shipping']['shipping_id'] ?? null,
+                ]);
+            });
 
             $paymentMethodCode = $request->payment_method ?? 'whatsapp';
             $pm = \App\Models\PaymentMethod::where('code', $paymentMethodCode)->first();

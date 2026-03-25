@@ -54,8 +54,10 @@ class PaymentForm
                             ->label('Monto')
                             ->required()
                             ->numeric()
-                            ->prefix(current_currency_symbol())
-                            ->step(0.01),
+                            ->prefix(fn() => current_currency_symbol())
+                            ->step(0.01)
+                            ->formatStateUsing(fn ($state) => convert_currency($state, \App\Models\Currency::default()->first(), current_currency()))
+                            ->dehydrateStateUsing(fn ($state) => convert_currency($state, current_currency(), \App\Models\Currency::default()->first())),
 
                         TextInput::make('currency')
                             ->label('Moneda')
@@ -113,8 +115,10 @@ class PaymentForm
                         TextInput::make('refund_amount')
                             ->label('Monto de Reembolso')
                             ->numeric()
-                            ->prefix('€')
-                            ->step(0.01),
+                            ->prefix(fn() => current_currency_symbol())
+                            ->step(0.01)
+                            ->formatStateUsing(fn ($state) => convert_currency($state, \App\Models\Currency::default()->first(), current_currency()))
+                            ->dehydrateStateUsing(fn ($state) => convert_currency($state, current_currency(), \App\Models\Currency::default()->first())),
 
                         DatePicker::make('refund_date')
                             ->label('Fecha de Reembolso'),

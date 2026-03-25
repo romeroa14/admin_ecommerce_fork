@@ -76,11 +76,23 @@ const currentShippingCost = computed(() => {
 
         <h2 class="text-2xl font-black text-gray-900 mb-8 tracking-tight">Información de Pago</h2>
 
+        <!-- Error display -->
+        <div v-if="form.errors.error" class="mb-8 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-medium rounded-r-lg shadow-sm">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span>{{ form.errors.error }}</span>
+            </div>
+        </div>
+
         <form id="payment-form" @submit.prevent="submit">
             <!-- Dynamic Payment Methods List -->
             <div class="space-y-4">
                 <div v-for="method in paymentMethods" :key="method.id" class="relative block cursor-pointer rounded-lg border bg-white p-5 shadow-sm focus:outline-none transition-all duration-200"
-                    :class="{'border-[#f6ab1a] ring-1 ring-[#f6ab1a] bg-yellow-50/20': form.payment_method === method.code, 'border-gray-200 hover:border-gray-300': form.payment_method !== method.code}"
+                    :class="{
+                        'border-[#25D366] ring-1 ring-[#25D366] bg-green-50/20': form.payment_method === method.code && method.code === 'whatsapp',
+                        'border-[#f6ab1a] ring-1 ring-[#f6ab1a] bg-yellow-50/20': form.payment_method === method.code && method.code !== 'whatsapp',
+                        'border-gray-200 hover:border-gray-300': form.payment_method !== method.code
+                    }"
                     @click="form.payment_method = method.code">
                     
                     <label class="flex items-center gap-4 cursor-pointer">
@@ -102,7 +114,9 @@ const currentShippingCost = computed(() => {
                         
                         <!-- Selected Checkmark -->
                         <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors"
-                            :class="form.payment_method === method.code ? 'border-[#f6ab1a] bg-[#f6ab1a]' : 'border-gray-300'">
+                            :class="form.payment_method === method.code 
+                                ? (method.code === 'whatsapp' ? 'border-[#25D366] bg-[#25D366]' : 'border-[#f6ab1a] bg-[#f6ab1a]') 
+                                : 'border-gray-300'">
                             <svg v-if="form.payment_method === method.code" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>

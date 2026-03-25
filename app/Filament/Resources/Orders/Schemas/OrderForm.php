@@ -262,6 +262,64 @@ class OrderForm
                                         self::calculateTotal($set, $get);
                                     })
                                     ->helperText('Se calcula automáticamente, pero puedes editarlo manualmente'),
+
+                                Placeholder::make('payments_summary')
+                                    ->label('Pagos Relacionados')
+                                    ->content(function ($record) {
+                                        if (!$record || !$record->id) {
+                                            return 'Sin pagos registrados';
+                                        }
+                                        
+                                        $payments = \App\Models\Payment::where('order_id', $record->id)->get();
+                                        
+                                        if ($payments->isEmpty()) {
+                                            return 'No hay pagos asociados a este pedido aún.';
+                                        }
+                                        
+                                        $rows = $payments->map(function ($payment) {
+                                            $statusColor = match ($payment->status) {
+                                                'completed' => '#22c55e',
+                                                'pending' => '#f59e0b',
+                                                'failed' => '#ef4444',
+                                                default => '#64748b',
+                                            };
+                                            
+                                            $amount = \App\Helpers\CurrencyHelper::formatAmount($payment->amount);
+                                            $date = $payment->created_at->format('d/m/Y H:i');
+                                            
+                                            // Link to payment
+                                            $url = route('filament.admin.resources.payments.edit', $payment->id);
+                                            
+                                            return "
+                                                <tr style='border-bottom: 1px solid #e2e8f0;'>
+                                                    <td style='padding: 8px 0;'><a href='{$url}' style='color: #3b82f6; text-decoration: underline;'>{$payment->transaction_id}</a></td>
+                                                    <td style='padding: 8px 0;'>{$payment->payment_method}</td>
+                                                    <td style='padding: 8px 0; color: {$statusColor}; font-weight: 600;'>" . ucfirst($payment->status) . "</td>
+                                                    <td style='padding: 8px 0; text-align: right; font-weight: bold;'>{$amount}</td>
+                                                </tr>
+                                            ";
+                                        })->implode('');
+                                        
+                                        return "
+                                            <div style='background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;'>
+                                                <table style='width: 100%; border-collapse: collapse; font-size: 13px;'>
+                                                    <thead>
+                                                        <tr style='text-align: left; color: #64748b; border-bottom: 2px solid #e2e8f0;'>
+                                                            <th style='padding-bottom: 5px;'>ID Transacción</th>
+                                                            <th style='padding-bottom: 5px;'>Método</th>
+                                                            <th style='padding-bottom: 5px;'>Estado</th>
+                                                            <th style='padding-bottom: 5px; text-align: right;'>Monto</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {$rows}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ";
+                                    })
+                                    ->html()
+                                    ->columnSpanFull(),
                             ]),
                     ])
                     ->collapsible(),

@@ -46,7 +46,7 @@ class PaymentsTable
                 TextColumn::make('amount')
                     ->label('Monto')
                     ->getStateUsing(function ($record) {
-                        return current_currency_symbol() . ' ' . $record->amount;
+                        return currency($record->amount);
                     })
                     ->sortable()
                     ->alignEnd(),
