@@ -116,19 +116,11 @@ class OrderForm
                             ->schema([
                                 Select::make('shipping_address_id')
                                     ->label('Dirección de Envío')
-                                    ->options(function (callable $get) {
-                                        $userId = $get('user_id');
-                                        if (!$userId) {
-                                            return [];
-                                        }
-                                        
-                                        $addresses = Address::where('user_id', $userId)->get();
-                                        $options = [];
-                                        foreach ($addresses as $address) {
-                                            $options[$address->id] = $address->first_name . ' ' . $address->last_name . ' - ' . $address->address_line_1;
-                                        }
-                                        return $options;
-                                    })
+                                    ->relationship(
+                                        name: 'shippingAddress',
+                                        modifyQueryUsing: fn (callable $get, \Illuminate\Database\Eloquent\Builder $query) => $query->where('user_id', $get('user_id')),
+                                    )
+                                    ->getOptionLabelFromRecordUsing(fn (\App\Models\Address $record) => "{$record->first_name} {$record->last_name} - {$record->address_line_1}")
                                     ->searchable()
                                     ->preload()
                                     ->createOptionForm([
@@ -160,24 +152,16 @@ class OrderForm
                                         
                                         $data['user_id'] = $userId;
                                         $data['type'] = 'shipping';
-                                        return Address::create($data)->id;
+                                        return \App\Models\Address::create($data)->id;
                                     }),
 
                                 Select::make('billing_address_id')
                                     ->label('Dirección de Facturación')
-                                    ->options(function (callable $get) {
-                                        $userId = $get('user_id');
-                                        if (!$userId) {
-                                            return [];
-                                        }
-                                        
-                                        $addresses = Address::where('user_id', $userId)->get();
-                                        $options = [];
-                                        foreach ($addresses as $address) {
-                                            $options[$address->id] = $address->first_name . ' ' . $address->last_name . ' - ' . $address->address_line_1;
-                                        }
-                                        return $options;
-                                    })
+                                    ->relationship(
+                                        name: 'billingAddress',
+                                        modifyQueryUsing: fn (callable $get, \Illuminate\Database\Eloquent\Builder $query) => $query->where('user_id', $get('user_id')),
+                                    )
+                                    ->getOptionLabelFromRecordUsing(fn (\App\Models\Address $record) => "{$record->first_name} {$record->last_name} - {$record->address_line_1}")
                                     ->searchable()
                                     ->preload()
                                     ->createOptionForm([
@@ -209,7 +193,7 @@ class OrderForm
                                         
                                         $data['user_id'] = $userId;
                                         $data['type'] = 'billing';
-                                        return Address::create($data)->id;
+                                        return \App\Models\Address::create($data)->id;
                                     }),
                             ]),
                     ])
@@ -271,6 +255,8 @@ class OrderForm
                                     ->numeric()
                                     ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
+                                    ->formatStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Models\Currency::default()->first(), \App\Helpers\CurrencyHelper::getCurrentCurrency()))
+                                    ->dehydrateStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Helpers\CurrencyHelper::getCurrentCurrency(), \App\Models\Currency::default()->first()))
                                     ->live()
                                     ->afterStateUpdated(function (callable $set, callable $get) {
                                         self::calculateTotal($set, $get);
@@ -292,6 +278,8 @@ class OrderForm
                                     ->numeric()
                                     ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
+                                    ->formatStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Models\Currency::default()->first(), \App\Helpers\CurrencyHelper::getCurrentCurrency()))
+                                    ->dehydrateStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Helpers\CurrencyHelper::getCurrentCurrency(), \App\Models\Currency::default()->first()))
                                     ->disabled()
                                     ->dehydrated(),
 
@@ -301,6 +289,8 @@ class OrderForm
                                     ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                                     ->step(0.01)
                                     ->default(0)
+                                    ->formatStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Models\Currency::default()->first(), \App\Helpers\CurrencyHelper::getCurrentCurrency()))
+                                    ->dehydrateStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Helpers\CurrencyHelper::getCurrentCurrency(), \App\Models\Currency::default()->first()))
                                     ->live()
                                     ->afterStateUpdated(function (callable $set, callable $get) {
                                         self::calculateTotal($set, $get);
@@ -313,6 +303,8 @@ class OrderForm
                             ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                             ->step(0.01)
                             ->default(0)
+                            ->formatStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Models\Currency::default()->first(), \App\Helpers\CurrencyHelper::getCurrentCurrency()))
+                            ->dehydrateStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Helpers\CurrencyHelper::getCurrentCurrency(), \App\Models\Currency::default()->first()))
                             ->live()
                             ->afterStateUpdated(function (callable $set, callable $get) {
                                 self::calculateTotal($set, $get);
@@ -325,6 +317,8 @@ class OrderForm
                             ->numeric()
                             ->prefix(fn() => \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol())
                             ->step(0.01)
+                            ->formatStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Models\Currency::default()->first(), \App\Helpers\CurrencyHelper::getCurrentCurrency()))
+                            ->dehydrateStateUsing(fn ($state) => \App\Helpers\CurrencyHelper::convertAmount($state, \App\Helpers\CurrencyHelper::getCurrentCurrency(), \App\Models\Currency::default()->first()))
                             ->disabled()
                             ->dehydrated()
                             ->columnSpanFull(),
@@ -347,8 +341,7 @@ class OrderForm
                                         $shippingInfo = " ({$shippingMethod->name})";
                                     }
                                 }
-                                
-                                // Obtener símbolo de moneda actual
+                                // Obtener símbolo de moneda actual (las variables ya vienen con la tasa aplicada del input)
                                 $currencySymbol = \App\Helpers\CurrencyHelper::getCurrentCurrencySymbol();
                                 
                                 return "
