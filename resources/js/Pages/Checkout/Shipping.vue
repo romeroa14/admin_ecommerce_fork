@@ -75,7 +75,7 @@ const currentShippingCost = computed(() => {
                     v-for="method in shippingMethods" 
                     :key="method.id"
                     class="relative flex cursor-pointer rounded-lg border bg-white p-5 shadow-sm focus:outline-none transition-all duration-200"
-                    :class="{'border-[#f6ab1a] ring-1 ring-[#f6ab1a] bg-yellow-50/20': form.shipping_method === method.code, 'border-gray-200 hover:border-gray-300': form.shipping_method !== method.code}"
+                    :class="{'border-[#040054] ring-1 ring-[#040054] bg-blue-50/20': form.shipping_method === method.code, 'border-gray-200 hover:border-gray-300': form.shipping_method !== method.code}"
                 >
                     <input type="radio" v-model="form.shipping_method" :value="method.code" class="sr-only">
                     <span class="flex flex-1">
@@ -93,7 +93,7 @@ const currentShippingCost = computed(() => {
                         
                         <!-- Selected Checkmark -->
                         <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors"
-                            :class="form.shipping_method === method.code ? 'border-[#f6ab1a] bg-[#f6ab1a]' : 'border-gray-300'">
+                            :class="form.shipping_method === method.code ? 'border-[#040054] bg-[#040054]' : 'border-gray-300'">
                             <svg v-if="form.shipping_method === method.code" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
