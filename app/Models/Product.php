@@ -20,6 +20,7 @@ class Product extends Model
         'cost',
         'discount_percentage',
         'category_id',
+        'subcategory_id',
         'stock',
         'low_stock_threshold',
         'track_inventory',
@@ -55,6 +56,7 @@ class Product extends Model
         'cost' => 'required|numeric',
         'discount_percentage' => 'required|numeric',
         'category_id' => 'required|exists:categories,id',
+        'subcategory_id' => 'nullable|exists:subcategories,id',
         'stock' => 'required|numeric',
         'low_stock_threshold' => 'required|numeric',
         'track_inventory' => 'required|boolean',
@@ -73,6 +75,11 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function subcategory(): BelongsTo
+    {
+        return $this->belongsTo(Subcategory::class, 'subcategory_id');
     }
 
     public function variants(): BelongsToMany

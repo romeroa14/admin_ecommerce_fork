@@ -47,6 +47,9 @@ class HandleInertiaRequests extends Middleware
             // Categories - available in navbar dropdown
             'categories' => function () {
                 return Category::active()
+                    ->with(['subcategories' => function($q) {
+                        $q->active()->ordered()->select('id', 'name', 'slug', 'category_id');
+                    }])
                     ->ordered()
                     ->take(8) // Limit to 8 main categories in navbar
                     ->get(['id', 'name', 'slug', 'icon'])

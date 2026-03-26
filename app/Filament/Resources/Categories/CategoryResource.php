@@ -7,6 +7,7 @@ use App\Filament\Resources\Categories\Pages\EditCategory;
 use App\Filament\Resources\Categories\Pages\ListCategories;
 use App\Filament\Resources\Categories\Schemas\CategoryForm;
 use App\Filament\Resources\Categories\Tables\CategoriesTable;
+use App\Filament\Resources\Categories\RelationManagers\SubcategoriesRelationManager;
 use App\Models\Category;
 use BackedEnum;
 use UnitEnum;
@@ -46,7 +47,7 @@ class CategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            // SubcategoriesRelationManager::class,
         ];
     }
 

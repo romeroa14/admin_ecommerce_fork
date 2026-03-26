@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 
-class Category extends Model
+class Subcategory extends Model
 {
     protected $fillable = [
+        'category_id',
         'name',
         'slug',
         'description',
         'image',
-        'icon',
         'is_active',
         'order',
     ];
@@ -23,25 +23,19 @@ class Category extends Model
         'is_active' => 'boolean',
     ];
 
-    /**
-     * Scope to get only active categories
-     */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
-    /**
-     * Scope to order categories by 'order' field
-     */
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('order', 'asc')->orderBy('name', 'asc');
     }
 
-    public function subcategories(): HasMany
+    public function category(): BelongsTo
     {
-        return $this->hasMany(Subcategory::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function products(): HasMany

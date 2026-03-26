@@ -2,41 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Models\Subcategory;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class CategoryController extends Controller
+class SubcategoryController extends Controller
 {
     /**
-     * Display all categories
+     * Display products from a specific subcategory
      */
-    public function index()
+    public function show(Request $request, Subcategory $subcategory)
     {
-        $categories = Category::active()
-            ->ordered()
-            ->withCount('products')
-            ->get();
-
-        return Inertia::render('Categories/Index', [
-            'categories' => $categories,
-        ]);
-    }
-
-    /**
-     * Display products from a specific category
-     * Reuses Products/Index.vue with category filter pre-applied
-     */
-    public function show(Request $request, Category $category)
-    {
-        // Start query: products belonging to this category or ANY of its subcategories
         $query = Product::active()
-            ->where(function ($q) use ($category) {
-                $subIds = $category->subcategories()->pluck('id')->toArray();
-                $q->where('category_id', $category->id)
-                  ->orWhereIn('subcategory_id', $subIds);
-            })
+            ->where('subcategory_id', $subcategory->id)
             ->with(['category', 'subcategory', 'productImages']);
 
         // Filter by stock availability
@@ -74,31 +54,29 @@ class CategoryController extends Controller
         }
 
         $products = $query->paginate(12)->withQueryString();
-        $categories = Category::all();
+        $categories = Category::active()->get();
 
-        // Pre-load subcategories to show menu in frontend
-        $category->load(['subcategories']);
+        // Load the main category for breadcrumbs
+        $subcategory->load('category');
 
-        // Reuse Products/Index.vue but with category context
         return Inertia::render('Products/Index', [
             'products' => $products,
             'categories' => $categories,
             'filters' => [
                 'stock' => $request->stock,
-                'category' => $category->id, // Pre-filter by this category
+                'category_id' => $subcategory->category_id,
+                'subcategory_id' => $subcategory->id,
                 'min_price' => $request->min_price,
                 'max_price' => $request->max_price,
                 'sort' => $sortBy,
             ],
-            // Pass category info for breadcrumbs and header
             'currentCategory' => [
-                'id' => $category->id,
-                'name' => $category->name,
-                'slug' => $category->slug,
-                'description' => $category->description,
-                'icon' => $category->icon,
-                'subcategories' => $category->subcategories,
-                'parent' => null, // Root categories have no parent now
+                'id' => $subcategory->id,
+                'name' => $subcategory->name,
+                'slug' => $subcategory->slug,
+                'description' => $subcategory->description,
+                'parent' => $subcategory->category, // Support breadcrumbs: Home > Category > Subcategory
+                'is_subcategory' => true,
             ],
         ]);
     }

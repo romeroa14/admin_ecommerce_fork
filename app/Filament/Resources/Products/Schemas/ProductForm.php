@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Models\Category;
+use App\Models\Subcategory;
 use App\Models\Tag;
 use App\Models\Currency;
 use App\Helpers\CurrencyHelper;
@@ -21,6 +22,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Grid;
 use Illuminate\Support\Str;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductForm
 {
@@ -112,10 +114,12 @@ class ProductForm
                         Grid::make(2)
                             ->schema([
                                 Select::make('category_id')
-                                    ->label('Categoría')
-                                    ->relationship('category', 'name')
+                                    ->label('Categoría Principal')
+                                    ->relationship('category', 'name', modifyQueryUsing: fn ($query) => $query->active()->ordered())
                                     ->searchable()
                                     ->preload()
+                                    ->live()
+                                    ->afterStateUpdated(fn(Set $set) => $set('subcategory_id', null))
                                     ->createOptionForm([
                                         TextInput::make('name')
                                             ->label('Nombre')
@@ -132,6 +136,35 @@ class ProductForm
                                     ])
                                     ->createOptionUsing(function (array $data): int {
                                         return Category::create($data)->getKey();
+                                    }),
+
+                                 Select::make('subcategory_id')
+                                    ->label('Subcategoría (Opcional)')
+                                    ->relationship(
+                                        name: 'subcategory',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: fn (Builder $query, Get $get) => $query->where('category_id', $get('category_id'))->active()->ordered()
+                                    )
+                                    ->searchable()
+                                    ->preload()
+                                    ->visible(fn (Get $get) => filled($get('category_id')))
+                                    ->createOptionForm([
+                                        TextInput::make('name')
+                                            ->label('Nombre de Subcategoría')
+                                            ->required(),
+                                        TextInput::make('slug')
+                                            ->label('Slug')
+                                            ->required()
+                                            ->unique(table: 'subcategories'),
+                                        Textarea::make('description')
+                                            ->label('Descripción'),
+                                        Toggle::make('is_active')
+                                            ->label('Activo')
+                                            ->default(true),
+                                    ])
+                                    ->createOptionUsing(function (array $data, Get $get): int {
+                                        $data['category_id'] = $get('category_id');
+                                        return Subcategory::create($data)->getKey();
                                     }),
                             ]),
 

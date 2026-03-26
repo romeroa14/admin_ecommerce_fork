@@ -87,6 +87,21 @@ const activeFiltersCount = computed(() => {
 // Price range percentage for visual
 const minPercentage = computed(() => (minPrice.value / 10000) * 100);
 const maxPercentage = computed(() => (maxPrice.value / 10000) * 100);
+
+// Dynamic Breadcrumbs
+const breadcrumbs = computed(() => {
+    const items = [{ label: 'Categorías', href: '/categories' }];
+    if (props.currentCategory) {
+        if (props.currentCategory.parent) {
+            items.push({ 
+                label: props.currentCategory.parent.name, 
+                href: `/categories/${props.currentCategory.parent.slug}` 
+            });
+        }
+        items.push({ label: props.currentCategory.name });
+    }
+    return items;
+});
 </script>
 
 <template>
@@ -98,10 +113,7 @@ const maxPercentage = computed(() => (maxPrice.value / 10000) * 100);
                 <!-- Breadcrumbs -->
                 <Breadcrumbs 
                     v-if="currentCategory"
-                    :items="[
-                        { label: 'Categorías', href: '/categories' },
-                        { label: currentCategory.name }
-                    ]"
+                    :items="breadcrumbs"
                 />
                 
                 <!-- Header -->
@@ -115,6 +127,21 @@ const maxPercentage = computed(() => (maxPrice.value / 10000) * 100);
                     <p class="mt-2 text-lg text-gray-600">
                         {{ currentCategory ? currentCategory.description || `Todos los productos de ${currentCategory.name}` : 'Encuentra lo que buscas al mejor precio' }}
                     </p>
+                </div>
+
+                <!-- Subcategories Menu -->
+                <div v-if="currentCategory && currentCategory.subcategories && currentCategory.subcategories.length > 0" class="mb-10 text-center">
+                    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Filtrar por subcategoría</h2>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <Link 
+                            v-for="child in currentCategory.subcategories" 
+                            :key="child.id" 
+                            :href="`/subcategories/${child.slug}`"
+                            class="px-6 py-2.5 bg-white border-2 border-[#040054] text-[#040054] rounded-full font-bold hover:bg-[#040054] hover:text-white hover:scale-105 transition-all shadow-sm"
+                        >
+                            {{ child.name }}
+                        </Link>
+                    </div>
                 </div>
 
                 <!-- Filter Button and Results -->

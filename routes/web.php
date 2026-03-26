@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubcategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ReviewController;
@@ -72,9 +73,10 @@ Route::post('/products/{product:slug}/reviews', [ReviewController::class, 'store
 Route::post('/reviews/{review}/helpful', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
 Route::post('/reviews/{review}/unhelpful', [ReviewController::class, 'markUnhelpful'])->name('reviews.unhelpful');
 
-// Categories
+// Categories & Subcategories
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/subcategories/{subcategory:slug}', [SubcategoryController::class, 'show'])->name('subcategories.show');
 
 // Tags
 Route::get('/tags/{tag:slug}', [\App\Http\Controllers\TagController::class, 'show'])->name('tags.show');

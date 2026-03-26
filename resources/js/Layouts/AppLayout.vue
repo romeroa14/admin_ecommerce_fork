@@ -148,7 +148,7 @@ const announcements = [
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
-                                    <span class="font-medium hidden lg:block">{{ user ? 'Mi cuenta' : 'Accesoo' }}</span>
+                                    <span class="font-medium hidden lg:block">{{ user ? 'Mi cuenta' : 'Acceso' }}</span>
                                 </Link>
                                 <!-- Dropdown if logged in -->
                                 <div v-if="user" class="absolute right-0 top-full -mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-100 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
@@ -205,10 +205,22 @@ const announcements = [
                         <li>
                             <Link href="/" class="hover:text-[#F41D27] whitespace-nowrap transition-colors">Inicio</Link>
                         </li>
-                        <li v-for="cat in categories" :key="cat.id">
-                            <Link :href="`/categories/${cat.slug}`" class="hover:text-[#F41D27] whitespace-nowrap transition-colors">
+                        <li v-for="cat in categories" :key="cat.id" class="relative group">
+                            <Link :href="`/categories/${cat.slug}`" class="flex items-center gap-1 hover:text-[#F41D27] whitespace-nowrap transition-colors py-2">
                                 {{ cat.name }}
+                                <svg v-if="cat.subcategories && cat.subcategories.length" class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                             </Link>
+
+                            <!-- Hover Dropdown for Subcategories -->
+                            <div v-if="cat.subcategories && cat.subcategories.length" class="absolute left-0 top-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 px-0 pt-0">
+                                <ul class="bg-white rounded-lg shadow-xl border border-gray-100 py-2 min-w-[220px] relative before:absolute before:-top-2 before:left-0 before:w-full before:h-2">
+                                    <li v-for="child in cat.subcategories" :key="child.id">
+                                        <Link :href="`/subcategories/${child.slug}`" class="block px-4 py-2 hover:bg-gray-50 hover:text-[#040054] text-gray-700 font-medium transition-colors">
+                                            {{ child.name }}
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
                 </div>

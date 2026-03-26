@@ -11,7 +11,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::active()->with(['category', 'productImages']);
+        $query = Product::active()->with(['category', 'subcategory', 'productImages']);
 
         // Filter by text search (LIKE)
         if ($request->has('search') && $request->search) {
@@ -76,7 +76,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load(['category', 'productImages', 'variants.variantGroup', 'tags']);
+        $product->load(['category', 'subcategory', 'productImages', 'variants.variantGroup', 'tags']);
 
         // Check stock logic
         $isInStock = $product->in_stock;

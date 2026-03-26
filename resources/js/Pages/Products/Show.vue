@@ -9,25 +9,49 @@ import { getProductImage, getAllProductImages } from '@/composables/useProductIm
 // @ts-ignore
 const route = window.route;
 
-const props = defineProps({
-    product: {
-        type: Object,
-        required: true,
-    },
-    isInStock: Boolean,
-    similarProducts: {
-        type: Array,
-        default: () => [],
-    },
-    reviews: {
-        type: Array,
-        default: () => [],
-    },
+interface BaseProduct {
+    id: number;
+    name: string;
+    slug: string;
+    price: number;
+    compare_price?: number;
+    images?: string[];
+    product_images?: any[];
+    category?: { name: string, slug: string };
+    subcategory?: { name: string, slug: string };
+    short_description?: string;
+    discount_percentage?: number;
+    stock?: number;
+}
+
+interface Review {
+    id: number;
+    rating: number;
+    title: string;
+    comment: string;
+    reviewer_display_name: string;
+    is_verified_purchase: boolean;
+    image_url?: string;
+    youtube_embed_url?: string;
+    created_at: string;
+    user: { name: string };
+    helpful_count: number;
+    unhelpful_count: number;
+    has_voted_helpful?: boolean;
+    has_voted_unhelpful?: boolean;
+}
+
+const props = defineProps<{
+    product: any; // Using any for complex models to avoid deep interface bloat but keep reactive
+    isInStock: boolean;
+    similarProducts: BaseProduct[];
+    reviews: Review[];
     reviewStats: {
-        type: Object,
-        default: () => ({ average: 0, total: 0, ratings: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } }),
-    },
-});
+        average: number;
+        total: number;
+        ratings: Record<number, number>;
+    };
+}>();
 
 const form = useForm({
     product_id: props.product.id,
@@ -53,10 +77,11 @@ const canScrollRight = ref(false);
 // Review form
 const showReviewForm = ref(false);
 const reviewForm = useForm({
+    product_id: props.product.id,
     rating: 5,
     title: '',
     comment: '',
-    image: null,
+    image: null as File | null,
     youtube_url: '',
     reviewer_name: '',
     reviewer_email: '',
@@ -65,6 +90,24 @@ const reviewForm = useForm({
 const discount = computed(() => {
     if (!props.product.compare_price || props.product.compare_price <= props.product.price) return 0;
     return Math.round(((props.product.compare_price - props.product.price) / props.product.compare_price) * 100);
+});
+
+const breadcrumbsItems = computed(() => {
+    const items = [];
+    
+    if (props.product.category) {
+        items.push({ label: props.product.category.name, href: `/categories/${props.product.category.slug}` });
+    } else {
+        items.push({ label: 'Productos', href: '/products' });
+    }
+    
+    if (props.product.subcategory) {
+        items.push({ label: props.product.subcategory.name, href: `/subcategories/${props.product.subcategory.slug}` });
+    }
+    
+    items.push({ label: props.product.name });
+    
+    return items;
 });
 
 const groupedVariants = computed(() => {
@@ -143,12 +186,7 @@ const buyNow = () => {
         <div class="bg-white min-h-screen">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <!-- Breadcrumbs -->
-                <Breadcrumbs
-                    :items="[
-                        { label: product.category ? product.category.name : 'Productos', href: product.category ? `/categories/${product.category.slug}` : '/products' },
-                        { label: product.name }
-                    ]"
-                />
+                <Breadcrumbs :items="breadcrumbsItems" />
 
                 <!-- Main Product Section - Full Width -->
                 <div class="flex flex-col lg:flex-row gap-8 mt-6">
@@ -436,7 +474,7 @@ const buyNow = () => {
                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             loading="lazy"
                                         >
-                                        <div v-if="similar.stock > 0" class="absolute top-2 right-2">
+                                        <div v-if="(similar.stock || 0) > 0" class="absolute top-2 right-2">
                                             <span class="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">En Stock</span>
                                         </div>
                                     </div>
@@ -515,7 +553,7 @@ const buyNow = () => {
                                         </span>
                                     </div>
                                     <!-- Stock Badge -->
-                                    <div v-if="similar.stock > 0" class="absolute top-3 right-3">
+                                    <div v-if="(similar.stock || 0) > 0" class="absolute top-3 right-3">
                                         <span class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                                             En Stock
                                         </span>
@@ -663,7 +701,7 @@ const buyNow = () => {
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Imagen/Video (opcional)</label>
                                 <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#040054] transition-colors cursor-pointer">
-                                    <input type="file" @change="reviewForm.image = $event.target.files[0]" accept="image/*" class="hidden" id="review-image">
+                                    <input type="file" @change="reviewForm.image = ($event.target as HTMLInputElement).files?.[0] || null" accept="image/*" class="hidden" id="review-image">
                                     <label for="review-image" class="cursor-pointer">
                                         <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
