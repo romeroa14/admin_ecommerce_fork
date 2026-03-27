@@ -27,21 +27,31 @@ class ReviewController extends Controller
             $validated['image'] = $request->file('image')->store('reviews', 'public');
         }
 
-        // Add product_id and user_id if logged in
-        $validated['product_id'] = $product->id;
-        $validated['user_id'] = auth()->id();
-
-        // Set status based on configuration (auto-approve or pending)
-        $validated['status'] = config('reviews.auto_approve', false) ? 'approved' : 'pending';
-
-        if ($validated['status'] === 'approved') {
-            $validated['approved_at'] = now();
+        // Logic to link or create user
+        $userId = auth()->id();
+        
+        if (!$userId && $request->reviewer_email) {
+            $user = \App\Models\User::firstOrCreate(
+                ['email' => $request->reviewer_email],
+                [
+                    'name' => $request->reviewer_name,
+                    'type' => 'customer',
+                    'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
+                ]
+            );
+            $userId = $user->id;
         }
 
-        $review = Review::create($validated);
+        $validated['product_id'] = $product->id;
+        $validated['user_id'] = $userId;
 
-        return back()->with('success', 'Gracias por tu reseña! ' .
-            ($review->status === 'pending' ? 'Será revisada antes de publicarse.' : 'Tu reseña ha sido publicada.'));
+        // Force approved status by default so they appear immediately
+        $validated['status'] = 'approved';
+        $validated['approved_at'] = now();
+
+        $review = \App\Models\Review::create($validated);
+
+        return back()->with('success', '¡Gracias por tu reseña! Tu opinión ha sido publicada correctamente.');
     }
 
     public function markHelpful(Review $review)

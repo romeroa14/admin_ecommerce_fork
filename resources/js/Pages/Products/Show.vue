@@ -87,6 +87,16 @@ const reviewForm = useForm({
     reviewer_email: '',
 });
 
+const submitReview = () => {
+    reviewForm.post(route('reviews.store', props.product.slug), {
+        preserveScroll: true,
+        onSuccess: () => {
+            showReviewForm.value = false;
+            reviewForm.reset();
+        },
+    });
+};
+
 const discount = computed(() => {
     if (!props.product.compare_price || props.product.compare_price <= props.product.price) return 0;
     return Math.round(((props.product.compare_price - props.product.price) / props.product.compare_price) * 100);
@@ -243,11 +253,17 @@ const buyNow = () => {
                         </h1>
                         
                         <!-- Rating -->
-                        <div class="flex items-center space-x-2 mb-6">
-                            <div class="flex text-yellow-400">
+                        <div v-if="reviewStats.total > 0" class="flex items-center space-x-2 mb-6">
+                            <div class="flex">
+                                <svg v-for="i in 5" :key="i" class="w-5 h-5" :class="i <= Math.round(reviewStats.average) ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current'" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </div>
+                            <span class="text-gray-500 text-sm">({{ reviewStats.average }}/5 basado en {{ reviewStats.total }} opiniones)</span>
+                        </div>
+                        <div v-else class="flex items-center space-x-2 mb-6">
+                            <div class="flex text-gray-300">
                                 <svg v-for="i in 5" :key="i" class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                             </div>
-                            <span class="text-gray-500 text-sm">(4.8/5 basado en opiniones)</span>
+                            <span class="text-gray-400 text-sm">(Sin opiniones aún)</span>
                         </div>
 
                         <!-- Price -->
@@ -292,11 +308,28 @@ const buyNow = () => {
 
                         <!-- Quantity -->
                         <div class="mb-6">
-                            <label class="text-sm font-semibold text-gray-900 mb-3 block">Cantidad:</label>
-                            <div class="flex items-center border-2 border-gray-300 rounded-lg bg-white w-32">
-                                <button @click="currentQuantity > 1 && currentQuantity--" class="px-4 py-3 text-gray-600 hover:bg-gray-100 transition">-</button>
-                                <input v-model="currentQuantity" readonly class="w-16 text-center border-none focus:ring-0 py-3 font-bold text-gray-900 bg-transparent">
-                                <button @click="currentQuantity++" class="px-4 py-3 text-gray-600 hover:bg-gray-100 transition">+</button>
+                            <label class="text-sm font-semibold text-gray-900 mb-2 block uppercase tracking-wider">Cantidad</label>
+                            <div class="inline-flex items-center p-1 border border-gray-200 rounded-xl bg-gray-50/50 shadow-sm backdrop-blur-sm">
+                                <button 
+                                    @click="currentQuantity > 1 && currentQuantity--" 
+                                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-[#040054] hover:border-[#040054] hover:shadow-md transition-all duration-200 active:scale-90 disabled:opacity-30"
+                                    :disabled="currentQuantity <= 1"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"></path></svg>
+                                </button>
+                                
+                                <input 
+                                    v-model.number="currentQuantity" 
+                                    readonly 
+                                    class="w-12 text-center border-none focus:ring-0 text-lg font-bold text-[#040054] bg-transparent"
+                                >
+                                
+                                <button 
+                                    @click="currentQuantity++" 
+                                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-[#040054] hover:border-[#040054] hover:shadow-md transition-all duration-200 active:scale-90"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                </button>
                             </div>
                         </div>
 
@@ -654,7 +687,7 @@ const buyNow = () => {
                     <!-- Review Form -->
                     <div v-if="showReviewForm" class="bg-gray-50 rounded-2xl p-8 mb-12 border-2 border-gray-200">
                         <h3 class="text-2xl font-bold mb-6 text-center">Escribe tu reseña</h3>
-                        <form @submit.prevent="reviewForm.post(route('reviews.store', product.slug))" class="max-w-2xl mx-auto space-y-6">
+                        <form @submit.prevent="submitReview" class="max-w-2xl mx-auto space-y-6">
                             <!-- Rating -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2 text-center">Calificación</label>
@@ -684,6 +717,7 @@ const buyNow = () => {
                                     maxlength="100"
                                     required
                                 >
+                                <div v-if="reviewForm.errors.title" class="text-red-500 text-xs mt-1">{{ reviewForm.errors.title }}</div>
                             </div>
 
                             <!-- Comment -->
@@ -695,6 +729,7 @@ const buyNow = () => {
                                     class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#040054] focus:ring-2 focus:ring-[#040054]/20 transition"
                                     placeholder="Empieza a escribir aquí..."
                                 ></textarea>
+                                <div v-if="reviewForm.errors.comment" class="text-red-500 text-xs mt-1">{{ reviewForm.errors.comment }}</div>
                             </div>
 
                             <!-- Image Upload -->
@@ -709,6 +744,7 @@ const buyNow = () => {
                                         <p class="text-gray-600">Haz clic para subir una imagen</p>
                                     </label>
                                 </div>
+                                <div v-if="reviewForm.errors.image" class="text-red-500 text-xs mt-1">{{ reviewForm.errors.image }}</div>
                             </div>
 
                             <!-- YouTube URL -->
@@ -733,6 +769,7 @@ const buyNow = () => {
                                         placeholder="Nombre"
                                         required
                                     >
+                                    <div v-if="reviewForm.errors.reviewer_name" class="text-red-500 text-xs mt-1">{{ reviewForm.errors.reviewer_name }}</div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección de correo electrónico</label>
@@ -743,6 +780,7 @@ const buyNow = () => {
                                         placeholder="Tu dirección de correo electrónico"
                                         required
                                     >
+                                    <div v-if="reviewForm.errors.reviewer_email" class="text-red-500 text-xs mt-1">{{ reviewForm.errors.reviewer_email }}</div>
                                 </div>
                             </div>
 
