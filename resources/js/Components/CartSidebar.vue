@@ -313,8 +313,8 @@ const proceedToCheckout = () => {
                 <div class="mt-5 flex items-center justify-center space-x-2 opacity-60">
                     <span class="text-xs text-gray-500">Aceptamos:</span>
                     <div class="flex space-x-1">
-                        <div class="w-8 h-5 bg-gray-200 rounded flex items-center justify-center text-[8px] font-bold">VISA</div>
-                        <div class="w-8 h-5 bg-gray-200 rounded flex items-center justify-center text-[8px] font-bold">MC</div>
+                        <div class="w-8 h-5 bg-gray-200 rounded flex items-center justify-center text-[8px] font-bold">BINANCE</div>
+                        <!-- <div class="w-8 h-5 bg-gray-200 rounded flex items-center justify-center text-[8px] font-bold">VISA</div> -->
                         <div class="w-8 h-5 bg-gray-200 rounded flex items-center justify-center text-[8px] font-bold">ZELLE</div>
                     </div>
                 </div>

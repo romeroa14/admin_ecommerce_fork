@@ -56,8 +56,8 @@ class SubcategoryController extends Controller
         $products = $query->paginate(12)->withQueryString();
         $categories = Category::active()->get();
 
-        // Load the main category for breadcrumbs
-        $subcategory->load('category');
+        // Load the main category for breadcrumbs and siblings for filters
+        $subcategory->load('category.subcategories');
 
         return Inertia::render('Products/Index', [
             'products' => $products,
@@ -76,6 +76,7 @@ class SubcategoryController extends Controller
                 'slug' => $subcategory->slug,
                 'description' => $subcategory->description,
                 'parent' => $subcategory->category, // Support breadcrumbs: Home > Category > Subcategory
+                'subcategories' => $subcategory->category->subcategories, // Support siblings in filters
                 'is_subcategory' => true,
             ],
         ]);

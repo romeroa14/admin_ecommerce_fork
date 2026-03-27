@@ -8,19 +8,53 @@ import { getProductImage } from '@/composables/useProductImage';
 // @ts-ignore
 const route = window.route;
 
-const props = defineProps({
-    products: Object,
-    categories: Array,
-    filters: Object,
-    currentCategory: Object, // When viewing a specific category
-});
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    icon?: string;
+    description?: string;
+    subcategories?: any[];
+    parent?: { name: string, slug: string };
+    is_subcategory?: boolean;
+}
+
+interface Product {
+    id: number;
+    name: string;
+    slug: string;
+    price: number;
+    compare_price?: number;
+    stock: number;
+    images?: string[];
+    product_images?: any[];
+    category?: { name: string };
+    discount_percentage?: number;
+    short_description?: string;
+}
+
+const props = defineProps<{
+    products: {
+        data: Product[];
+        total: number;
+        links: any[];
+        current_page: number;
+        last_page: number;
+        prev_page_url: string | null;
+        next_page_url: string | null;
+    };
+    categories: Category[];
+    filters: any;
+    currentCategory?: Category;
+}>();
 
 // Modal state
 const showFiltersModal = ref(false);
 
 // Filter state
 const selectedStock = ref(props.filters?.stock || '');
-const selectedCategory = ref(props.filters?.category || '');
+const selectedCategory = ref(props.filters?.category_id || props.filters?.category || ''); // Handling both names
+const selectedSubcategory = ref(props.filters?.subcategory_id || '');
 const minPrice = ref(props.filters?.min_price || 0);
 const maxPrice = ref(props.filters?.max_price || 10000);
 const sortBy = ref(props.filters?.sort || 'latest');
@@ -46,9 +80,20 @@ watch(maxPrice, (newMax) => {
 
 // Apply filters
 const applyFilters = () => {
-    router.get('/products', {
+    // Determine the base URL
+    let baseUrl = '/products';
+    if (props.currentCategory) {
+        if (props.currentCategory.is_subcategory) {
+             baseUrl = `/subcategories/${props.currentCategory.slug}`;
+        } else {
+             baseUrl = `/categories/${props.currentCategory.slug}`;
+        }
+    }
+
+    router.get(baseUrl, {
         stock: selectedStock.value,
-        category: selectedCategory.value,
+        category_id: selectedCategory.value,
+        subcategory_id: selectedSubcategory.value,
         min_price: minPrice.value,
         max_price: maxPrice.value,
         sort: sortBy.value,
@@ -63,22 +108,34 @@ const applyFilters = () => {
 const clearFilters = () => {
     selectedStock.value = '';
     selectedCategory.value = '';
+    selectedSubcategory.value = '';
     minPrice.value = 0;
     maxPrice.value = 10000;
     sortBy.value = 'latest';
-    router.get('/products');
+    
+    let baseUrl = '/products';
+    if (props.currentCategory) {
+        if (props.currentCategory.is_subcategory) {
+             baseUrl = `/subcategories/${props.currentCategory.slug}`;
+        } else {
+             baseUrl = `/categories/${props.currentCategory.slug}`;
+        }
+    }
+    
+    router.get(baseUrl);
     showFiltersModal.value = false;
 };
 
 // Check if any filter is active
 const hasActiveFilters = computed(() => {
-    return selectedStock.value || selectedCategory.value || minPrice.value > 0 || maxPrice.value < 10000 || sortBy.value !== 'latest';
+    return selectedStock.value || selectedCategory.value || selectedSubcategory.value || minPrice.value > 0 || maxPrice.value < 10000 || sortBy.value !== 'latest';
 });
 
 const activeFiltersCount = computed(() => {
     let count = 0;
     if (selectedStock.value) count++;
     if (selectedCategory.value) count++;
+    if (selectedSubcategory.value) count++;
     if (minPrice.value > 0 || maxPrice.value < 10000) count++;
     if (sortBy.value !== 'latest') count++;
     return count;
@@ -98,7 +155,12 @@ const breadcrumbs = computed(() => {
                 href: `/categories/${props.currentCategory.parent.slug}` 
             });
         }
-        items.push({ label: props.currentCategory.name });
+        items.push({ 
+            label: props.currentCategory.name,
+            href: props.currentCategory.is_subcategory 
+                ? `/subcategories/${props.currentCategory.slug}` 
+                : `/categories/${props.currentCategory.slug}`
+        });
     }
     return items;
 });
@@ -117,7 +179,7 @@ const breadcrumbs = computed(() => {
                 />
                 
                 <!-- Header -->
-                <div class="text-center mb-8">
+                <!-- <div class="text-center mb-6">
                     <div v-if="currentCategory" class="flex items-center justify-center space-x-3 mb-4">
                         <span v-if="currentCategory.icon" class="text-5xl">{{ currentCategory.icon }}</span>
                     </div>
@@ -127,22 +189,9 @@ const breadcrumbs = computed(() => {
                     <p class="mt-2 text-lg text-gray-600">
                         {{ currentCategory ? currentCategory.description || `Todos los productos de ${currentCategory.name}` : 'Encuentra lo que buscas al mejor precio' }}
                     </p>
-                </div>
+                </div> -->
 
-                <!-- Subcategories Menu -->
-                <div v-if="currentCategory && currentCategory.subcategories && currentCategory.subcategories.length > 0" class="mb-10 text-center">
-                    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Filtrar por subcategoría</h2>
-                    <div class="flex flex-wrap justify-center gap-3">
-                        <Link 
-                            v-for="child in currentCategory.subcategories" 
-                            :key="child.id" 
-                            :href="`/subcategories/${child.slug}`"
-                            class="px-6 py-2.5 bg-white border-2 border-[#040054] text-[#040054] rounded-full font-bold hover:bg-[#040054] hover:text-white hover:scale-105 transition-all shadow-sm"
-                        >
-                            {{ child.name }}
-                        </Link>
-                    </div>
-                </div>
+
 
                 <!-- Filter Button and Results -->
                 <div class="flex items-center justify-between mb-6 relative">
@@ -234,7 +283,7 @@ const breadcrumbs = computed(() => {
                                 </div>
 
                                 <!-- Category Filter -->
-                                <div>
+                                <!-- <div>
                                     <h4 class="font-bold text-gray-900 mb-3">Categorías</h4>
                                     <select 
                                         v-model="selectedCategory" 
@@ -243,6 +292,20 @@ const breadcrumbs = computed(() => {
                                         <option value="">Todas las categorías</option>
                                         <option v-for="category in categories" :key="category.id" :value="category.id">
                                             {{ category.name }}
+                                        </option>
+                                    </select>
+                                </div> -->
+
+                                <!-- Subcategory Filter - Only visible in categorical context -->
+                                <div v-if="currentCategory && currentCategory.subcategories && currentCategory.subcategories.length > 0">
+                                    <h4 class="font-bold text-gray-900 mb-3">Subcategorías</h4>
+                                    <select 
+                                        v-model="selectedSubcategory" 
+                                        class="w-full border-gray-300 rounded-lg text-sm focus:ring-[#040054] focus:border-[#040054]"
+                                    >
+                                        <option value="">Todas las subcategorías</option>
+                                        <option v-for="sub in currentCategory.subcategories" :key="sub.id" :value="sub.id">
+                                            {{ sub.name }}
                                         </option>
                                     </select>
                                 </div>
@@ -367,8 +430,10 @@ const breadcrumbs = computed(() => {
                                 :alt="product.name"
                                 class="h-64 w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
                             >
-                            <div v-if="product.discount_percentage > 0" class="absolute top-3 right-3 bg-[#F41D27] text-white px-3 py-1 rounded-full font-bold text-xs shadow-lg">
-                                -{{ product.discount_percentage }}%
+                            <div v-if="(product.discount_percentage || 0) > 0" class="absolute top-4 left-4 z-10">
+                                <div class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                                    -{{ product.discount_percentage }}%
+                                </div>
                             </div>
                         </div>
                         <div class="p-5 flex-1 flex flex-col">
@@ -384,8 +449,8 @@ const breadcrumbs = computed(() => {
                             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                                 <div>
                                     <span class="text-xl font-bold text-[#040054]">{{ $formatCurrency(product.price) }}</span>
-                                    <span v-if="product.compare_price > product.price" class="block text-xs text-gray-400 line-through">
-                                        {{ $formatCurrency(product.compare_price) }}
+                                    <span v-if="product.compare_price && product.compare_price > product.price" class="text-xs text-gray-400 line-through">
+                                        {{ product.compare_price }}
                                     </span>
                                 </div>
                                 <span v-if="product.stock > 0" class="text-xs font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">

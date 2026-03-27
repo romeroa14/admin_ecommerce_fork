@@ -29,8 +29,16 @@ class ProductController extends Controller
         }
 
         // Filter by category
-        if ($request->has('category') && $request->category) {
+        if ($request->has('category_id') && $request->category_id) {
+            $query->where('category_id', $request->category_id);
+        } elseif ($request->has('category') && $request->category) {
+            // Support legacy query param
             $query->where('category_id', $request->category);
+        }
+
+        // Filter by subcategory
+        if ($request->has('subcategory_id') && $request->subcategory_id) {
+            $query->where('subcategory_id', $request->subcategory_id);
         }
 
         // Filter by price range
@@ -66,10 +74,12 @@ class ProductController extends Controller
             'categories' => $categories,
             'filters' => [
                 'stock' => $request->stock,
-                'category' => $request->category,
+                'category_id' => $request->category_id ?: $request->category,
+                'subcategory_id' => $request->subcategory_id,
                 'min_price' => $request->min_price,
                 'max_price' => $request->max_price,
                 'sort' => $sortBy,
+                'search' => $request->search,
             ],
         ]);
     }

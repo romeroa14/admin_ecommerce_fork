@@ -30,12 +30,16 @@ class CategoryController extends Controller
      */
     public function show(Request $request, Category $category)
     {
-        // Start query: products belonging to this category or ANY of its subcategories
+        // Start query: products belonging to this category or its subcategories
         $query = Product::active()
-            ->where(function ($q) use ($category) {
-                $subIds = $category->subcategories()->pluck('id')->toArray();
-                $q->where('category_id', $category->id)
-                  ->orWhereIn('subcategory_id', $subIds);
+            ->where(function ($q) use ($category, $request) {
+                if ($request->filled('subcategory_id')) {
+                    $q->where('subcategory_id', $request->subcategory_id);
+                } else {
+                    $subIds = $category->subcategories()->pluck('id')->toArray();
+                    $q->where('category_id', $category->id)
+                      ->orWhereIn('subcategory_id', $subIds);
+                }
             })
             ->with(['category', 'subcategory', 'productImages']);
 
@@ -85,7 +89,8 @@ class CategoryController extends Controller
             'categories' => $categories,
             'filters' => [
                 'stock' => $request->stock,
-                'category' => $category->id, // Pre-filter by this category
+                'category_id' => $category->id,
+                'subcategory_id' => $request->subcategory_id,
                 'min_price' => $request->min_price,
                 'max_price' => $request->max_price,
                 'sort' => $sortBy,
