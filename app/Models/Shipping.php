@@ -94,11 +94,12 @@ class Shipping extends Model
 
     public function isAvailableForZone($zone)
     {
-        if (!$this->zones) {
+        if (empty($this->zones)) {
             return true; // Sin restricciones de zona
         }
 
-        return in_array($zone, $this->zones);
+        // Si zones es un array de objetos con clave 'zone'
+        return collect($this->zones)->pluck('zone')->contains($zone);
     }
 
     public function isWithinWeightLimit($weight)

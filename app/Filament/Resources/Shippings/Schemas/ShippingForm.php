@@ -105,8 +105,10 @@ class ShippingForm
                                     ->required()
                                     ->placeholder('Ej: Caracas, Miranda, Nacional'),
                             ])
+                            ->itemLabel(fn (array $state): ?string => $state['zone'] ?? null)
                             ->defaultItems(1)
                             ->collapsible()
+                            ->collapsed(false)
                             ->helperText('Zonas donde este método de envío está disponible'),
                     ])
                     ->collapsible(),

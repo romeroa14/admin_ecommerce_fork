@@ -61,15 +61,12 @@ class ShippingsTable
                 TextColumn::make('zones')
                     ->label('Zonas')
                     ->getStateUsing(function ($record) {
-                        if (!$record->zones || empty($record->zones)) {
+                        if (empty($record->zones)) {
                             return 'Sin restricciones';
                         }
                         
-                        // Asegurar que zones es un array y convertir a string
-                        $zones = is_array($record->zones) ? $record->zones : [];
-                        $zones = array_filter($zones, function($zone) {
-                            return is_string($zone) || is_numeric($zone);
-                        });
+                        // Extraer los nombres de las zonas del array de objetos [{"zone": "nombre"}]
+                        $zones = collect($record->zones)->pluck('zone')->filter()->all();
                         
                         return empty($zones) ? 'Sin restricciones' : implode(', ', $zones);
                     })
