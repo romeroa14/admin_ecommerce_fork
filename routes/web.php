@@ -39,7 +39,9 @@ Route::get('/', function () {
         ->orderByDesc('stock')
         ->limit(4)->get();
 
-    $categories = \App\Models\Category::active()
+    // Renombrado a 'homeCategories' para NO sobreescribir la prop global 'categories'
+    // que el middleware ya comparte CON subcategorías para el dropdown del nav
+    $homeCategories = \App\Models\Category::active()
         ->ordered()
         ->with(['products' => function ($q) {
             $q->active()->with('productImages')->limit(1);
@@ -52,14 +54,14 @@ Route::get('/', function () {
         });
 
     return Inertia::render('Home', [
-        'bannerHero'   => $bannerHero,
-        'bannerMiddle' => $bannerMiddle,
-        'bannerMiddle2' => $bannerMiddle2,
-        'bannerBottom' => $bannerBottom,
-        'saleProducts' => $saleProducts,
-        'newProducts'  => $newProducts,
-        'bestSellers'  => $bestSellers,
-        'categories'   => $categories,
+        'bannerHero'     => $bannerHero,
+        'bannerMiddle'   => $bannerMiddle,
+        'bannerMiddle2'  => $bannerMiddle2,
+        'bannerBottom'   => $bannerBottom,
+        'saleProducts'   => $saleProducts,
+        'newProducts'    => $newProducts,
+        'bestSellers'    => $bestSellers,
+        'homeCategories' => $homeCategories, // Para la sección de categorías del Home
     ]);
 })->name('home');
 

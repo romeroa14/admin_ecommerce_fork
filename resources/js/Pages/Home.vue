@@ -17,17 +17,18 @@ const props = defineProps({
     newProducts:  { type: Array as () => any[], default: () => [] },
     bestSellers:  { type: Array as () => any[], default: () => [] },
     categories:   { type: Array as () => any[], default: () => [] },
+    homeCategories: { type: Array as () => any[], default: () => [] },
 });
 
 /* ── Category Carousel Logic ── */
 const catSlide = ref(0);
 const catsPerView = 4;
-const totalCats = computed(() => props.categories?.length || 0);
+const totalCats = computed(() => props.homeCategories?.length || 0);
 const maxCatSlide = computed(() => Math.max(0, totalCats.value - catsPerView));
 
 const visibleCats = computed(() => {
-    if (!props.categories) return [];
-    return props.categories.slice(catSlide.value, catSlide.value + catsPerView);
+    if (!props.homeCategories) return [];
+    return props.homeCategories.slice(catSlide.value, catSlide.value + catsPerView);
 });
 
 const prevCat = () => {
@@ -81,7 +82,7 @@ function getCategoryImage(cat: any): string | null {
         </section>
 
         <!-- ═══════════════ 2. CARRUSEL DE CATEGORÍAS ═══════════════ -->
-        <section v-if="categories && categories.length > 0" class="bg-white py-12 border-b border-gray-100">
+        <section v-if="homeCategories && homeCategories.length > 0" class="bg-white py-12 border-b border-gray-100">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- <h2 class="text-2xl font-extrabold text-[#040054] mb-8 text-center">Explora por Categoría</h2> -->
                 
