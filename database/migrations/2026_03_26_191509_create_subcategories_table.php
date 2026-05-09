@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Guard: skip if table already exists (production already migrated)
+        if (Schema::hasTable('subcategories')) {
+            return;
+        }
+
         Schema::create('subcategories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
