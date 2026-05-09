@@ -22,13 +22,27 @@ const props = defineProps({
 
 /* ── Category Carousel Logic ── */
 const catSlide = ref(0);
-const catsPerView = 4;
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
+const catsPerView = computed(() => {
+    if (windowWidth.value < 640) return 2;
+    if (windowWidth.value < 1024) return 3;
+    return 4;
+});
+
+let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+function onResize() {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        windowWidth.value = window.innerWidth;
+    }, 150);
+}
+
 const totalCats = computed(() => props.homeCategories?.length || 0);
-const maxCatSlide = computed(() => Math.max(0, totalCats.value - catsPerView));
+const maxCatSlide = computed(() => Math.max(0, totalCats.value - catsPerView.value));
 
 const visibleCats = computed(() => {
     if (!props.homeCategories) return [];
-    return props.homeCategories.slice(catSlide.value, catSlide.value + catsPerView);
+    return props.homeCategories.slice(catSlide.value, catSlide.value + catsPerView.value);
 });
 
 const prevCat = () => {
@@ -49,11 +63,15 @@ const stopCatAutoplay = () => {
 };
 
 onMounted(() => {
-    if (totalCats.value > catsPerView) {
+    windowWidth.value = window.innerWidth;
+    window.addEventListener('resize', onResize);
+    if (totalCats.value > catsPerView.value) {
         startCatAutoplay();
     }
 });
 onUnmounted(() => {
+    window.removeEventListener('resize', onResize);
+    if (resizeTimer) clearTimeout(resizeTimer);
     stopCatAutoplay();
 });
 
@@ -89,7 +107,7 @@ function getCategoryImage(cat: any): string | null {
                 <div class="relative group/carousel max-w-5xl mx-auto" @mouseenter="stopCatAutoplay" @mouseleave="startCatAutoplay">
                     <!-- Nav Prev -->
                     <button
-                        v-if="totalCats > catsPerView"
+                        v-if="totalCats > catsPerView.value"
                         @click="prevCat"
                         class="absolute -left-6 lg:-left-12 top-1/2 -translate-y-1/2 z-10 bg-white shadow hover:shadow-lg border border-gray-100 w-12 h-12 rounded-full flex items-center justify-center text-gray-500 hover:text-[#F41D27] opacity-0 group-hover/carousel:opacity-100 -translate-x-4 group-hover/carousel:translate-x-0 transition-all duration-300"
                     >
@@ -129,7 +147,7 @@ function getCategoryImage(cat: any): string | null {
 
                     <!-- Nav Next -->
                     <button
-                        v-if="totalCats > catsPerView"
+                        v-if="totalCats > catsPerView.value"
                         @click="nextCat"
                         class="absolute -right-6 lg:-right-12 top-1/2 -translate-y-1/2 z-10 bg-white shadow hover:shadow-lg border border-gray-100 w-12 h-12 rounded-full flex items-center justify-center text-gray-500 hover:text-[#F41D27] opacity-0 group-hover/carousel:opacity-100 translate-x-4 group-hover/carousel:translate-x-0 transition-all duration-300"
                     >
@@ -182,9 +200,9 @@ function getCategoryImage(cat: any): string | null {
                 <img :src="getBannerUrl(bannerMiddle)" :alt="bannerMiddle.title" class="w-full object-cover max-h-[440px]">
                 <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent flex items-center">
                     <div class="max-w-7xl mx-auto px-8 w-full">
-                        <h2 class="text-3xl md:text-5xl font-black text-white mb-4 leading-tight drop-shadow-xl">{{ bannerMiddle.title }}</h2>
-                        <p v-if="bannerMiddle.description" class="text-white/85 mb-6 max-w-lg text-base">{{ bannerMiddle.description }}</p>
-                        <a v-if="bannerMiddle.button_text" :href="bannerMiddle.link || '#'" class="inline-block bg-[#F41D27] text-white font-extrabold px-8 py-3 rounded-xl shadow-xl hover:bg-[#cc1520] transition text-sm uppercase tracking-wide">{{ bannerMiddle.button_text }}</a>
+                        <h2 class="text-xl sm:text-2xl md:text-5xl font-black text-white mb-4 leading-tight drop-shadow-xl">{{ bannerMiddle.title }}</h2>
+                        <p v-if="bannerMiddle.description" class="text-white/85 mb-6 max-w-lg text-sm sm:text-base">{{ bannerMiddle.description }}</p>
+                        <a v-if="bannerMiddle.button_text" :href="bannerMiddle.link || '#'" class="inline-block bg-[#F41D27] text-white font-extrabold px-4 sm:px-8 py-2 sm:py-3 rounded-xl shadow-xl hover:bg-[#cc1520] transition text-xs sm:text-sm uppercase tracking-wide">{{ bannerMiddle.button_text }}</a>
                     </div>
                 </div>
             </a>
@@ -233,9 +251,9 @@ function getCategoryImage(cat: any): string | null {
                 <img :src="getBannerUrl(bannerMiddle2)" :alt="bannerMiddle2.title" class="w-full object-cover max-h-[440px]">
                 <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent flex items-center">
                     <div class="max-w-7xl mx-auto px-8 w-full">
-                        <h2 class="text-3xl md:text-5xl font-black text-white mb-4 leading-tight drop-shadow-xl">{{ bannerMiddle2.title }}</h2>
-                        <p v-if="bannerMiddle2.description" class="text-white/85 mb-6 max-w-lg text-base">{{ bannerMiddle2.description }}</p>
-                        <a v-if="bannerMiddle2.button_text" :href="bannerMiddle2.link || '#'" class="inline-block bg-[#F41D27] text-white font-extrabold px-8 py-3 rounded-xl shadow-xl hover:bg-[#cc1520] transition text-sm uppercase tracking-wide">{{ bannerMiddle2.button_text }}</a>
+                        <h2 class="text-xl sm:text-2xl md:text-5xl font-black text-white mb-4 leading-tight drop-shadow-xl">{{ bannerMiddle2.title }}</h2>
+                        <p v-if="bannerMiddle2.description" class="text-white/85 mb-6 max-w-lg text-sm sm:text-base">{{ bannerMiddle2.description }}</p>
+                        <a v-if="bannerMiddle2.button_text" :href="bannerMiddle2.link || '#'" class="inline-block bg-[#F41D27] text-white font-extrabold px-4 sm:px-8 py-2 sm:py-3 rounded-xl shadow-xl hover:bg-[#cc1520] transition text-xs sm:text-sm uppercase tracking-wide">{{ bannerMiddle2.button_text }}</a>
                     </div>
                 </div>
             </a>
@@ -300,11 +318,12 @@ function getCategoryImage(cat: any): string | null {
    ────────────────────────────────────────────────────────── */
 .cats-grid {
     display: grid;
-    /* Forzamos que sean 4 columnas de igual tamaño, usando 1fr */
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
     justify-items: center;
 }
+@media (min-width: 640px)  { .cats-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .cats-grid { grid-template-columns: repeat(4, 1fr); } }
 
 .cat-item { width: 100%; max-width: 220px; }
 

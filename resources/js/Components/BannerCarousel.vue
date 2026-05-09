@@ -73,7 +73,7 @@ onUnmounted(() => {
         @mouseleave="isPaused = false"
     >
         <!-- Slides Container -->
-        <div class="relative w-full" style="aspect-ratio: 16/5; max-height: 420px;">
+        <div class="relative w-full aspect-[4/3] sm:aspect-[16/5]" style="max-height: 420px;">
             <TransitionGroup
                 enter-active-class="transition-all duration-600 ease-out"
                 leave-active-class="transition-all duration-600 ease-out absolute inset-0"
@@ -90,9 +90,17 @@ onUnmounted(() => {
                 >
                     <!-- Background Image -->
                     <img
+                        v-if="banner.mobile_image"
+                        :src="getImageUrl(banner.mobile_image)"
+                        :alt="banner.title"
+                        class="w-full h-full object-cover sm:hidden"
+                        @error="(e: Event) => (e.target as HTMLImageElement).style.display = 'none'"
+                    >
+                    <img
                         :src="getImageUrl(banner.image)"
                         :alt="banner.title"
                         class="w-full h-full object-cover"
+                        :class="banner.mobile_image ? 'hidden sm:block' : ''"
                         @error="(e: Event) => (e.target as HTMLImageElement).style.display = 'none'"
                     >
 
@@ -137,7 +145,7 @@ onUnmounted(() => {
         <template v-if="totalSlides > 1">
             <button
                 @click="prev"
-                class="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white p-3 rounded-full transition-all shadow-lg group"
+                class="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white p-3 rounded-full transition-all shadow-lg group hidden sm:block"
                 aria-label="Anterior"
             >
                 <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,7 +154,7 @@ onUnmounted(() => {
             </button>
             <button
                 @click="next"
-                class="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white p-3 rounded-full transition-all shadow-lg group"
+                class="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white p-3 rounded-full transition-all shadow-lg group hidden sm:block"
                 aria-label="Siguiente"
             >
                 <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Link, usePage, router } from '@inertiajs/vue3';
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import CartSidebar from '@/Components/CartSidebar.vue';
+import MobileMenuDrawer from '@/Components/MobileMenuDrawer.vue';
 
 // @ts-ignore
 const route = window.route;
@@ -34,6 +35,40 @@ const itemsCount = computed(() => {
 
 // Cart sidebar state
 const isCartOpen = ref(false);
+
+// Mobile menu state
+const mobileMenuOpen = ref(false);
+const currencyOpen = ref(false);
+const subcategoryOpen = ref<Record<number, boolean>>({});
+
+function toggleCurrency() {
+    currencyOpen.value = !currencyOpen.value;
+}
+
+function toggleSubcategory(catId: number) {
+    subcategoryOpen.value = {
+        ...subcategoryOpen.value,
+        [catId]: !subcategoryOpen.value[catId]
+    };
+}
+
+function closeMobileMenu() {
+    mobileMenuOpen.value = false;
+    currencyOpen.value = false;
+    subcategoryOpen.value = {};
+}
+
+// Lock body scroll when drawer is open
+watch(mobileMenuOpen, (val) => {
+    document.body.style.overflow = val ? 'hidden' : '';
+});
+
+function handleCategoryClick(catId: number, event: MouseEvent) {
+    if (window.innerWidth < 768) {
+        event.preventDefault();
+        toggleSubcategory(catId);
+    }
+}
 
 interface Currency {
     id: number;
@@ -116,11 +151,18 @@ const announcements = [
                         </div>
 
                         <!-- Actions -->
-                        <div class="flex-1 flex items-center justify-end space-x-6 text-sm">
+                        <div class="flex-1 flex items-center justify-end space-x-3 sm:space-x-6 text-sm">
+                            
+                            <!-- Hamburger (mobile) -->
+                            <button @click="mobileMenuOpen = true" class="md:hidden p-2 hover:text-gray-300 transition">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
 
                             <!-- Currency Selector -->
                             <div class="relative group h-full flex items-center" v-if="currencies && currencies.length > 0">
-                                <button class="flex items-center gap-1 hover:text-gray-300 transition py-6 font-medium">
+                                <button @click="toggleCurrency" class="flex items-center gap-1 hover:text-gray-300 transition py-6 font-medium">
                                     <span>{{ currentCurrency?.symbol || '$' }}</span>
                                     <span class="hidden sm:inline">{{ currentCurrency?.code || 'USD' }}</span>
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +170,8 @@ const announcements = [
                                     </svg>
                                 </button>
                                 <!-- Dropdown -->
-                                <div class="absolute right-0 top-full -mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-100 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all text-gray-800">
+                                <div class="absolute right-0 top-full -mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-100 py-1 transition-all text-gray-800"
+                                    :class="currencyOpen ? 'opacity-100 visible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'">
                                     <button 
                                         v-for="curr in (currencies as any[])" 
                                         :key="curr.id"
@@ -143,23 +186,15 @@ const announcements = [
                             </div>
 
                             <!-- User -->
-                            <div class="relative group hidden sm:block h-full">
-                                <Link :href="user ? route('account.dashboard') : route('login')" class="flex items-center gap-2 hover:text-gray-300 transition py-6">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    <span class="font-medium hidden lg:block">{{ user ? 'Mi cuenta' : 'Acceso' }}</span>
-                                </Link>
-                                <!-- Dropdown if logged in -->
-                                <div v-if="user" class="absolute right-0 top-full -mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-100 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                                    <Link :href="route('account.dashboard')" class="block px-4 py-2 text-gray-700 hover:bg-gray-50">Mi Cuenta</Link>
-                                    <Link href="/mis-pedidos" class="block px-4 py-2 text-gray-700 hover:bg-gray-50">Mis Pedidos</Link>
-                                    <Link :href="route('logout')" method="post" as="button" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50">Cerrar Sesión</Link>
-                                </div>
-                            </div>
+                            <Link :href="user ? route('account.dashboard') : route('login')" class="flex items-center gap-2 hover:text-gray-300 transition py-6">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span class="font-medium hidden lg:block">{{ user ? 'Mi cuenta' : 'Acceso' }}</span>
+                            </Link>
 
                             <!-- Favoritos -->
-                            <Link href="/favoritos" class="flex items-center gap-2 hover:text-gray-300 transition hidden sm:flex">
+                            <Link href="/favoritos" class="flex items-center gap-2 hover:text-gray-300 transition">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                 </svg>
@@ -206,13 +241,14 @@ const announcements = [
                             <Link href="/" class="hover:text-[#F41D27] whitespace-nowrap transition-colors">Inicio</Link>
                         </li>
                         <li v-for="cat in categories" :key="cat.id" class="relative group">
-                            <Link :href="`/categories/${cat.slug}`" class="flex items-center gap-1 hover:text-[#F41D27] whitespace-nowrap transition-colors py-2">
+                            <Link :href="`/categories/${cat.slug}`" @click="(e: MouseEvent) => handleCategoryClick(cat.id, e)" class="flex items-center gap-1 hover:text-[#F41D27] whitespace-nowrap transition-colors py-2">
                                 {{ cat.name }}
-                                <svg v-if="cat.subcategories && cat.subcategories.length" class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                <svg v-if="cat.subcategories && cat.subcategories.length" class="w-3.5 h-3.5 opacity-60 transition-transform" :class="{ 'rotate-180': subcategoryOpen[cat.id] }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                             </Link>
 
                             <!-- Hover Dropdown for Subcategories -->
-                            <div v-if="cat.subcategories && cat.subcategories.length" class="absolute left-0 top-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 px-0 pt-0">
+                            <div v-if="cat.subcategories && cat.subcategories.length" class="absolute left-0 top-full transition-all duration-200 z-50 px-0 pt-0"
+                                :class="subcategoryOpen[cat.id] ? 'opacity-100 visible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'">
                                 <ul class="bg-white rounded-lg shadow-xl border border-gray-100 py-2 min-w-[220px] relative before:absolute before:-top-2 before:left-0 before:w-full before:h-2">
                                     <li v-for="child in cat.subcategories" :key="child.id">
                                         <Link :href="`/subcategories/${child.slug}`" class="block px-4 py-2 hover:bg-gray-50 hover:text-[#040054] text-gray-700 font-medium transition-colors">
@@ -227,6 +263,21 @@ const announcements = [
             </div>
         </header>
 
+        <!-- Mobile Menu Drawer -->
+        <MobileMenuDrawer
+            :is-open="mobileMenuOpen"
+            :categories="categories"
+            :user="user"
+            :currencies="currencies"
+            :current-currency="currentCurrency"
+            :currency-open="currencyOpen"
+            :subcategory-open="subcategoryOpen"
+            @close="closeMobileMenu"
+            @toggle-currency="toggleCurrency"
+            @toggle-subcategory="toggleSubcategory"
+            @change-currency="changeCurrency"
+        />
+
         <!-- Main Content -->
         <main>
             <slot />
@@ -239,7 +290,7 @@ const announcements = [
         />
 
         <!-- Footer -->
-        <footer class="bg-[#040054] text-white mt-20">
+        <footer class="bg-[#040054] text-white mt-10 md:mt-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <!-- About -->

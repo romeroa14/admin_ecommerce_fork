@@ -9,8 +9,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use App\Mail\OrderConfirmation;
 
 class CheckoutController extends Controller
 {
@@ -231,6 +233,18 @@ class CheckoutController extends Controller
             Session::forget('checkout_data');
 
             DB::commit();
+
+            // Send confirmation email
+            try {
+                $customerEmail = $addressData['email'] ?? null;
+                if ($customerEmail) {
+                    Mail::to($customerEmail)->send(new OrderConfirmation($order));
+                    Log::info("Order confirmation email sent to {$customerEmail} for order #{$order->order_number}");
+                }
+            } catch (\Exception $mailException) {
+                // Log mail error but don't fail the checkout
+                Log::warning('Failed to send order confirmation email: ' . $mailException->getMessage());
+            }
 
             return redirect()->route('checkout.success', $order->id);
             

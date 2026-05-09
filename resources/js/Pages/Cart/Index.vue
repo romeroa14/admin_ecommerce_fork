@@ -60,7 +60,7 @@ const applyCoupon = () => {
                                 <div
                                     v-for="(item, idx) in items"
                                     :key="idx"
-                                    class="py-6 flex gap-6"
+                                    class="py-6 flex flex-col sm:flex-row gap-4 sm:gap-6"
                                 >
                                     <!-- Product Image -->
                                     <div class="w-24 h-24 flex-shrink-0 border border-gray-200 rounded p-1">

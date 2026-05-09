@@ -227,7 +227,7 @@ const buyNow = () => {
                         </div>
                         
                         <!-- Thumbnails -->
-                        <div class="grid grid-cols-5 gap-3" v-if="allImages.length > 1">
+                        <div class="grid grid-cols-3 sm:grid-cols-5 gap-3" v-if="allImages.length > 1">
                             <button 
                                 v-for="(imgUrl, idx) in allImages" 
                                 :key="idx"
@@ -248,7 +248,7 @@ const buyNow = () => {
                         </Link>
                         
                         <!-- Product Name -->
-                        <h1 class="text-4xl font-extrabold text-gray-900 leading-tight mb-3">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-3">
                             {{ product.name }}
                         </h1>
                         
@@ -269,8 +269,8 @@ const buyNow = () => {
                         <!-- Price -->
                         <div class="mb-6">
                             <div class="flex items-baseline mb-2">
-                                <span class="text-5xl font-black text-gray-900">{{ $formatCurrency(product.price) }}</span>
-                                <span v-if="product.compare_price > product.price" class="ml-3 text-2xl text-gray-400 line-through">
+                                <span class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900">{{ $formatCurrency(product.price) }}</span>
+                                <span v-if="product.compare_price > product.price" class="ml-3 text-lg sm:text-2xl text-gray-400 line-through">
                                     {{ $formatCurrency(product.compare_price) }}
                                 </span>
                             </div>
@@ -387,19 +387,19 @@ const buyNow = () => {
                                 <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
                                     <span class="text-2xl">🚚</span>
                                 </div>
-                                <span class="text-xs font-semibold text-gray-700">Envío Gratis</span>
+                                <span class="text-xs sm:text-sm font-semibold text-gray-700">Envío Gratis</span>
                             </div>
                             <div class="flex flex-col items-center text-center">
                                 <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2">
                                     <span class="text-2xl">🔒</span>
                                 </div>
-                                <span class="text-xs font-semibold text-gray-700">Pago Seguro</span>
+                                <span class="text-xs sm:text-sm font-semibold text-gray-700">Pago Seguro</span>
                             </div>
                             <div class="flex flex-col items-center text-center">
                                 <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-2">
                                     <span class="text-2xl">↩️</span>
                                 </div>
-                                <span class="text-xs font-semibold text-gray-700">Devolución 30d</span>
+                                <span class="text-xs sm:text-sm font-semibold text-gray-700">Devolución 30d</span>
                             </div>
                         </div>
 
@@ -411,7 +411,7 @@ const buyNow = () => {
                 <div class="mt-12 border-t border-gray-200 pt-8">
                     <!-- Tab Buttons -->
                     <div class="border-b border-gray-200">
-                        <nav class="flex gap-8">
+                        <nav class="flex gap-4 sm:gap-8 overflow-x-auto">
                             <button
                                 @click="activeTab = 'descripcion'"
                                 class="relative pb-4 text-sm font-bold uppercase tracking-wider transition-colors"
@@ -570,7 +570,7 @@ const buyNow = () => {
                                 v-for="similar in similarProducts" 
                                 :key="similar.id"
                                 :href="route('products.show', similar.slug)"
-                                class="group flex-shrink-0 w-72 bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden"
+                                class="group flex-shrink-0 w-64 sm:w-72 md:w-80 bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden"
                             >
                                 <!-- Product Image -->
                                 <div class="relative aspect-square w-full overflow-hidden bg-gray-100">
@@ -735,7 +735,7 @@ const buyNow = () => {
                             <!-- Image Upload -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Imagen/Video (opcional)</label>
-                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#040054] transition-colors cursor-pointer">
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-8 text-center hover:border-[#040054] transition-colors cursor-pointer">
                                     <input type="file" @change="reviewForm.image = ($event.target as HTMLInputElement).files?.[0] || null" accept="image/*" class="hidden" id="review-image">
                                     <label for="review-image" class="cursor-pointer">
                                         <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

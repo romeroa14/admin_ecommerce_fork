@@ -44,6 +44,8 @@ return new class extends Migration
         
         // Remove old parent_id column from categories table
         Schema::table('categories', function (Blueprint $table) {
+            $table->dropIndex('categories_parent_id_is_active_index');
+            $table->dropForeign(['parent_id']);
             $table->dropColumn('parent_id');
         });
 

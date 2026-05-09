@@ -231,7 +231,7 @@ const breadcrumbs = computed(() => {
                     >
                         <div 
                             v-if="showFiltersModal"
-                            class="absolute top-full left-0 mt-2 w-full max-w-2xl bg-white rounded-xl shadow-2xl border-2 border-[#040054] p-6 z-50"
+                            class="absolute top-full left-0 right-0 mt-2 w-full max-w-full sm:max-w-2xl bg-white rounded-xl shadow-2xl border-2 border-[#040054] p-6 z-50 overflow-y-auto max-h-[80vh]"
                         >
                             <!-- Header -->
                             <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
@@ -428,7 +428,7 @@ const breadcrumbs = computed(() => {
                             <img 
                                 :src="getProductImage(product)" 
                                 :alt="product.name"
-                                class="h-64 w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                                class="h-48 sm:h-56 md:h-64 w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
                             >
                             <div v-if="(product.discount_percentage || 0) > 0" class="absolute top-4 left-4 z-10">
                                 <div class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
@@ -485,7 +485,7 @@ const breadcrumbs = computed(() => {
                         <Link 
                             v-if="products.prev_page_url"
                             :href="products.prev_page_url"
-                            class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+                            class="px-4 py-2 sm:px-6 sm:py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
                         >
                             Anterior
                         </Link>
@@ -495,7 +495,7 @@ const breadcrumbs = computed(() => {
                         <Link 
                             v-if="products.next_page_url"
                             :href="products.next_page_url"
-                            class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+                            class="px-4 py-2 sm:px-6 sm:py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
                         >
                             Siguiente
                         </Link>
