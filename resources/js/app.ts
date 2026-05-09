@@ -2,7 +2,7 @@ import './bootstrap';
 import '../css/app.css';
 
 import { createApp, h, DefineComponent } from 'vue';
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from 'ziggy-js';
 
@@ -54,4 +54,14 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+});
+
+// Google Analytics — track page views on Inertia SPA navigation
+router.on('navigate', (event) => {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_view', {
+            page_location: event.detail.page.url,
+            page_title: document.title,
+        });
+    }
 });
