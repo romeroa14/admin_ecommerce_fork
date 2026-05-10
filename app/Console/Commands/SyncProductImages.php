@@ -142,11 +142,12 @@ class SyncProductImages extends Command
 
     private function downloadFile(string $fileId): string
     {
-        $url = "https://www.googleapis.com/drive/v3/files/{$fileId}?alt=media";
+        // Use direct download URL (works for publicly shared files, no API key needed)
+        $url = "https://drive.google.com/uc?export=download&id={$fileId}";
 
         $response = Http::timeout(30)
-            ->withOptions(['stream' => false])
-            ->get($url, ['key' => $this->apiKey]);
+            ->withOptions(['allow_redirects' => true])
+            ->get($url);
 
         return $response->successful() ? $response->body() : '';
     }
