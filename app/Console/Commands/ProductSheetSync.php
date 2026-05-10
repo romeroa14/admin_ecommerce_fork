@@ -121,6 +121,7 @@ class ProductSheetSync extends Command
                 'discount_percentage' => $discountPct,
                 'stock'               => $row['stock'],
                 'status'              => $isActive ? 'active' : 'draft',
+                'photo_link'          => $row['photo_link'],
                 'short_description'   => $description,
                 'description'         => $description,
             ]);
@@ -141,6 +142,7 @@ class ProductSheetSync extends Command
                 'cost'                => $price * 0.6, // approximate
                 'discount_percentage' => $discountPct,
                 'category_id'         => $this->getDefaultCategoryId(),
+                'photo_link'          => $row['photo_link'],
                 'stock'               => $row['stock'],
                 'low_stock_threshold' => 5,
                 'track_inventory'     => true,

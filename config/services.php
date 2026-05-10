@@ -35,6 +35,8 @@ return [
         ],
     ],
 
+    'google_drive_api_key' => env('GOOGLE_DRIVE_API_KEY'),
+
     'sync_webhook_token' => env('SYNC_WEBHOOK_TOKEN'),
 
     'facebook' => [
