@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- Domain Verification -->
+    <meta name="facebook-domain-verification" content="djxnj6mu0dzbti6dzs5xrib0wehyub" />
+
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
