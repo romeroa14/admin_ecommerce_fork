@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'facebook' => [
+        'pixel_id' => env('FACEBOOK_PIXEL_ID'),
+        'capi_token' => env('FACEBOOK_CAPI_TOKEN'),
+        'api_version' => env('FACEBOOK_API_VERSION', 'v22.0'),
+        'test_event_code' => env('FACEBOOK_TEST_EVENT_CODE'),
+    ],
+
 ];

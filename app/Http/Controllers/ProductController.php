@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Services\FacebookConversionsService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -17,6 +18,26 @@ class ProductController extends Controller
         if ($request->has('search') && $request->search) {
             $searchTerm = '%' . $request->search . '%';
             $query->where('name', 'ilike', $searchTerm);
+
+            // Facebook CAPI: Search
+            try {
+                $capi = new FacebookConversionsService();
+                $capi->sendEvent(
+                    eventName: 'Search',
+                    eventTime: now()->timestamp,
+                    eventSourceUrl: request()->fullUrl(),
+                    userData: [
+                        'client_ip_address' => request()->ip(),
+                        'client_user_agent' => request()->userAgent(),
+                    ],
+                    customData: [
+                        'search_string' => $request->search,
+                    ],
+                    eventId: FacebookConversionsService::generateEventId(),
+                );
+            } catch (\Exception $e) {
+                // Never block the user for tracking failures
+            }
         }
 
         // Filter by stock availability
@@ -87,6 +108,31 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $product->load(['category', 'subcategory', 'productImages', 'variants.variantGroup', 'tags']);
+
+        // Facebook CAPI: ViewContent
+        try {
+            $capi = new FacebookConversionsService();
+            $capi->sendEvent(
+                eventName: 'ViewContent',
+                eventTime: now()->timestamp,
+                eventSourceUrl: request()->fullUrl(),
+                userData: [
+                    'client_ip_address' => request()->ip(),
+                    'client_user_agent' => request()->userAgent(),
+                ],
+                customData: [
+                    'content_name' => $product->name,
+                    'content_category' => $product->category?->name,
+                    'content_ids' => [$product->sku ?? (string) $product->id],
+                    'content_type' => 'product',
+                    'value' => $product->price,
+                    'currency' => 'USD',
+                ],
+                eventId: FacebookConversionsService::generateEventId(),
+            );
+        } catch (\Exception $e) {
+            // Never block the user for tracking failures
+        }
 
         // Check stock logic
         $isInStock = $product->in_stock;

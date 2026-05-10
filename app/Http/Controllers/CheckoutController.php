@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\FacebookConversionsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -37,6 +38,29 @@ class CheckoutController extends Controller
         $cart = $this->getCart();
         if (!$cart || $cart->isEmpty()) {
             return redirect()->route('cart.index');
+        }
+
+        // Facebook CAPI: InitiateCheckout
+        try {
+            $totals = $cart->getTotals();
+            $capi = new FacebookConversionsService();
+            $capi->sendEvent(
+                eventName: 'InitiateCheckout',
+                eventTime: now()->timestamp,
+                eventSourceUrl: request()->fullUrl(),
+                userData: [
+                    'client_ip_address' => request()->ip(),
+                    'client_user_agent' => request()->userAgent(),
+                ],
+                customData: [
+                    'value' => $totals['total'],
+                    'currency' => 'USD',
+                    'num_items' => $cart->getItemsCount(),
+                ],
+                eventId: FacebookConversionsService::generateEventId(),
+            );
+        } catch (\Exception $e) {
+            // Never block the user for tracking failures
         }
 
         if (auth()->check()) {
@@ -233,6 +257,33 @@ class CheckoutController extends Controller
             Session::forget('checkout_data');
 
             DB::commit();
+
+            // Facebook CAPI: Purchase
+            try {
+                $capi = new FacebookConversionsService();
+                $capi->sendEvent(
+                    eventName: 'Purchase',
+                    eventTime: now()->timestamp,
+                    eventSourceUrl: request()->fullUrl(),
+                    userData: [
+                        'em' => $addressData['email'] ?? null,
+                        'fn' => $addressData['first_name'] ?? null,
+                        'ln' => $addressData['last_name'] ?? null,
+                        'ph' => $addressData['phone'] ?? null,
+                        'country' => 'VE',
+                        'client_ip_address' => request()->ip(),
+                        'client_user_agent' => request()->userAgent(),
+                    ],
+                    customData: [
+                        'value' => $order->total_amount,
+                        'currency' => 'USD',
+                        'num_items' => $order->items()->count(),
+                    ],
+                    eventId: FacebookConversionsService::generateEventId(),
+                );
+            } catch (\Exception $e) {
+                // Never block the user for tracking failures
+            }
 
             // Send confirmation email
             try {

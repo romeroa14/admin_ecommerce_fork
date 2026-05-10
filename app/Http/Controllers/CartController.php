@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Product;
+use App\Services\FacebookConversionsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
@@ -69,6 +70,30 @@ class CartController extends Controller
         }
 
         $cart->addProduct($product->id, $request->quantity, $request->variants ?? []);
+
+        // Facebook CAPI: AddToCart
+        try {
+            $capi = new FacebookConversionsService();
+            $capi->sendEvent(
+                eventName: 'AddToCart',
+                eventTime: now()->timestamp,
+                eventSourceUrl: url()->previous(),
+                userData: [
+                    'client_ip_address' => request()->ip(),
+                    'client_user_agent' => request()->userAgent(),
+                ],
+                customData: [
+                    'content_name' => $product->name,
+                    'content_ids' => [$product->sku ?? (string) $product->id],
+                    'content_type' => 'product',
+                    'value' => $product->price * $request->quantity,
+                    'currency' => 'USD',
+                ],
+                eventId: FacebookConversionsService::generateEventId(),
+            );
+        } catch (\Exception $e) {
+            // Never block the user for tracking failures
+        }
 
         return redirect()->back()->with('success', 'Producto agregado al carrito.');
     }
