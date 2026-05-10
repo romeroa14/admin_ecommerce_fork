@@ -115,6 +115,12 @@ jobs:
             php artisan route:cache
             php artisan view:cache
             
+            # Facebook Conversions API config
+            echo "📘 Configuring Facebook API..."
+            grep -q "FACEBOOK_PIXEL_ID" .env || echo "FACEBOOK_PIXEL_ID=1482584693273993" >> .env
+            grep -q "FACEBOOK_CAPI_TOKEN" .env || echo "FACEBOOK_CAPI_TOKEN=EAANgToNfCqgBRVZAjj1ZAJvFMaZBhj5Hd76dC8sCZAGxP5fTgSxirFgZCJfmS342PO9p8nCZCPbt4rrundHuv2L9scIztXKTZB3NnmpnX5waXDSK9ejdmPZAKIL1FtfizpiZA2fZAZAXs7UMFbuFKYi5Qu6S9YL8swLRSYvBZBUSNZBZBtiRCWvVPZCNxmbn2ybgRO1FLXjXwZDZD" >> .env
+            php artisan config:cache
+            
             # Set correct permissions
             echo "🔐 Setting permissions..."
             chmod -R 775 storage bootstrap/cache
