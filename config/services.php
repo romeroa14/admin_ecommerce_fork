@@ -35,6 +35,8 @@ return [
         ],
     ],
 
+    'sync_webhook_token' => env('SYNC_WEBHOOK_TOKEN'),
+
     'facebook' => [
         'pixel_id' => env('FACEBOOK_PIXEL_ID'),
         'capi_token' => env('FACEBOOK_CAPI_TOKEN'),

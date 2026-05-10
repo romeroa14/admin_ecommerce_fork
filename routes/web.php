@@ -159,3 +159,11 @@ Route::get('/checkout/success/{order}', function ($order) {
         'orderData' => $orderInstance
     ]);
 })->name('checkout.success');
+
+/*
+|--------------------------------------------------------------------------
+| Webhooks
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/api/sync-products', [\App\Http\Controllers\WebhookController::class, 'syncProducts']);

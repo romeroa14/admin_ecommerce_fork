@@ -115,6 +115,9 @@ jobs:
             php artisan route:cache
             php artisan view:cache
             
+            # Product Sheet Sync config
+            grep -q "SYNC_WEBHOOK_TOKEN" .env || echo "SYNC_WEBHOOK_TOKEN=11b1897d6b9410eb5d6e6340eab6c3d3" >> .env
+
             # Facebook Conversions API config
             echo "📘 Configuring Facebook API..."
             grep -q "FACEBOOK_PIXEL_ID" .env || echo "FACEBOOK_PIXEL_ID=1482584693273993" >> .env
