@@ -64,8 +64,9 @@ class SyncProductImages extends Command
             return;
         }
 
-        // Check if product already has images
+        // Check if product already has images — skip download but still sync images column
         if (!$this->option('dry-run') && $product->productImages()->count() > 0) {
+            $this->syncImagesColumn($product);
             $this->skipped++;
             return;
         }
@@ -105,7 +106,16 @@ class SyncProductImages extends Command
             $isFirst = false;
         }
 
+        // Also populate the images JSON column so frontend picks them up via Priority 1
+        $this->syncImagesColumn($product);
+
         $this->downloaded++;
+    }
+
+    private function syncImagesColumn(Product $product): void
+    {
+        $imagePaths = $product->productImages()->ordered()->pluck('image')->toArray();
+        $product->update(['images' => $imagePaths]);
     }
 
     private function extractFolderId(?string $url): ?string
