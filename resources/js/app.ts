@@ -64,4 +64,8 @@ router.on('navigate', (event) => {
             page_title: document.title,
         });
     }
+    // Facebook Pixel — track page views on SPA navigation
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'PageView');
+    }
 });
